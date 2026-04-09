@@ -1,0 +1,49 @@
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+}
+.step {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+.stepNum {
+  width: 56px;
+  height: 56px;
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.step h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+.step p {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+.connector {
+  position: absolute;
+  top: 4.25rem;
+  right: -20px;
+  width: 40px;
+  height: 2px;
+  background: var(--color-border);
+}
+
+@media (max-width: 768px) {
+  .stepsGrid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .connector { display: none; }
+}
+@media (max-width: 480px) {
+  .stepsGrid { grid-template-columns: 1fr; }
+}

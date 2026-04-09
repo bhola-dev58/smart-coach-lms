@@ -1,0 +1,108 @@
+.lmsWrapper { display: flex; height: 100vh; overflow: hidden; background: #0D0D0D; }
+
+/* Sidebar */
+.sidebar { width: 340px; background: #1a1a1e; border-right: 1px solid #2a2a2e; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; transition: width 0.3s, opacity 0.3s; }
+.sidebarCollapsed { width: 0; opacity: 0; overflow: hidden; }
+.sidebarHeader { padding: 20px; border-bottom: 1px solid #2a2a2e; background: #1f1f24; flex-shrink: 0; }
+.sidebarHeader h3 { color: white; font-size: 15px; font-weight: 700; margin: 0 0 4px; }
+.instructor { font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 14px; }
+.progressBar { }
+.progressRow { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.65); margin-bottom: 6px; font-weight: 500; }
+.progressTrack { height: 6px; background: #2a2a2e; overflow: hidden; }
+.progressFill { height: 100%; background: linear-gradient(90deg, #C8102E, #ff4757); transition: width 1s; }
+.nav { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3a3a3e #1a1a1e; }
+
+/* Chapters */
+.chapterHeader { padding: 12px 20px; background: #222228; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2a2a2e; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.chapterHeader:hover { background: #28282e; }
+.chLeft { display: flex; align-items: center; gap: 8px; }
+.chNum { width: 22px; height: 22px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; background: rgba(200,16,46,0.2); color: #C8102E; }
+.chProgress { font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+/* Lessons */
+.lessonItem { display: flex; align-items: center; gap: 12px; padding: 10px 20px 10px 24px; font-size: 13px; color: rgba(255,255,255,0.75); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.15s; }
+.lessonItem:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.95); }
+.completed .lessonIcon { color: #2ed573; }
+.completed .lessonTitle { color: rgba(255,255,255,0.6); }
+.active { background: rgba(200,16,46,0.12); color: white; border-left: 3px solid #C8102E; padding-left: 21px; }
+.active .lessonTitle { color: white; font-weight: 600; }
+.locked { opacity: 0.5; pointer-events: none; }
+.lessonIcon { flex-shrink: 0; width: 20px; display: flex; align-items: center; justify-content: center; }
+.lessonTitle { flex: 1; line-height: 1.4; }
+.lessonDuration { font-size: 11px; color: rgba(255,255,255,0.5); white-space: nowrap; }
+
+/* Toggle */
+.sidebarToggle { position: fixed; left: 340px; top: 50%; transform: translateY(-50%); width: 20px; height: 48px; background: #161616; border: 1px solid #1e1e1e; border-left: none; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; transition: left 0.3s; color: rgba(255,255,255,0.4); }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0D0D0D; }
+
+/* Topbar */
+.topbar { height: 52px; background: #161616; border-bottom: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
+.topbarLeft { display: flex; align-items: center; gap: 16px; }
+.backLink { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+.backLink:hover { color: #C8102E; }
+.divider { width: 1px; height: 20px; background: #2a2a2a; }
+.courseName { color: white; font-weight: 600; font-size: 14px; }
+.topbarRight { display: flex; align-items: center; gap: 10px; }
+.progressInfo { font-size: 12px; color: rgba(255,255,255,0.6); }
+.miniBar { width: 120px; height: 4px; background: #2a2a2a; overflow: hidden; }
+.miniFill { height: 100%; width: 72%; background: linear-gradient(90deg, #C8102E, #ff4757); }
+
+/* Video */
+.videoContainer { position: relative; width: 100%; aspect-ratio: 16/9; max-height: 55vh; background: linear-gradient(135deg, #0a0a0a, #1a1a2d); overflow: hidden; flex-shrink: 0; }
+.videoOverlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.7)); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.playBtn { width: 72px; height: 72px; background: #C8102E; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; }
+.playBtn:hover { transform: scale(1.08); background: #e0162b; }
+.videoLabel { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 14px; }
+
+/* Content */
+.contentScroll { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #2a2a2a #0D0D0D; }
+.content { padding: 32px 40px 40px; max-width: 900px; }
+.content h2 { color: white; font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+.meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+.desc { color: rgba(255,255,255,0.6); line-height: 1.75; font-size: 15px; margin-bottom: 32px; border-bottom: 1px solid #1e1e1e; padding-bottom: 28px; }
+.conceptsTitle { color: white; font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.conceptsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 36px; }
+.conceptCard { padding: 14px 16px; background: #161616; border: 1px solid #1e1e1e; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; transition: border-color 0.2s; }
+.conceptCard:hover { border-color: rgba(200,16,46,0.4); }
+
+/* Tabs */
+.tabs { border: 1px solid #1e1e1e; background: #111; margin-bottom: 32px; }
+.tabNav { display: flex; border-bottom: 1px solid #1e1e1e; background: #161616; overflow-x: auto; }
+.tabBtn { padding: 14px 24px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45); background: none; border: none; cursor: pointer; position: relative; transition: color 0.2s; white-space: nowrap; }
+.tabBtn:hover { color: rgba(255,255,255,0.7); }
+.tabActive { color: #C8102E; }
+.tabActive::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #C8102E; }
+.badge { display: inline-flex; margin-left: 6px; padding: 1px 7px; font-size: 10px; font-weight: 700; background: rgba(200,16,46,0.2); color: #C8102E; }
+.tabContent { padding: 24px; }
+.notes { width: 100%; background: #0D0D0D; border: 1px solid #1e1e1e; color: rgba(255,255,255,0.7); padding: 16px; font-size: 14px; resize: vertical; min-height: 120px; outline: none; font-family: inherit; }
+.notes:focus { border-color: #C8102E; }
+
+/* Q&A */
+.qaItem { display: flex; gap: 12px; padding: 14px; border: 1px solid #1e1e1e; margin-bottom: 8px; font-size: 13px; color: rgba(255,255,255,0.5); }
+.qaAvatar { width: 32px; height: 32px; background: rgba(200,16,46,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; color: #C8102E; }
+.qaItem strong { color: rgba(255,255,255,0.8); }
+.qaItem small { color: rgba(255,255,255,0.3); }
+
+/* Resources */
+.resourceItem { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #1e1e1e; margin-bottom: 8px; }
+.resourceName { flex: 1; font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
+.resourceSize { font-size: 11px; color: rgba(255,255,255,0.3); }
+.downloadBtn { padding: 6px 14px; font-size: 11px; font-weight: 600; color: #C8102E; border: 1px solid rgba(200,16,46,0.3); background: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s; }
+.downloadBtn:hover { background: rgba(200,16,46,0.1); border-color: #C8102E; }
+
+/* Nav */
+.lessonNav { display: flex; justify-content: space-between; margin-top: 8px; }
+.navBtn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #1e1e1e; background: #161616; color: rgba(255,255,255,0.6); transition: all 0.2s; }
+.navBtn:hover { border-color: rgba(200,16,46,0.4); color: white; }
+.navPrimary { background: #C8102E; border-color: #C8102E; color: white; }
+.navPrimary:hover { background: #e0162b; }
+
+@media (max-width: 1024px) {
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; }
+}
+@media (max-width: 768px) {
+  .content { padding: 24px 20px; }
+  .conceptsGrid { grid-template-columns: 1fr 1fr; }
+}
