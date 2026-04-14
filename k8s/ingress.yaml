@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: meetme-center-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m" # allow large video/file uploads
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # automatically issue TLS certificates
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - meetme.example.com # Replace with your actual domain
+      secretName: meetme-tls
+  rules:
+    - host: meetme.example.com # Replace with your actual domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: meetme-center-service
+                port:
+                  number: 80

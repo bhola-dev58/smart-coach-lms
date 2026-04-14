@@ -13,7 +13,7 @@ export default function CoursesSection() {
       <div className="container">
         <div className="section-header">
           <span className="section-label">Our Courses</span>
-          <h2>Industry-Relevant B.Tech Courses</h2>
+          <h2>Courses Created by Industry Experts</h2>
           <div className="section-divider" />
           <p>Structured curriculum designed by IIT alumni, updated with latest industry trends.</p>
         </div>
@@ -29,15 +29,15 @@ export default function CoursesSection() {
                 <p className="card-text">{c.desc}</p>
                 <div className="course-meta">
                   <span className="course-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
                     {c.hours} Hours
                   </span>
                   <span className="course-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
                     {c.students}
                   </span>
                   <span className="course-meta-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                     {c.rating}
                   </span>
                 </div>

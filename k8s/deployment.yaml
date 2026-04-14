@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meetme-center
+  labels:
+    app: meetme-center
+spec:
+  replicas: 3 # Start with 3 instances for high availability
+  selector:
+    matchLabels:
+      app: meetme-center
+  template:
+    metadata:
+      labels:
+        app: meetme-center
+    spec:
+      containers:
+        - name: meetme-center
+          image: your-docker-registry/meetme-center:latest # Replace with your actual image
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: meetme-center-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

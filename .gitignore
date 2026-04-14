@@ -30,12 +30,23 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# Environment files (NEVER commit these)
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+.env.test
 
-# vercel
+# Temporary Scripts
+restructure.js
+
+# Kubernetes Secrets (Best practice: don't push yaml with real secrets)
+k8s/secret.yaml
+
+# Vercel
 .vercel
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
