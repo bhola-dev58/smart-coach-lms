@@ -290,8 +290,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 .course-price {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.course-price-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+.course-btn-group {
+  display: flex;
+  gap: var(--space-2);
+}
+.course-btn-group .btn {
+  flex: 1;
+  text-align: center;
 }
 .price-amount {
   font-family: var(--font-heading);

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function EnrollButton({ courseId, studentId, amount, courseTitle }) {
+export default function EnrollButton({ courseId, studentId, amount, courseTitle, className, style, children }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -86,10 +86,10 @@ export default function EnrollButton({ courseId, studentId, amount, courseTitle 
     <button 
       onClick={handlePayment} 
       disabled={loading}
-      className="btn btn-primary btn-lg"
-      style={{ width: '100%', padding: '1rem' }}
+      className={className || "btn btn-primary btn-lg"}
+      style={style || { width: '100%', padding: '1rem' }}
     >
-      {loading ? 'Processing...' : `Enroll Now — ₹${amount.toLocaleString('en-IN')}`}
+      {loading ? 'Processing...' : (children || `Enroll Now — ₹${amount.toLocaleString('en-IN')}`)}
     </button>
   );
 }

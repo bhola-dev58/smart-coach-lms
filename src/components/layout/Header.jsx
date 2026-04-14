@@ -78,7 +78,6 @@ export default function Header() {
 
             <div className={styles.actions}>
               <Link href="/auth/login" className="btn btn-outline btn-sm">Login</Link>
-              <Link href="/courses" className="btn btn-primary btn-sm">Enroll Now</Link>
               <button
                 className={`${styles.hamburger} ${mobileOpen ? styles.open : ''}`}
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -100,7 +99,6 @@ export default function Header() {
         ))}
         <div className={styles.mobileActions}>
           <Link href="/auth/login" className="btn btn-outline btn-block">Login</Link>
-          <Link href="/courses" className="btn btn-primary btn-block">Enroll Now</Link>
         </div>
       </div>
     </>
