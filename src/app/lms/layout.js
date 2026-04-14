@@ -1,12 +1,26 @@
-export const metadata = {
-  title: 'Student LMS Dashboard',
-  description: 'Access your courses, watch video lectures, track progress, take notes, and take quizzes on MeetMe Center LMS.',
-};
+'use client';
 
-export default function LmsLayout({ children }) {
+import { useState } from 'react';
+import DashboardSidebar from '@/components/lms/DashboardSidebar';
+import styles from './lms.module.css';
+
+export default function LMSLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
-      {children}
+    <div className={styles.lmsWrapper}>
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className={styles.mainContent}>
+        {children}
+      </div>
+      {/* Mobile toggle */}
+      <button
+        className={styles.mobileToggle}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
     </div>
   );
 }

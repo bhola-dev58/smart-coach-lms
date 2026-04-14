@@ -1,7 +1,8 @@
 import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import AuthProvider from '@/components/providers/AuthProvider';
+import AuthModal from '@/components/auth/AuthModal';
+import LayoutShell from '@/components/layout/LayoutShell';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,9 +15,6 @@ const outfit = Outfit({
   variable: '--font-heading',
   display: 'swap',
 });
-
-import AuthProvider from '@/components/providers/AuthProvider';
-import AuthModal from '@/components/auth/AuthModal';
 
 export const metadata = {
   title: {
@@ -32,12 +30,8 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body>
         <AuthProvider>
-          <Header />
           <AuthModal />
-          <main id="main-content">
-            {children}
-          </main>
-          <Footer />
+          <LayoutShell>{children}</LayoutShell>
         </AuthProvider>
       </body>
     </html>

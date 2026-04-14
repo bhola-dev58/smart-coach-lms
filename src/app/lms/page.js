@@ -1,40 +1,44 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/authOptions';
-import Link from 'next/link';
+'use client';
 
-export const metadata = {
-  title: 'My Learning Dashboard - MeetMe Center',
-};
+import { useState, useEffect } from 'react';
+import DashboardContent from '@/components/lms/DashboardContent';
 
-export default async function LMSDashboard() {
-  const session = await getServerSession(authOptions);
+export default function LMSDashboard() {
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <div className="section" style={{ background: 'var(--color-surface)', minHeight: '80vh' }}>
-      <div className="container">
-        <div style={{ background: 'white', padding: 'var(--space-8)', borderRadius: 'var(--radius-lg)', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-          <span className="badge badge-primary" style={{ marginBottom: '1rem' }}>
-            {session?.user?.role?.toUpperCase()}
-          </span>
-          <h1 style={{ marginBottom: '1rem' }}>Welcome, {session?.user?.name}!</h1>
-          <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>
-            Logged in as {session?.user?.email}
-          </p>
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const res = await fetch('/api/lms/enrollments');
+        const data = await res.json();
+        if (data.success) {
+          setEnrolledCourses(data.enrollments || []);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDashboardData();
+  }, []);
 
-          <div className="grid grid-3">
-            {/* Just placeholders for now */}
-            <div className="card">
-              <div className="card-body">
-                <h3>My Courses</h3>
-                <p style={{ color: 'var(--color-text-muted)', margin: '1rem 0' }}>
-                  You haven't enrolled in any courses yet.
-                </p>
-                <Link href="/courses" className="btn btn-outline btn-sm">Browse Courses</Link>
-              </div>
-            </div>
-          </div>
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', color: '#a0a0a0' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⏳</div>
+          <p>Loading your dashboard...</p>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <DashboardContent
+      enrolledCourses={enrolledCourses}
+      leaderboard={[]}
+    />
   );
 }
