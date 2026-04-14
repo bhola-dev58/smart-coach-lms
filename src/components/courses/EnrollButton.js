@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
-export default function EnrollButton({ courseId, studentId, amount, courseTitle, className, style, children }) {
+export default function EnrollButton({ courseId, amount, courseTitle, className, style, children }) {
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -18,6 +21,11 @@ export default function EnrollButton({ courseId, studentId, amount, courseTitle,
   };
 
   const handlePayment = async () => {
+    if (!session) {
+      router.push(`${pathname}?auth=login`, { scroll: false });
+      return;
+    }
+
     setLoading(true);
 
     const res = await loadRazorpay();
@@ -32,7 +40,7 @@ export default function EnrollButton({ courseId, studentId, amount, courseTitle,
       const orderRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId, studentId, amount }),
+        body: JSON.stringify({ courseId, studentId: session.user.id, amount }),
       });
       const orderData = await orderRes.json();
 
@@ -66,8 +74,8 @@ export default function EnrollButton({ courseId, studentId, amount, courseTitle,
           }
         },
         prefill: {
-          name: '', // We can pass user info here
-          email: '',
+          name: session.user?.name || '', // Use logged in user details
+          email: session.user?.email || '',
         },
         theme: { color: '#C8102E' },
       };

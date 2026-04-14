@@ -1,20 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Header.module.css';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
   { href: '/about', label: 'About Us' },
-  { href: '/lms', label: 'LMS' },
   { href: '/contact', label: 'Contact' },
 ];
 
 export default function Header() {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -77,7 +79,19 @@ export default function Header() {
             </nav>
 
             <div className={styles.actions}>
-              <Link href="/auth/login" className="btn btn-outline btn-sm">Login</Link>
+              {status === 'loading' ? null : session ? (
+                <>
+                  <Link href="/lms" className="btn btn-primary btn-sm">Dashboard</Link>
+                  <button onClick={() => signOut()} className="btn btn-outline btn-sm">Logout</button>
+                </>
+              ) : (
+                <button 
+                  onClick={() => router.push(`${pathname}?auth=login`, { scroll: false })} 
+                  className="btn btn-outline btn-sm"
+                >
+                  Login
+                </button>
+              )}
               <button
                 className={`${styles.hamburger} ${mobileOpen ? styles.open : ''}`}
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -98,7 +112,22 @@ export default function Header() {
           </Link>
         ))}
         <div className={styles.mobileActions}>
-          <Link href="/auth/login" className="btn btn-outline btn-block">Login</Link>
+          {status === 'loading' ? null : session ? (
+            <>
+              <Link href="/lms" className="btn btn-primary btn-block">Dashboard</Link>
+              <button onClick={() => signOut()} className="btn btn-outline btn-block">Logout</button>
+            </>
+          ) : (
+            <button 
+              onClick={() => {
+                setMobileOpen(false);
+                router.push(`${pathname}?auth=login`, { scroll: false });
+              }} 
+              className="btn btn-outline btn-block"
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
     </>

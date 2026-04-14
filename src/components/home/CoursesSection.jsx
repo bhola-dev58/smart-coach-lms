@@ -2,8 +2,6 @@ import Link from 'next/link';
 import EnrollButton from '@/components/courses/EnrollButton';
 
 export default function CoursesSection({ courses = [] }) {
-  // Demo student ID while not logged in
-  const demoStudentId = "6614f6b2c892864a2f7c32e1"; 
 
   return (
     <section className="section section-light" id="popular-courses">
@@ -107,7 +105,6 @@ export default function CoursesSection({ courses = [] }) {
                       </Link>
                       <EnrollButton
                         courseId={c._id.toString()}
-                        studentId={demoStudentId}
                         amount={c.price}
                         courseTitle={c.title}
                         className="btn btn-primary btn-sm"

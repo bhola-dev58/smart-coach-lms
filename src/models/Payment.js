@@ -55,7 +55,6 @@ const paymentSchema = new mongoose.Schema(
 );
 
 // ── Indexes ──
-paymentSchema.index({ razorpayOrderId: 1 });
 paymentSchema.index({ razorpayPaymentId: 1 });
 paymentSchema.index({ student: 1 });
 paymentSchema.index({ status: 1 });

@@ -15,6 +15,9 @@ const outfit = Outfit({
   display: 'swap',
 });
 
+import AuthProvider from '@/components/providers/AuthProvider';
+import AuthModal from '@/components/auth/AuthModal';
+
 export const metadata = {
   title: {
     default: 'MeetMe Center — Premier B.Tech Coaching Institute',
@@ -28,11 +31,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body>
-        <Header />
-        <main id="main-content">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <AuthModal />
+          <main id="main-content">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

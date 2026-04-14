@@ -4,11 +4,11 @@ A modern, scalable Learning Management System (LMS) built for coaching centers. 
 
 ## ✨ Features
 
-- 🎨 **Premium Dark Theme** — Modern, responsive UI with glassmorphism and micro-animations
-- 📚 **Course Management** — Browse, search, and view detailed course pages
-- 💳 **Razorpay Payment Integration** — Secure online enrollment and payment
-- 🔐 **Authentication** — NextAuth-powered login/signup for students and admins
-- 📹 **Video Hosting Ready** — Course content delivery with video player
+- 🎨 **Premium UI/UX** — Modern, responsive design with glassmorphism and micro-animations
+- 📚 **Course Management** — Browse, search, and view dynamic course pages fetched from MongoDB
+- 💳 **Razorpay Payment Integration** — Secure online enrollment directly via course cards
+- 🔐 **Stateless JWT Authentication** — NextAuth-powered secure popup login/signup (No page reloads)
+- 📹 **Video Hosting Ready** — Course content delivery tailored for heavy video storage
 - ☸️ **Kubernetes Ready** — Pre-configured K8s manifests for production-grade scalability (auto-scales 3→15 pods)
 
 ## 🛠️ Tech Stack

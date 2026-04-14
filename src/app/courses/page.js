@@ -34,8 +34,6 @@ export default async function CoursesPage({ searchParams }) {
   // All unique categories for filter tabs
   const allCategories = await Course.distinct('category', { isPublished: true });
 
-  const demoStudentId = "6614f6b2c892864a2f7c32e1";
-
   return (
     <>
       <div className="page-banner">
@@ -213,7 +211,6 @@ export default async function CoursesPage({ searchParams }) {
                         </Link>
                         <EnrollButton
                           courseId={c._id.toString()}
-                          studentId={demoStudentId}
                           amount={c.price}
                           courseTitle={c.title}
                           className="btn btn-primary btn-sm"

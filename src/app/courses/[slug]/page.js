@@ -24,9 +24,7 @@ export default async function CourseDetailsPage({ params }) {
 
   if (!course) notFound();
 
-  // For demo purposes, we'll use a hardcoded student ID if not logged in
-  // In a real app, this would come from NextAuth session
-  const studentId = "6614f6b2c892864a2f7c32e1"; 
+
 
   return (
     <div className="course-details-page">
@@ -74,7 +72,7 @@ export default async function CourseDetailsPage({ params }) {
               
               <EnrollButton 
                 courseId={course._id.toString()} 
-                studentId={studentId} 
+
                 amount={course.price} 
                 courseTitle={course.title}
               />
