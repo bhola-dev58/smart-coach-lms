@@ -13,12 +13,8 @@ export default async function BrowseCoursesPage() {
     .sort({ createdAt: -1 })
     .lean();
 
-  // Serialize MongoDB ObjectIds to strings
-  const serialized = courses.map(c => ({
-    ...c,
-    _id: c._id.toString(),
-    instructor: c.instructor ? { ...c.instructor, _id: c.instructor._id.toString() } : null,
-  }));
+  // Deep serialize — converts ALL nested ObjectIds to plain strings
+  const serialized = JSON.parse(JSON.stringify(courses));
 
   return <BrowseCoursesClient courses={serialized} />;
 }

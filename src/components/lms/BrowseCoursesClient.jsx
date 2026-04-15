@@ -150,7 +150,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
                 {/* Buttons */}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <Link
-                    href={`/courses/${c.slug}`}
+                    href={`/lms/browse/${c.slug}`}
                     style={{
                       flex: 1,
                       padding: '0.5rem',

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import styles from '@/app/lms/lms.module.css';
 
 // ── Course Progress Card ──
-function CourseProgressCard({ title, unit, progress, thumbnail }) {
+function CourseProgressCard({ courseId, title, unit, progress, thumbnail }) {
   return (
-    <div className={styles.courseItem}>
+    <Link href={`/lms/learn/${courseId}`} className={styles.courseItem} style={{ textDecoration: 'none' }}>
       <div className={styles.courseThumb}>
         {thumbnail ? (
           <img src={thumbnail} alt={title} />
@@ -21,9 +21,9 @@ function CourseProgressCard({ title, unit, progress, thumbnail }) {
         <div className={styles.progressBar}>
           <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
-        <button className={styles.startBtn}>Start Next Lesson</button>
+        <span className={styles.startBtn}>Start Next Lesson</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -169,6 +169,7 @@ export default function DashboardContent({ enrolledCourses = [], leaderboard = [
               {enrolledCourses.map((enr) => (
                 <CourseProgressCard
                   key={enr._id}
+                  courseId={enr.course?._id?.toString() || enr._id}
                   title={enr.course?.title || 'Course'}
                   unit={enr.progress?.currentLesson || 'Unit 1'}
                   progress={enr.progress?.percentage || 0}

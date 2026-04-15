@@ -19,6 +19,17 @@ export default function Header() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(`.${styles.profileWrapper}`)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +39,7 @@ export default function Header() {
 
   useEffect(() => {
     setMobileOpen(false);
+    setDropdownOpen(false);
   }, [pathname]);
 
   return (
@@ -80,10 +92,32 @@ export default function Header() {
 
             <div className={styles.actions}>
               {status === 'loading' ? null : session ? (
-                <>
-                  <Link href="/lms" className="btn btn-primary btn-sm">Dashboard</Link>
-                  <button onClick={() => signOut()} className="btn btn-outline btn-sm">Logout</button>
-                </>
+                <div className={styles.profileWrapper}>
+                  <button 
+                    className={styles.profileBtn}
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    <div className={styles.avatar}>{session.user.name?.charAt(0).toUpperCase() || 'U'}</div>
+                    <span className={styles.profileName}>Profile</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  {dropdownOpen && (
+                    <div className={styles.dropdownMenu}>
+                      <div className={styles.dropdownHeader}>
+                        <div className={styles.dropdownName}>{session.user.name}</div>
+                        <div className={styles.dropdownEmail}>{session.user.email}</div>
+                      </div>
+                      <Link href="/lms" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        Dashboard
+                      </Link>
+                      <button onClick={() => signOut({ callbackUrl: '/' })} className={styles.dropdownItem}>
+                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <button 
                   onClick={() => router.push(`${pathname}?auth=login`, { scroll: false })} 
