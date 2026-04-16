@@ -39,7 +39,7 @@ function AuthModalInner() {
   
   const authMode = searchParams.get('auth'); // 'login' or 'register'
   
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'CSE', year: '1' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'CSE', year: '1', role: 'student' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -147,9 +147,19 @@ function AuthModalInner() {
         <form onSubmit={handleSubmit} className={styles.authForm}>
           {authMode === 'register' ? (
             <>
-              <div className="form-group">
-                <label className="form-label">Full Name *</label>
-                <input type="text" className="form-input" required placeholder="Your full name" value={formData.name} onChange={e => update('name', e.target.value)} />
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label className="form-label">Full Name *</label>
+                  <input type="text" className="form-input" required placeholder="Your full name" value={formData.name} onChange={e => update('name', e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Register As</label>
+                  <select className="form-select" value={formData.role} onChange={e => update('role', e.target.value)}>
+                    <option value="student">Student</option>
+                    <option value="instructor">Instructor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
                 <div className="form-group">

@@ -56,7 +56,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
 
       // ── 2. Open Razorpay Checkout ──
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'MeetMe Center',

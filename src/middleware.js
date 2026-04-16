@@ -15,10 +15,24 @@ export default withAuth(
       return null;
     }
 
+    const headers = new Headers();
+    // Security Headers
+    headers.set('X-XSS-Protection', '1; mode=block');
+    headers.set('X-Frame-Options', 'DENY');
+    headers.set('X-Content-Type-Options', 'nosniff');
+    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
     // Role-based protection: Admin routes only accessible by admins
     if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'admin') {
-      return NextResponse.rewrite(new URL('/404', req.url)); // Hide the route completely if not admin
+      return NextResponse.rewrite(new URL('/404', req.url), { headers }); // Hide the route completely if not admin
     }
+
+    const response = NextResponse.next();
+    // Apply headers to normal responses
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    return response;
   },
   {
     callbacks: {

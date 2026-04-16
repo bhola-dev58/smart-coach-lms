@@ -6,7 +6,7 @@ import User from '@/models/User';
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { name, email, password, phone, college, branch, year } = body;
+    const { name, email, password, phone, college, branch, year, role } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json({ success: false, error: 'Name, email, and password are required' }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(req) {
       college: college || '',
       branch: branch || 'CSE',
       year: parseInt(year) || 1,
-      role: 'student', // Default role for new signups
+      role: ['admin', 'instructor', 'student'].includes(role) ? role : 'student',
     });
 
     return NextResponse.json({ 

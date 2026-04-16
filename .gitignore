@@ -50,3 +50,8 @@ k8s/secret.yaml
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI & Local Agent Folders
+.gemini/
+.gsd/
+.agent/

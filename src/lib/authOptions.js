@@ -70,5 +70,6 @@ export const authOptions = {
     strategy: 'jwt', // Ensure we use JWT for stateless auth
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  useSecureCookies: process.env.NODE_ENV === 'production',
   secret: process.env.NEXTAUTH_SECRET,
 };
