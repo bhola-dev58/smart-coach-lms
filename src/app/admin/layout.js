@@ -12,9 +12,18 @@ export const metadata = {
 export default async function AdminLayout({ children }) {
   const session = await getServerSession(authOptions);
 
-  // Check if admin or instructor
-  if (!session || !['admin', 'instructor'].includes(session.user?.role)) {
-    redirect('/?auth=login'); // Or show an unauthorized page
+  // Base check if unauthenticated
+  if (!session) {
+    redirect('/?auth=login');
+  }
+
+  // Check if not admin
+  if (session.user?.role !== 'admin') {
+    if (session.user?.role === 'instructor') {
+      redirect('/instructor');
+    } else {
+      redirect('/lms');
+    }
   }
 
   return (

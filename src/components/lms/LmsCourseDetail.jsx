@@ -13,11 +13,11 @@ export default function LmsCourseDetail({ course }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.4rem',
-        color: '#888',
+        color: 'var(--dash-text-secondary)',
         fontSize: '0.85rem',
         textDecoration: 'none',
         marginBottom: '1.5rem',
-        transition: 'color 0.2s',
+        transition: 'color var(--dash-transition)',
       }}>
         ← Back to Courses
       </Link>
@@ -33,8 +33,8 @@ export default function LmsCourseDetail({ course }) {
         <div>
           <span style={{
             display: 'inline-block',
-            background: 'rgba(200,16,46,0.12)',
-            color: 'var(--color-primary)',
+            background: 'var(--dash-accent-light)',
+            color: 'var(--dash-accent)',
             padding: '0.2rem 0.75rem',
             borderRadius: '6px',
             fontSize: '0.75rem',
@@ -48,7 +48,7 @@ export default function LmsCourseDetail({ course }) {
             fontFamily: 'var(--font-heading)',
             fontSize: '1.8rem',
             fontWeight: 700,
-            color: '#f0f0f0',
+            color: 'var(--dash-text)',
             marginBottom: '1rem',
             lineHeight: 1.3,
           }}>
@@ -56,7 +56,7 @@ export default function LmsCourseDetail({ course }) {
           </h1>
 
           <p style={{
-            color: '#888',
+            color: 'var(--dash-text-muted)',
             fontSize: '0.92rem',
             lineHeight: 1.7,
             marginBottom: '1.5rem',
@@ -65,7 +65,7 @@ export default function LmsCourseDetail({ course }) {
           </p>
 
           {/* Meta */}
-          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', color: '#999', fontSize: '0.82rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', color: 'var(--dash-text-secondary)', fontSize: '0.82rem' }}>
             <span>⏱ {c.totalHours} Hours</span>
             <span>📖 {c.totalLessons} Lessons</span>
             <span>👥 {c.totalStudents?.toLocaleString('en-IN')} Students</span>
@@ -78,8 +78,8 @@ export default function LmsCourseDetail({ course }) {
             <div style={{
               marginTop: '1.5rem',
               padding: '1rem',
-              background: '#1a1a1a',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--dash-surface)',
+              border: '1px solid var(--dash-border)',
               borderRadius: '12px',
               display: 'flex',
               gap: '0.75rem',
@@ -87,15 +87,15 @@ export default function LmsCourseDetail({ course }) {
             }}>
               <div style={{
                 width: '42px', height: '42px', borderRadius: '10px',
-                background: 'var(--color-primary)', display: 'flex',
+                background: 'var(--dash-accent)', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
                 color: 'white', fontWeight: 700, fontSize: '1rem', flexShrink: 0,
               }}>
                 {c.instructor.name?.charAt(0)}
               </div>
               <div>
-                <div style={{ color: '#f0f0f0', fontWeight: 600, fontSize: '0.9rem' }}>{c.instructor.name}</div>
-                <div style={{ color: '#666', fontSize: '0.75rem' }}>{c.instructor.bio}</div>
+                <div style={{ color: 'var(--dash-text)', fontWeight: 600, fontSize: '0.9rem' }}>{c.instructor.name}</div>
+                <div style={{ color: 'var(--dash-text-muted)', fontSize: '0.75rem' }}>{c.instructor.bio}</div>
               </div>
             </div>
           )}
@@ -103,13 +103,14 @@ export default function LmsCourseDetail({ course }) {
 
         {/* Right — Enroll Card */}
         <div style={{
-          background: '#1a1a1a',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--dash-surface)',
+          border: '1px solid var(--dash-border)',
           borderRadius: '14px',
           padding: '1.25rem',
           position: 'sticky',
           top: '1rem',
           alignSelf: 'start',
+          boxShadow: 'var(--dash-shadow)',
         }}>
           {/* Thumbnail */}
           <div style={{
@@ -131,11 +132,11 @@ export default function LmsCourseDetail({ course }) {
 
           {/* Price */}
           <div style={{ marginBottom: '1rem' }}>
-            <span style={{ color: 'var(--color-primary)', fontSize: '1.6rem', fontWeight: 700 }}>
+            <span style={{ color: 'var(--dash-accent)', fontSize: '1.6rem', fontWeight: 700 }}>
               ₹{c.price?.toLocaleString('en-IN')}
             </span>
             {c.originalPrice > 0 && (
-              <span style={{ color: '#555', textDecoration: 'line-through', marginLeft: '0.75rem', fontSize: '1rem' }}>
+              <span style={{ color: 'var(--dash-text-muted)', textDecoration: 'line-through', marginLeft: '0.75rem', fontSize: '1rem' }}>
                 ₹{c.originalPrice?.toLocaleString('en-IN')}
               </span>
             )}
@@ -161,7 +162,7 @@ export default function LmsCourseDetail({ course }) {
             courseTitle={c.title}
           />
 
-          <div style={{ marginTop: '1rem', fontSize: '0.78rem', color: '#666', lineHeight: 1.8 }}>
+          <div style={{ marginTop: '1rem', fontSize: '0.78rem', color: 'var(--dash-text-muted)', lineHeight: 1.8 }}>
             <p>● Full lifetime access</p>
             <p>● Certificate of completion</p>
             <p>● Responsive support</p>
@@ -172,18 +173,19 @@ export default function LmsCourseDetail({ course }) {
       {/* Learning Outcomes */}
       {c.learningOutcomes?.length > 0 && (
         <div style={{
-          background: '#1a1a1a',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--dash-surface)',
+          border: '1px solid var(--dash-border)',
           borderRadius: '14px',
           padding: '1.5rem',
           marginBottom: '1.5rem',
+          boxShadow: 'var(--dash-shadow)',
         }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', color: '#f0f0f0', fontSize: '1.2rem', marginBottom: '1rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '1rem' }}>
             What You&apos;ll Learn
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
             {c.learningOutcomes.map((o, i) => (
-              <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', color: '#b0b0b0', fontSize: '0.85rem' }}>
+              <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', color: 'var(--dash-text-muted)', fontSize: '0.85rem' }}>
                 <span style={{ color: '#2ed573', flexShrink: 0 }}>✓</span>
                 <span>{o}</span>
               </div>
@@ -195,27 +197,28 @@ export default function LmsCourseDetail({ course }) {
       {/* Curriculum */}
       {c.chapters?.length > 0 && (
         <div style={{
-          background: '#1a1a1a',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--dash-surface)',
+          border: '1px solid var(--dash-border)',
           borderRadius: '14px',
           padding: '1.5rem',
           marginBottom: '1.5rem',
+          boxShadow: 'var(--dash-shadow)',
         }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', color: '#f0f0f0', fontSize: '1.2rem', marginBottom: '1rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '1rem' }}>
             Course Curriculum
           </h2>
           {c.chapters.map((ch, i) => (
             <div key={i} style={{
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: '1px solid var(--dash-border)',
               borderRadius: '10px',
               overflow: 'hidden',
               marginBottom: '0.75rem',
             }}>
               <div style={{
-                background: 'rgba(255,255,255,0.03)',
+                background: 'var(--dash-bg)',
                 padding: '0.85rem 1rem',
                 fontWeight: 600,
-                color: '#d0d0d0',
+                color: 'var(--dash-text)',
                 fontSize: '0.9rem',
               }}>
                 Chapter {i + 1}: {ch.title}
@@ -223,14 +226,14 @@ export default function LmsCourseDetail({ course }) {
               {ch.lessons?.map((l, j) => (
                 <div key={j} style={{
                   padding: '0.6rem 1rem',
-                  borderTop: '1px solid rgba(255,255,255,0.04)',
+                  borderTop: '1px solid var(--dash-border)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   fontSize: '0.82rem',
-                  color: '#888',
+                  color: 'var(--dash-text-muted)',
                 }}>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <span style={{ color: '#555' }}>▶</span>
+                    <span style={{ color: 'var(--dash-text-secondary)' }}>▶</span>
                     <span>{l.title}</span>
                     {l.isFree && (
                       <span style={{
@@ -250,20 +253,21 @@ export default function LmsCourseDetail({ course }) {
       {/* FAQs */}
       {c.faqs?.length > 0 && (
         <div style={{
-          background: '#1a1a1a',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--dash-surface)',
+          border: '1px solid var(--dash-border)',
           borderRadius: '14px',
           padding: '1.5rem',
+          boxShadow: 'var(--dash-shadow)',
         }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', color: '#f0f0f0', fontSize: '1.2rem', marginBottom: '1rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '1rem' }}>
             FAQs
           </h2>
           {c.faqs.map((faq, i) => (
             <div key={i} style={{ marginBottom: '1rem' }}>
-              <div style={{ color: '#d0d0d0', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.3rem' }}>
+              <div style={{ color: 'var(--dash-text)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.3rem' }}>
                 Q: {faq.question}
               </div>
-              <div style={{ color: '#888', fontSize: '0.82rem' }}>
+              <div style={{ color: 'var(--dash-text-muted)', fontSize: '0.82rem' }}>
                 {faq.answer}
               </div>
             </div>

@@ -14,11 +14,26 @@
   --dash-text-muted: #666666;
   --dash-accent: var(--color-primary);
   --dash-accent-hover: var(--color-primary-hover);
-  --dash-accent-light: rgba(200, 16, 46, 0.12);
   --dash-radius: 14px;
   --dash-radius-sm: 10px;
   --dash-radius-xs: 8px;
   --dash-transition: 0.25s ease;
+  --dash-shadow: none;
+}
+
+/* ---- Dashboard Light Theme Variables ---- */
+:global([data-theme='light']) .lmsWrapper {
+  --dash-bg: #F4F6F8;
+  --dash-surface: #FFFFFF;
+  --dash-surface-hover: #F0F0F2;
+  --dash-border: #D1D5DB; /* Darker border for better visibility in light mode */
+  --dash-text: #1A1A1A;
+  --dash-text-secondary: #4A4A4A;
+  --dash-text-muted: #8A8A8A;
+  --dash-accent: var(--color-primary);
+  --dash-accent-hover: var(--color-primary-hover);
+  --dash-accent-light: rgba(200, 16, 46, 0.08);
+  --dash-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Slight shadow to make cards pop */
 }
 
 /* ---- Layout ---- */
@@ -44,7 +59,12 @@
   left: 0;
   z-index: 100;
   overflow-y: auto;
-  transition: transform var(--dash-transition);
+  overflow-x: hidden;
+  transition: width var(--dash-transition), transform var(--dash-transition);
+}
+
+.sidebarCollapsed {
+  width: 80px;
 }
 
 .sidebarLogo {
@@ -73,6 +93,20 @@
   font-family: var(--font-heading);
   font-size: 1.05rem;
   font-weight: 700;
+  color: var(--dash-text);
+  white-space: nowrap;
+}
+
+.collapseBtn {
+  background: transparent;
+  border: none;
+  color: var(--dash-text-muted);
+  cursor: pointer;
+  margin-left: auto;
+  padding: 0.2rem;
+  transition: color var(--dash-transition);
+}
+.collapseBtn:hover {
   color: var(--dash-text);
 }
 
@@ -203,6 +237,11 @@
   margin-left: 250px;
   padding: 0;
   min-height: 100vh;
+  transition: margin-left var(--dash-transition);
+}
+
+.mainContentCollapsed {
+  margin-left: 80px;
 }
 
 /* ── Top Bar ── */
@@ -307,6 +346,23 @@
   transform: translateY(-1px);
 }
 
+.outlineBtn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--dash-accent);
+  border: 1px solid var(--dash-accent);
+  border-radius: var(--dash-radius-xs);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--dash-transition);
+}
+
+.outlineBtn:hover {
+  background: var(--dash-accent);
+  color: white;
+}
+
 .notifBtn {
   position: relative;
   background: var(--dash-surface);
@@ -369,7 +425,8 @@
   padding: 1.25rem;
   position: relative;
   overflow: hidden;
-  transition: border-color var(--dash-transition);
+  transition: border-color var(--dash-transition), box-shadow var(--dash-transition);
+  box-shadow: var(--dash-shadow);
 }
 
 .dCard:hover {
@@ -530,7 +587,7 @@
 
 .trackCircle {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.06);
+  stroke: var(--dash-border);
   stroke-width: 8;
 }
 
@@ -714,7 +771,7 @@
 
 /* ── Leaderboard ── */
 .leaderCard {
-  grid-column: 1 / -1;
+  grid-column: 2 / 3;
   grid-row: 2;
 }
 
@@ -898,8 +955,10 @@
     grid-row: auto;
   }
 
+  .liveCard,
   .leaderCard {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1; /* Both take full width on tablets */
+    grid-row: auto; /* Drops down automatically without overlapping */
   }
 }
 

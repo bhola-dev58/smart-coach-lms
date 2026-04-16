@@ -124,37 +124,6 @@ export default function DashboardContent({ enrolledCourses = [], leaderboard = [
 
   return (
     <>
-      {/* ── Top Bar ── */}
-      <div className={styles.topBar}>
-        <div className={styles.welcomeText}>
-          <h1>Welcome back, {userName}!</h1>
-          <p>Let&apos;s conquer new heights today.</p>
-        </div>
-        <div className={styles.topBarActions}>
-          <select className={styles.filterSelect}>
-            <option>All Course</option>
-            <option>CSE</option>
-            <option>ECE</option>
-            <option>Mechanical</option>
-          </select>
-          <div className={styles.searchBox}>
-            <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" placeholder="Search" />
-          </div>
-
-          <button className={styles.notifBtn}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            <span className={styles.notifBadge}>2</span>
-          </button>
-          <div className={styles.avatar}>{userInitial}</div>
-        </div>
-      </div>
-
       {/* ── Dashboard Grid ── */}
       <div className={styles.dashGrid}>
 
@@ -183,7 +152,7 @@ export default function DashboardContent({ enrolledCourses = [], leaderboard = [
               title="No Courses Yet"
               text="Explore our catalog and start learning today!"
               btnText="Browse Courses"
-              btnHref="/courses"
+              btnHref="/lms/browse"
             />
           )}
         </div>

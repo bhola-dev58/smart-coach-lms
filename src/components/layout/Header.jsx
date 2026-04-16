@@ -107,10 +107,16 @@ export default function Header() {
                         <div className={styles.dropdownName}>{session.user.name}</div>
                         <div className={styles.dropdownEmail}>{session.user.email}</div>
                       </div>
-                      {['admin', 'instructor'].includes(session.user?.role) && (
+                      {session.user?.role === 'admin' && (
                         <Link href="/admin" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l9 4.9V17L12 22l-9-4.9V6.9z"></path></svg>
                           Admin Panel
+                        </Link>
+                      )}
+                      {session.user?.role === 'instructor' && (
+                        <Link href="/instructor" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                          Instructor Panel
                         </Link>
                       )}
                       <Link href="/lms" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
@@ -154,8 +160,11 @@ export default function Header() {
         <div className={styles.mobileActions}>
           {status === 'loading' ? null : session ? (
             <>
-              {['admin', 'instructor'].includes(session.user?.role) && (
+              {session.user?.role === 'admin' && (
                 <Link href="/admin" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Admin Panel</Link>
+              )}
+              {session.user?.role === 'instructor' && (
+                <Link href="/instructor" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Instructor Panel</Link>
               )}
               <Link href="/lms" className="btn btn-primary btn-block" onClick={() => setMobileOpen(false)}>Student Portal</Link>
               <button onClick={() => signOut()} className="btn btn-outline btn-block">Logout</button>

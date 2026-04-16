@@ -2,62 +2,82 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import DashboardSidebar from '@/components/lms/DashboardSidebar';
-import styles from './lms.module.css';
+import { useRouter } from 'next/navigation';
+import styles from '@/app/lms/lms.module.css';
+import InstructorSidebar from '@/components/instructor/InstructorSidebar';
 
-export default function LMSLayout({ children }) {
-  const { data: session } = useSession();
-  const userName = session?.user?.name || 'Student';
-  const userInitial = userName.charAt(0).toUpperCase();
-
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile drawer
-  const [isCollapsed, setIsCollapsed] = useState(false); // Desktop collapse
+export default function InstructorLayout({ children }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  
   const [theme, setTheme] = useState('dark');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile drawer
 
   useEffect(() => {
-    // Check saved theme or system preference
-    const saved = localStorage.getItem('lmsTheme');
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.setAttribute('data-theme', saved);
+    const savedTheme = localStorage.getItem('lms_theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
     }
   }, []);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/?auth=login');
+    } else if (status === 'authenticated') {
+      if (!['instructor', 'admin'].includes(session?.user?.role)) {
+        router.push('/lms');
+      }
+    }
+  }, [status, session, router]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    localStorage.setItem('lmsTheme', newTheme);
+    localStorage.setItem('lms_theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  if (status === 'loading' || !session) {
+    return (
+      <div className={styles.loadingScreen}>
+         <div className={styles.spinner}></div>
+         Loading Instructor Panel...
+      </div>
+    );
+  }
+
   return (
     <div className={styles.lmsWrapper}>
-      <DashboardSidebar 
+      <InstructorSidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
-        isCollapsed={isCollapsed}
-        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        isCollapsed={sidebarCollapsed} 
+        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
       />
-      <div className={`${styles.mainContent} ${isCollapsed ? styles.mainContentCollapsed : ''}`}>
+      
+      <div className={`${styles.mainContent} ${sidebarCollapsed ? styles.mainContentCollapsed : ''}`}>
         
         {/* Universal Top Bar */}
         <div className={styles.topBar}>
           <div className={styles.welcomeText}>
-            <h1>Welcome back, {userName}!</h1>
-            <p>Let&apos;s conquer new heights today.</p>
+            <h1>Instructor Panel</h1>
+            <p>Manage your courses and students efficiently.</p>
           </div>
+          
           <div className={styles.topBarActions}>
-            <select className={styles.filterSelect}>
-              <option>All Course</option>
-              <option>CSE</option>
-              <option>ECE</option>
-              <option>Mechanical</option>
-            </select>
             <div className={styles.searchBox}>
               <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              <input type="text" placeholder="Search" />
+              <input type="text" placeholder="Search students..." />
             </div>
 
             <button className={styles.notifBtn} onClick={toggleTheme} aria-label="Toggle Theme" title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}>
@@ -73,14 +93,16 @@ export default function LMSLayout({ children }) {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
-              <span className={styles.notifBadge}>2</span>
+              <span className={styles.notifBadge}>5</span>
             </button>
-            <div className={styles.avatar}>{userInitial}</div>
+            <div className={styles.avatar}>{session?.user?.name?.charAt(0) || 'I'}</div>
           </div>
         </div>
 
+        {/* Page Content */}
         {children}
       </div>
+
       {/* Mobile toggle */}
       <button
         className={styles.mobileToggle}

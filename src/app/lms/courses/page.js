@@ -34,12 +34,12 @@ export default function MyCoursesPage() {
       <h1 style={{
         fontFamily: 'var(--font-heading)',
         fontSize: 'var(--text-2xl)',
-        color: '#f0f0f0',
+        color: 'var(--dash-text)',
         marginBottom: '0.4rem',
       }}>
         My Courses
       </h1>
-      <p style={{ color: '#666', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
+      <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
         {courses.length > 0
           ? `You have ${courses.length} enrolled course${courses.length > 1 ? 's' : ''}`
           : 'No enrolled courses yet'}
@@ -48,10 +48,10 @@ export default function MyCoursesPage() {
       {courses.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.3 }}>📚</div>
-          <h2 style={{ color: '#f0f0f0', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--dash-text)', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
             No Courses Yet
           </h2>
-          <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+          <p style={{ color: 'var(--dash-text-secondary)', marginBottom: '1.5rem' }}>
             Explore our catalog and enroll in your first course!
           </p>
           <Link href="/lms/browse" style={{

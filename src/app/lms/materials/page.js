@@ -12,29 +12,55 @@ export default function MaterialsPage() {
   ];
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Study Materials</h1>
-      <p className={styles.subtitle}>Downloadable resources, cheatsheets, and question banks provided by your instructors.</p>
+    <div style={{ padding: '1.5rem 2rem' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: 'var(--dash-text)', marginBottom: '0.4rem', fontWeight: 700 }}>
+          Study Materials
+        </h1>
+        <p style={{ color: 'var(--dash-text-secondary)', fontSize: '0.9rem' }}>
+          Downloadable resources, cheatsheets, and question banks provided by your instructors.
+        </p>
+      </div>
 
-      <div className={styles.grid} style={{ marginTop: '2rem' }}>
+      {/* Materials Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
         {materials.map((mat) => (
-          <div key={mat.id} className={styles.card} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
+          <div key={mat.id} className={styles.dCard} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem' }}>
+            
+            {/* Top Row: Icon & Date */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-               <div style={{ background: 'rgba(200, 16, 46, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '8px' }}>
-                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+               <div style={{ background: 'var(--dash-accent-light)', color: 'var(--dash-accent)', padding: '0.6rem', borderRadius: '10px' }}>
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                   <polyline points="14 2 14 8 20 8"></polyline>
+                   <line x1="16" y1="13" x2="8" y2="13"></line>
+                   <line x1="16" y1="17" x2="8" y2="17"></line>
+                 </svg>
                </div>
-               <span style={{ fontSize: '0.8rem', color: '#888' }}>{mat.date}</span>
+               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--dash-text-muted)' }}>{mat.date}</span>
             </div>
             
-            <div style={{ marginTop: '0.5rem' }}>
-              <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.5rem 0', color: '#e0e0e0', fontWeight: 600 }}>{mat.title}</h3>
-              <p style={{ fontSize: '0.85rem', color: '#888', margin: 0 }}>Course: <span style={{ color: '#aaa' }}>{mat.course}</span></p>
+            {/* Middle Row: Title & Course */}
+            <div style={{ marginTop: '0.2rem' }}>
+              <h3 style={{ fontSize: '1.05rem', margin: '0 0 0.5rem 0', color: 'var(--dash-text)', fontWeight: 700, lineHeight: 1.3 }}>
+                {mat.title}
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', margin: 0 }}>
+                Course: <span style={{ color: 'var(--dash-text-secondary)', fontWeight: 500 }}>{mat.course}</span>
+              </p>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-               <div style={{ fontSize: '0.8rem', color: '#666', fontWeight: 500 }}>{mat.type} • {mat.size}</div>
-               <button className="btn btn-outline btn-sm" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>Download</button>
+            {/* Bottom Row: File Info & Download Button */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '1rem', borderTop: '1px dashed var(--dash-border)' }}>
+               <div style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', fontWeight: 500 }}>
+                 {mat.type} • {mat.size}
+               </div>
+               <button className={styles.outlineBtn}>
+                 Download
+               </button>
             </div>
+
           </div>
         ))}
       </div>

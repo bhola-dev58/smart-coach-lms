@@ -7,9 +7,11 @@ import Footer from '@/components/layout/Footer';
 export default function LayoutShell({ children }) {
   const pathname = usePathname();
   const isLMS = pathname.startsWith('/lms');
+  const isInstructor = pathname.startsWith('/instructor');
+  const isAdmin = pathname.startsWith('/admin');
 
-  if (isLMS) {
-    // LMS routes: No Header, No Footer — the lms/layout.js handles its own sidebar
+  if (isLMS || isInstructor || isAdmin) {
+    // Isolated application routes: handled by their respective layout files
     return <>{children}</>;
   }
 

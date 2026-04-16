@@ -18,12 +18,12 @@ export default function BrowseCoursesClient({ courses = [] }) {
         <h1 style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'var(--text-2xl)',
-          color: '#f0f0f0',
+          color: 'var(--dash-text)',
           marginBottom: '0.5rem',
         }}>
           Browse Courses
         </h1>
-        <p style={{ color: '#666', fontSize: 'var(--text-sm)' }}>
+        <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)' }}>
           Explore {courses.length} courses and start learning today
         </p>
       </div>
@@ -38,9 +38,9 @@ export default function BrowseCoursesClient({ courses = [] }) {
               padding: '0.4rem 1rem',
               borderRadius: '8px',
               border: '1px solid',
-              borderColor: filter === cat ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)',
-              background: filter === cat ? 'rgba(200,16,46,0.12)' : '#1A1A1A',
-              color: filter === cat ? 'var(--color-primary)' : '#a0a0a0',
+              borderColor: filter === cat ? 'var(--dash-accent)' : 'var(--dash-border)',
+              background: filter === cat ? 'var(--dash-accent-light)' : 'var(--dash-surface)',
+              color: filter === cat ? 'var(--dash-accent)' : 'var(--dash-text-secondary)',
               fontSize: '0.82rem',
               fontWeight: 600,
               cursor: 'pointer',
@@ -54,7 +54,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
 
       {/* Courses Grid */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--dash-text-secondary)' }}>
           <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</p>
           <p>No courses found in this category.</p>
         </div>
@@ -66,11 +66,12 @@ export default function BrowseCoursesClient({ courses = [] }) {
         }}>
           {filtered.map(c => (
             <div key={c._id} style={{
-              background: '#1A1A1A',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '14px',
+              background: 'var(--dash-surface)',
+              border: '1px solid var(--dash-border)',
+              borderRadius: 'var(--dash-radius)',
               overflow: 'hidden',
-              transition: 'border-color 0.25s',
+              transition: 'border-color var(--dash-transition), box-shadow var(--dash-transition)',
+              boxShadow: 'var(--dash-shadow)',
             }}>
               {/* Thumbnail */}
               <div style={{
@@ -105,7 +106,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
               {/* Body */}
               <div style={{ padding: '1rem' }}>
                 <h3 style={{
-                  color: '#f0f0f0',
+                  color: 'var(--dash-text)',
                   fontSize: '1rem',
                   fontWeight: 700,
                   marginBottom: '0.4rem',
@@ -117,7 +118,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
                   {c.title}
                 </h3>
                 <p style={{
-                  color: '#666',
+                  color: 'var(--dash-text-muted)',
                   fontSize: '0.78rem',
                   marginBottom: '0.75rem',
                   display: '-webkit-box',
@@ -129,7 +130,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
                 </p>
 
                 {/* Meta */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem', color: '#888', fontSize: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem', color: 'var(--dash-text-muted)', fontSize: '0.75rem' }}>
                   <span>⏱ {c.totalHours}h</span>
                   <span>👥 {c.totalStudents?.toLocaleString('en-IN')}</span>
                   <span>⭐ {c.rating}</span>
@@ -137,11 +138,11 @@ export default function BrowseCoursesClient({ courses = [] }) {
 
                 {/* Price */}
                 <div style={{ marginBottom: '0.75rem' }}>
-                  <span style={{ color: 'var(--color-primary)', fontSize: '1.15rem', fontWeight: 700 }}>
+                  <span style={{ color: 'var(--dash-accent)', fontSize: '1.15rem', fontWeight: 700 }}>
                     ₹{c.price?.toLocaleString('en-IN')}
                   </span>
                   {c.originalPrice > 0 && (
-                    <span style={{ color: '#555', textDecoration: 'line-through', marginLeft: '0.5rem', fontSize: '0.85rem' }}>
+                    <span style={{ color: 'var(--dash-text-muted)', textDecoration: 'line-through', marginLeft: '0.5rem', fontSize: '0.85rem' }}>
                       ₹{c.originalPrice?.toLocaleString('en-IN')}
                     </span>
                   )}
@@ -155,13 +156,13 @@ export default function BrowseCoursesClient({ courses = [] }) {
                       flex: 1,
                       padding: '0.5rem',
                       textAlign: 'center',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      border: '1px solid var(--dash-border)',
                       borderRadius: '8px',
-                      color: '#a0a0a0',
+                      color: 'var(--dash-text)',
                       fontSize: '0.8rem',
                       fontWeight: 600,
                       textDecoration: 'none',
-                      transition: 'border-color 0.2s',
+                      transition: 'border-color var(--dash-transition)',
                     }}
                   >
                     Details
