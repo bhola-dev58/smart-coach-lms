@@ -20,7 +20,6 @@ export default async function HomePage() {
   await connectDB();
   const featuredCourses = await Course.find({
     isPublished: true,
-    isFeatured: true,
   })
     .select(
       'title slug shortDescription description thumbnail category level price originalPrice totalHours totalStudents rating'

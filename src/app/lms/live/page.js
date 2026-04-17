@@ -1,13 +1,35 @@
 import styles from '@/app/lms/lms.module.css';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
+import { redirect } from 'next/navigation';
+import { connectDB } from '@/lib/db';
+import LiveSession from '@/models/LiveSession';
+import Enrollment from '@/models/Enrollment';
 
 export const metadata = { title: 'Live Classes | LMS' };
 
-export default function LiveClassesPage() {
-  const schedule = [
-    { id: 1, title: 'Calculus Doubt Clearing Session', date: 'Tomorrow, 5:00 PM', instructor: 'Prof. Sharma', status: 'Upcoming' },
-    { id: 2, title: 'System Design Mock Interview', date: 'Oct 20, 10:00 AM', instructor: 'Rahul Dev', status: 'Scheduled' },
-    { id: 3, title: 'Orientation & Roadmap 2025', date: 'Past (Oct 10)', instructor: 'Admin', status: 'Recording Available' },
-  ];
+export default async function LiveClassesPage() {
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    redirect('/?auth=login');
+  }
+
+  await connectDB();
+
+  // Find courses this student is enrolled in
+  const enrollments = await Enrollment.find({ student: session.user.id }).select('course').lean();
+  const courseIds = enrollments.map(e => e.course);
+
+  // Fetch Live Sessions where course is in their enrollments OR course is null (General session)
+  const sessions = await LiveSession.find({
+    $or: [{ course: { $in: courseIds } }, { course: null }]
+  })
+    .populate('instructor', 'name')
+    .sort({ scheduledAt: 1 })
+    .lean();
+
+  const now = new Date();
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
@@ -36,33 +58,52 @@ export default function LiveClassesPage() {
             </tr>
           </thead>
           <tbody>
-            {schedule.map(session => (
-              <tr key={session.id} style={{ borderBottom: '1px solid var(--dash-border)', transition: 'background 0.2s', background: 'var(--dash-surface)' }}>
-                <td style={{ padding: '1.25rem' }}>
-                   <div style={{ fontWeight: 600, color: 'var(--dash-text)' }}>{session.title}</div>
-                   <div style={{ fontSize: '0.8rem', color: session.status === 'Upcoming' ? '#2ed573' : 'var(--dash-text-muted)', marginTop: '0.4rem', fontWeight: 500 }}>{session.status}</div>
-                </td>
-                <td style={{ padding: '1.25rem', color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>{session.date}</td>
-                <td style={{ padding: '1.25rem', color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>{session.instructor}</td>
-                <td style={{ padding: '1.25rem' }}>
-                  <button 
-                     disabled={session.status === 'Scheduled'}
-                     style={{ 
-                        padding: '0.5rem 1.25rem', 
-                        background: session.status === 'Upcoming' ? 'var(--dash-accent)' : 'var(--dash-bg)', 
-                        color: session.status === 'Upcoming' ? 'white' : 'var(--dash-text-muted)', 
-                        borderRadius: 'var(--dash-radius-xs)', 
-                        border: session.status === 'Upcoming' ? 'none' : '1px solid var(--dash-border)', 
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: session.status === 'Scheduled' ? 'not-allowed' : 'pointer',
-                        transition: 'opacity var(--dash-transition)'
-                     }}>
-                    {session.status === 'Recording Available' ? 'Watch' : 'Join'}
-                  </button>
+            {sessions.length === 0 ? (
+              <tr>
+                <td colSpan="4" style={{ padding: '3rem', textAlign: 'center', color: 'var(--dash-text-muted)' }}>
+                  No live sessions scheduled at the moment.
                 </td>
               </tr>
-            ))}
+            ) : (
+              sessions.map(s => {
+                const isPast = new Date(s.scheduledAt) < now;
+                let statusLabel = s.status === 'cancelled' ? 'Cancelled' : isPast ? 'Past Session' : 'Upcoming';
+                let btnText = isPast ? 'N/A' : 'Join Class';
+                if (s.status === 'live') {
+                   statusLabel = '🔴 LIVE NOW';
+                   btnText = 'Join Now';
+                }
+
+                return (
+                 <tr key={s._id.toString()} style={{ borderBottom: '1px solid var(--dash-border)', transition: 'background 0.2s', background: 'var(--dash-surface)' }}>
+                   <td style={{ padding: '1.25rem' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--dash-text)' }}>{s.title}</div>
+                      <div style={{ fontSize: '0.8rem', color: statusLabel.includes('LIVE') || statusLabel === 'Upcoming' ? '#2ed573' : 'var(--dash-text-muted)', marginTop: '0.4rem', fontWeight: 500 }}>
+                        {statusLabel}
+                      </div>
+                   </td>
+                   <td style={{ padding: '1.25rem', color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>
+                     {new Date(s.scheduledAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}<br/>
+                     <span style={{ fontSize: '0.75rem' }}>({s.duration} mins)</span>
+                   </td>
+                   <td style={{ padding: '1.25rem', color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>
+                     {s.instructor?.name || 'Instructor'}
+                   </td>
+                   <td style={{ padding: '1.25rem' }}>
+                     {isPast || s.status === 'cancelled' ? (
+                        <button disabled style={{ padding: '0.5rem 1.25rem', background: 'var(--dash-bg)', color: 'var(--dash-text-muted)', borderRadius: 'var(--dash-radius-xs)', border: '1px solid var(--dash-border)', fontSize: '0.85rem', fontWeight: 600, cursor: 'not-allowed' }}>
+                          Ended
+                        </button>
+                     ) : (
+                        <a href={s.joinUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'inline-block', padding: '0.5rem 1.25rem', background: 'var(--dash-accent)', color: 'white', borderRadius: 'var(--dash-radius-xs)', border: 'none', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>
+                          {btnText}
+                        </a>
+                     )}
+                   </td>
+                 </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
