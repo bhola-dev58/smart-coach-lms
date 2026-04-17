@@ -169,6 +169,28 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lessonSidebarCollapsed {
+  width: 60px !important;
+}
+
+.lessonSidebarCollapsed .sidebarTitle,
+.lessonSidebarCollapsed .sidebarProgress,
+.lessonSidebarCollapsed .sidebarProgressText,
+.lessonSidebarCollapsed .chapterName,
+.lessonSidebarCollapsed .chapterMeta,
+.lessonSidebarCollapsed .chapterArrow,
+.lessonSidebarCollapsed .lessonCheck,
+.lessonSidebarCollapsed .lessonItemTitle,
+.lessonSidebarCollapsed .lessonItemDuration {
+  display: none !important;
+}
+
+.lessonSidebarCollapsed .chapterHeader {
+  justify-content: center;
+  padding: 1rem 0;
 }
 
 .sidebarHeader {
@@ -273,10 +295,73 @@
 .lessonCheck {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--dash-border);
-  display: flex;
+  border-radius: 12px;
+  border: 1px solid var(--dash-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* 🔥 Customizing the Native HTML5 Video Player Controls */
+.videoPlayer::-webkit-media-controls-enclosure {
+  background: linear-gradient(to top, rgba(15, 15, 20, 0.95) 0%, rgba(15, 15, 20, 0.4) 50%, transparent 100%) !important;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.videoPlayer::-webkit-media-controls-panel {
+  display: flex !important;
   align-items: center;
+  padding: 0 20px;
+  height: 60px;
+}
+
+.videoPlayer::-webkit-media-controls-play-button {
+  background-color: #6c5ce7;
+  border-radius: 50%;
+  transform: scale(1.2);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+  transition: all 0.3s ease;
+}
+
+.videoPlayer::-webkit-media-controls-play-button:hover {
+  background-color: #a29bfe;
+  transform: scale(1.3);
+}
+
+.videoPlayer::-webkit-media-controls-current-time-display,
+.videoPlayer::-webkit-media-controls-time-remaining-display {
+  color: #fff !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.videoPlayer::-webkit-media-controls-timeline {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  height: 6px;
+  margin: 0 20px;
+}
+
+.videoPlayer::-webkit-media-controls-volume-slider {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  height: 6px;
+}
+
+.videoPlayer::-webkit-media-controls-mute-button,
+.videoPlayer::-webkit-media-controls-fullscreen-button {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  transition: transform 0.2s ease;
+}
+
+.videoPlayer::-webkit-media-controls-mute-button:hover,
+.videoPlayer::-webkit-media-controls-fullscreen-button:hover {
+  transform: scale(1.15);
+}
+
+.videoPlaceholder {
+  display: flex;
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.2s;

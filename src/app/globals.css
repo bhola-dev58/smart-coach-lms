@@ -728,3 +728,8 @@ h6 {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.meetme-premium-player::-webkit-media-controls-mute-button:hover,
+.meetme-premium-player::-webkit-media-controls-fullscreen-button:hover {
+  transform: scale(1.15);
+}
