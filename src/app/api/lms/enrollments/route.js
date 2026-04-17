@@ -16,7 +16,7 @@ export async function GET(req) {
 
     const enrollments = await Enrollment.find({
       student: session.user.id,
-      status: 'active',
+      status: { $in: ['active', 'completed'] },
     })
       .populate('course', 'title slug thumbnail category totalHours')
       .sort({ 'progress.lastAccessedAt': -1 })
