@@ -15,9 +15,16 @@ export default async function CoursesPage({ searchParams }) {
   const params = await searchParams;
   const category = params.category;
   const sort = params.sort || 'popular';
+  const searchQuery = params.q || '';
 
   const filter = { isPublished: true };
   if (category) filter.category = category;
+  if (searchQuery) {
+    filter.$or = [
+      { title: { $regex: searchQuery, $options: 'i' } },
+      { shortDescription: { $regex: searchQuery, $options: 'i' } },
+    ];
+  }
 
   let sortQuery = {};
   if (sort === 'popular') sortQuery = { totalStudents: -1 };
@@ -49,30 +56,70 @@ export default async function CoursesPage({ searchParams }) {
 
       <section className="section">
         <div className="container">
-          {/* Category Filter Tabs */}
-          <div
+          
+          <div 
+            className="courses-toolbar"
             style={{
               display: 'flex',
-              gap: 'var(--space-2)',
-              flexWrap: 'wrap',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '1.5rem',
               marginBottom: 'var(--space-6)',
+              background: 'var(--color-surface)',
+              padding: '1rem 1.5rem',
+              borderRadius: '12px',
+              border: '1px solid var(--color-border)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              flexWrap: 'wrap'
             }}
           >
-            <Link
-              href="/courses"
-              className={`btn btn-sm ${!category ? 'btn-primary' : 'btn-outline'}`}
+            {/* Category Filter Tabs */}
+            <div
+              style={{
+                display: 'flex',
+                gap: 'var(--space-2)',
+                flexWrap: 'wrap',
+                flex: 1
+              }}
             >
-              All
-            </Link>
-            {allCategories.map((cat) => (
               <Link
-                href={`/courses?category=${cat}`}
-                className={`btn btn-sm ${category === cat ? 'btn-primary' : 'btn-outline'}`}
-                key={cat}
+                href={`/courses${searchQuery ? `?q=${searchQuery}` : ''}`}
+                className={`btn btn-sm ${!category ? 'btn-primary' : 'btn-outline'}`}
+                style={{ borderRadius: '20px' }}
               >
-                {cat}
+                All
               </Link>
-            ))}
+              {allCategories.map((cat) => (
+                <Link
+                  href={`/courses?category=${cat}${searchQuery ? `&q=${searchQuery}` : ''}`}
+                  className={`btn btn-sm ${category === cat ? 'btn-primary' : 'btn-outline'}`}
+                  key={cat}
+                  style={{ borderRadius: '20px' }}
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
+
+            {/* Search Bar Navbar Style */}
+            <form method="GET" action="/courses" style={{ display: 'flex', gap: '0.5rem', minWidth: '300px', flex: '0 1 auto' }}>
+               <input 
+                 type="search" 
+                 name="q" 
+                 defaultValue={searchQuery}
+                 placeholder="Search courses..." 
+                 style={{
+                   flex: 1, padding: '0.6rem 1rem', borderRadius: '20px',
+                   border: '1px solid var(--color-border)', outline: 'none',
+                   fontSize: '0.9rem', color: 'var(--color-text)', background: 'var(--color-background)'
+                 }}
+               />
+               {category && <input type="hidden" name="category" value={category} />}
+               <button type="submit" className="btn btn-primary btn-sm" style={{ padding: '0 1.25rem', borderRadius: '20px' }}>
+                 Search
+               </button>
+            </form>
           </div>
 
           <div
