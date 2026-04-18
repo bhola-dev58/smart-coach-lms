@@ -9,9 +9,11 @@ import mongoose from 'mongoose';
 const lessonSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true },
   slug: { type: String, required: true },
+  type: { type: String, enum: ['video', 'assignment'], default: 'video' },
   duration: { type: Number, required: true }, // in minutes
   videoUrl: { type: String, default: '' },
   content: { type: String, default: '' }, // markdown/HTML content
+  assignmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Assignment' },
   resources: [
     {
       name: { type: String, required: true },

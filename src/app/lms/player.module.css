@@ -242,7 +242,10 @@
 }
 
 .chapterGroup {
-  border-bottom: 1px solid var(--dash-border);
+  border: 1px solid var(--dash-border);
+  border-radius: 15px;
+  margin-bottom: 5px;
+  overflow: hidden;
 }
 .chapterHeader {
   display: flex;
@@ -253,7 +256,7 @@
   transition: background 0.2s;
   user-select: none;
 }
-.chapterHeader:hover { background: var(--dash-surface); }
+.chapterHeader:hover { background: rgba(220, 20, 60, 0.1); }
 .chapterName {
   font-size: var(--text-sm);
   font-weight: 600;

@@ -46,9 +46,19 @@ export async function GET() {
           {
             title: 'Feature Engineering',
             slug: 'feature-engineering',
+            type: 'video',
             duration: 40,
             videoUrl: 'https://res.cloudinary.com/ds3gjhrob/video/upload/v1776418616/0AFeature_Engineering_epkmtu.mp4',
             order: 3,
+            isFree: false
+          },
+          {
+            title: 'Assignment 1: Feature Engineering Prototype',
+            slug: 'project-assignment-1',
+            type: 'assignment',
+            duration: 60,
+            content: '<p>Please upload your Jupyter notebook implementation of the Feature Engineering module. Ensure all outputs are executed before submitting your `.ipynb` file.</p>',
+            order: 4,
             isFree: false
           }
         ]
@@ -76,9 +86,19 @@ export async function GET() {
           {
             title: 'SVM & KNN',
             slug: 'svm-knn',
+            type: 'video',
             duration: 35,
             videoUrl: 'https://res.cloudinary.com/ds3gjhrob/video/upload/v1776418610/SVM_KNN_ykhadl.mp4',
             order: 3,
+            isFree: false
+          },
+          {
+            title: 'Assignment 2: Final ML Prototype',
+            slug: 'final-ml-prototype',
+            type: 'assignment',
+            duration: 120,
+            content: '<p>Using the techniques taught in this chapter, build a predictive model for housing prices using SVM or Decision Trees. Export your model and upload the `.zip` containing your script and the model checkpoint.</p>',
+            order: 4,
             isFree: false
           }
         ]
