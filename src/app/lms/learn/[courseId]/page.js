@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import styles from '@/app/lms/player.module.css';
+import AssignmentDropzone from '@/components/lms/AssignmentDropzone';
 
 export default function LearnCoursePage() {
   const { courseId } = useParams();
@@ -48,6 +49,7 @@ export default function LearnCoursePage() {
   const [feedbackComment, setFeedbackComment] = useState('');
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [expandedAssignment, setExpandedAssignment] = useState(null);
 
   const { data: session } = useSession();
   const [watermarkPos, setWatermarkPos] = useState({ top: '80%', left: '15%', transform: 'rotate(-30deg)' });
@@ -400,6 +402,7 @@ export default function LearnCoursePage() {
   const currentIdx = allLessons.findIndex((l) => l.slug === activeLesson?.slug);
   const isCompleted = activeLesson ? completedLessons.includes(activeLesson.slug) : false;
   const totalLessons = allLessons.length;
+  const isAssignment = activeLesson?.type === 'assignment' || activeLesson?.title?.toLowerCase().includes('assignment');
 
   return (
     <>
@@ -957,47 +960,94 @@ export default function LearnCoursePage() {
           </div>
 
           <div className={styles.chapterList}>
-            {course?.chapters.map((ch) => (
-              <div key={ch._id} className={styles.chapterGroup}>
-                <div className={styles.chapterHeader} onClick={() => toggleChapter(ch._id)}>
-                  <div>
-                    <div className={styles.chapterName}>{ch.title}</div>
-                    <div className={styles.chapterMeta}>
-                      {ch.lessons.filter(l => completedLessons.includes(l.slug)).length}/{ch.lessons.length} lessons
-                    </div>
-                  </div>
-                  <span className={`${styles.chapterArrow} ${openChapters[ch._id] ? styles.chapterArrowOpen : ''}`}>
-                    ▶
-                  </span>
-                </div>
+            {course?.chapters.map((ch) => {
+              const videoLessons = ch.lessons.filter(l => !(l.title.toLowerCase().includes('assignment') || l.type === 'assignment'));
+              const assignments = ch.lessons.filter(l => l.title.toLowerCase().includes('assignment') || l.type === 'assignment');
 
-                {openChapters[ch._id] && (
-                  <div className={styles.lessonList}>
-                    {ch.lessons.map((l) => {
-                      const done = completedLessons.includes(l.slug);
-                      const isActive = activeLesson?.slug === l.slug;
-                      return (
-                        <div
-                          key={l._id}
-                          className={`${styles.lessonItem} ${isActive ? styles.lessonItemActive : ''}`}
-                          onClick={() => selectLesson(l)}
-                        >
-                          <div className={`${styles.lessonCheck} ${done ? styles.lessonCheckDone : ''}`}>
-                            {done && '✓'}
-                          </div>
-                          <span className={styles.lessonItemTitle}>{l.title}</span>
-                          <span className={styles.lessonItemDuration}>
-                            {durationsMap[l._id] > 0
-                              ? `${Math.floor(durationsMap[l._id] / 60)}:${Math.floor(durationsMap[l._id] % 60) < 10 ? '0' : ''}${Math.floor(durationsMap[l._id] % 60)}`
-                              : `...`}
-                          </span>
+              return (
+                <div key={ch._id} style={{ display: 'flex', flexDirection: 'column' }}>
+                  {/* Chapter Module Accordion */}
+                  <div className={styles.chapterGroup}>
+                    <div className={styles.chapterHeader} onClick={() => toggleChapter(ch._id)}>
+                      <div>
+                        <div className={styles.chapterName}>{ch.title}</div>
+                        <div className={styles.chapterMeta}>
+                          {videoLessons.filter(l => completedLessons.includes(l.slug)).length}/{videoLessons.length} lessons
                         </div>
-                      );
-                    })}
+                      </div>
+                      <span className={`${styles.chapterArrow} ${openChapters[ch._id] ? styles.chapterArrowOpen : ''}`}>
+                        ▶
+                      </span>
+                    </div>
+
+                    {openChapters[ch._id] && (
+                      <div className={styles.lessonList}>
+                        {videoLessons.map((l) => {
+                          const done = completedLessons.includes(l.slug);
+                          const isActive = activeLesson?.slug === l.slug;
+                          return (
+                            <div
+                              key={l._id}
+                              className={`${styles.lessonItem} ${isActive ? styles.lessonItemActive : ''}`}
+                              onClick={() => selectLesson(l)}
+                            >
+                              <div className={`${styles.lessonCheck} ${done ? styles.lessonCheckDone : ''}`}>
+                                {done && '✓'}
+                              </div>
+                              <span className={styles.lessonItemTitle}>{l.title}</span>
+                              <span className={styles.lessonItemDuration}>
+                                {durationsMap[l._id] > 0
+                                  ? `${Math.floor(durationsMap[l._id] / 60)}:${Math.floor(durationsMap[l._id] % 60) < 10 ? '0' : ''}${Math.floor(durationsMap[l._id] % 60)}`
+                                  : `...`}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* Standalone Assignments for this Chapter (Outside Accordion) */}
+                  {assignments.map(l => {
+                    const done = completedLessons.includes(l.slug);
+                    const isExpanded = expandedAssignment === l.slug;
+                    return (
+                      <div key={l._id} className={styles.chapterGroup}>
+                        <div
+                          className={styles.chapterHeader}
+                          onClick={() => setExpandedAssignment(isExpanded ? null : l.slug)}
+                          style={{
+                            borderLeft: isExpanded ? '3px solid var(--color-primary)' : '3px solid transparent',
+                            ...(isExpanded ? { background: 'var(--dash-surface)' } : {})
+                          }}
+                        >
+                          <div>
+                            <div className={styles.chapterName} style={{ color: 'var(--color-primary)', fontSize: '0.95rem', fontWeight: 700 }}>
+                              {l.title.split(':').length > 1 ? l.title.split(':')[0] : 'Assignment'}
+                            </div>
+                            <div className={styles.chapterMeta} style={{ color: 'var(--dash-text-muted)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
+                              {l.title.split(':').length > 1 ? l.title.split(':')[1].trim() : l.title}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span className={styles.chapterArrow} style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                              ▶
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Expanded Assignment Dropdown Content */}
+                        {isExpanded && (
+                          <div style={{ padding: '0 0.5rem', borderLeft: '3px solid var(--color-primary)' }}>
+                            <AssignmentDropzone lesson={l} courseId={courseId} onComplete={markComplete} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

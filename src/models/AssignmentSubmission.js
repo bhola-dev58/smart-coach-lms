@@ -2,9 +2,13 @@ import mongoose from 'mongoose';
 
 const submissionSchema = new mongoose.Schema(
   {
-    assignment: {
+    course: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Assignment',
+      ref: 'Course',
+      required: true,
+    },
+    lessonSlug: {
+      type: String,
       required: true,
     },
     student: {
@@ -25,6 +29,6 @@ const submissionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-submissionSchema.index({ assignment: 1, student: 1 }, { unique: true });
+submissionSchema.index({ course: 1, lessonSlug: 1, student: 1 }, { unique: true });
 
 export default mongoose.models.AssignmentSubmission || mongoose.model('AssignmentSubmission', submissionSchema);

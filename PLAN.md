@@ -14,8 +14,6 @@
 * **Missing Components**: Placeholder LMS tabs (`/lms/live`, `/lms/materials`, `/lms/tests`), Admin Settings (`/admin/settings`).
 * **Validation**: Input validation in Admin APIs is basic, needs fortification (empty checks, type validation).
 * **Media Management**: Course thumbnails and content uploads are hardcoded text fields in the admin panel instead of structured image/video uploaders.
-* **Resilience**: Lacking `loading.js` and `error.js` boundaries across major server components for smooth User Experience during SSR.
-
 ---
 
 ## Step 2: Upgrade Phases
