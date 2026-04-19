@@ -100,9 +100,26 @@ export default function GenericResourcePage({ params }) {
        if (f.type === 'file' && val) return <a href={val} target="_blank" rel="noreferrer" style={{color: '#3b82f6'}}>Link</a>;
        if (f.type === 'date' && val) return new Date(val).toLocaleDateString();
        
+       if (val === null || val === undefined) return '';
+
+       // Handle arrays (like stringArray or faqArray)
+       if (Array.isArray(val)) {
+         if (f.type === 'faqArray' || typeof val[0] === 'object') {
+           return `${val.length} items`; // Safe summary for object arrays
+         }
+         return val.join(', '); // Comma separated for string arrays
+       }
+       
+       // Handle generic objects (like nested IDs or weird DB responses)
+       if (typeof val === 'object') {
+         if (val._id || val.id) return String(val._id || val.id);
+         return 'Object';
+       }
+
        // Truncate long text
-       if (typeof val === 'string' && val.length > 50) return val.substring(0, 47) + '...';
-       return val;
+       const strVal = String(val);
+       if (strVal.length > 50) return strVal.substring(0, 47) + '...';
+       return strVal;
     }
   }));
 
