@@ -105,6 +105,31 @@ export default function GenericResourcePage({ params }) {
     }
   }));
 
+  // Append curriculum builder action explicitly for Courses
+  if (resource === 'courses') {
+    columns.push({
+      key: 'curriculum',
+      label: 'Curriculum',
+      render: (_, row) => (
+        <button 
+          onClick={() => router.push(`/lms/instructor/courses/${row._id}/builder`)}
+          style={{
+            padding: '0.4rem 0.75rem',
+            background: 'var(--dash-accent)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          ⚙️ Builder
+        </button>
+      )
+    });
+  }
+
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       
