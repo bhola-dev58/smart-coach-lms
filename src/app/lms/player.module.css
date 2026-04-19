@@ -282,17 +282,26 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.6rem 1.25rem 0.6rem 1.75rem;
+  padding: 0.65rem 1.25rem 0.65rem 1.75rem;
   cursor: pointer;
   transition: all 0.15s;
   border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--dash-border);
+  margin: 0 0.5rem;
+  border-radius: 0 8px 8px 0;
+}
+.lessonItem:last-child {
+  border-bottom: none;
 }
 .lessonItem:hover {
-  background: var(--dash-surface);
+  background: var(--dash-surface-hover, rgba(255,255,255,0.05));
+  border-left-color: rgba(200,16,46,0.4);
 }
 .lessonItemActive {
   background: var(--dash-surface) !important;
   border-left-color: var(--color-primary);
+  border-bottom-color: transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .lessonCheck {

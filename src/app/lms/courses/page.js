@@ -92,8 +92,14 @@ export default function MyCoursesPage() {
               <div className={styles.myCourseBody}>
                 <div className={styles.myCourseName}>{c.title}</div>
                 <div className={styles.myCourseMeta}>
-                  <span>⏱ {c.totalHours}h</span>
-                  <span>📖 {c.completedLessons}/{c.totalLessons} lessons</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {c.formattedTime || `${c.totalHours}h`}
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    {c.completedLessons}/{c.totalLessons} lessons
+                  </span>
                   <span>📊 {c.level}</span>
                 </div>
                 <div className={`${styles.myCourseProgress} ${c.percentage >= 100 ? styles.myCourseProgressComplete : ''}`}>

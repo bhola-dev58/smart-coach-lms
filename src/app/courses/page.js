@@ -33,10 +33,40 @@ export default async function CoursesPage({ searchParams }) {
   else if (sort === 'rating') sortQuery = { rating: -1 };
   else if (sort === 'newest') sortQuery = { publishedAt: -1 };
 
-  const courses = await Course.find(filter)
+  let courses = await Course.find(filter)
     .populate('instructor', 'name avatar')
     .sort(sortQuery)
     .lean();
+
+  // Dynamically compute runtime stats
+  courses = courses.map(c => {
+    let computedLessons = 0;
+    let computedDurationMinutes = 0;
+    if (c.chapters) {
+      c.chapters.forEach(ch => {
+        if (ch.lessons) {
+          ch.lessons.forEach(l => {
+            const isAssignment = l.title.toLowerCase().includes('assignment') || l.type === 'assignment';
+            if (!isAssignment) {
+              computedLessons += 1;
+              computedDurationMinutes += (l.duration || 0);
+            }
+          });
+        }
+      });
+    }
+
+    const hours = Math.floor(computedDurationMinutes / 60);
+    const mins = computedDurationMinutes % 60;
+    const formattedTime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+
+    return {
+      ...c,
+      totalLessons: computedLessons,
+      formattedTime: formattedTime,
+      totalHours: Math.ceil(computedDurationMinutes / 60)
+    };
+  });
 
   // All unique categories for filter tabs
   const allCategories = await Course.distinct('category', { isPublished: true });
@@ -208,7 +238,7 @@ export default async function CoursesPage({ searchParams }) {
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
                         </svg>
-                        {c.totalHours} Hours
+                        {c.formattedTime || `${c.totalHours}h`}
                       </span>
                       <span className="course-meta-item">
                         <svg
@@ -223,6 +253,21 @@ export default async function CoursesPage({ searchParams }) {
                           <circle cx="9" cy="7" r="4" />
                         </svg>
                         {c.totalStudents?.toLocaleString('en-IN')}
+                      </span>
+                      <span className="course-meta-item">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                          <polyline points="2 17 12 22 22 17" />
+                          <polyline points="2 12 12 17 22 12" />
+                        </svg>
+                        {c.totalLessons} Lessons
                       </span>
                       <span className="course-meta-item">
                         <svg

@@ -42,6 +42,21 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     ],
 
+    // ── KYC / Verification ──
+    verification: {
+      status: {
+        type: String,
+        enum: ['unverified', 'pending', 'approved', 'rejected'],
+        default: 'unverified',
+      },
+      documentUrl: { type: String, default: '' },     // Cloudinary URL of uploaded ID
+      documentType: { type: String, default: '' },     // e.g. 'aadhaar', 'student_id', 'pan', 'passport'
+      submittedAt: { type: Date },
+      reviewedAt: { type: Date },
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      rejectionReason: { type: String, default: '' },
+    },
+
     // ── Instructor-specific fields ──
     bio: { type: String, default: '', maxlength: 500 },
     specialization: [{ type: String }],
@@ -49,6 +64,13 @@ const userSchema = new mongoose.Schema(
       linkedin: { type: String, default: '' },
       youtube: { type: String, default: '' },
       website: { type: String, default: '' },
+    },
+    // Instructor payout details (encrypted in production)
+    payoutInfo: {
+      upiId: { type: String, default: '' },
+      bankAccount: { type: String, default: '' },
+      ifscCode: { type: String, default: '' },
+      bankName: { type: String, default: '' },
     },
   },
   { timestamps: true }
