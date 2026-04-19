@@ -22,15 +22,26 @@ export async function GET() {
       .sort({ 'progress.lastAccessedAt': -1 })
       .lean();
 
-    // Calculate total lessons from chapters for accurate progress
+    // ── Compute accurate stats (exclude assignments) ──
     const enriched = enrollments.map((enr) => {
       const course = enr.course;
       let totalLessons = 0;
+      let computedDurationMinutes = 0;
       if (course?.chapters) {
         course.chapters.forEach((ch) => {
-          totalLessons += ch.lessons?.length || 0;
+          ch.lessons?.forEach((l) => {
+            const isAssignment = l.title?.toLowerCase().includes('assignment') || l.type === 'assignment';
+            if (!isAssignment) {
+              totalLessons += 1;
+              computedDurationMinutes += (l.duration || 0);
+            }
+          });
         });
       }
+      const hours = Math.floor(computedDurationMinutes / 60);
+      const mins = computedDurationMinutes % 60;
+      const formattedTime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+
       const completedCount = enr.progress?.completedLessons?.length || 0;
       const percentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
@@ -42,7 +53,8 @@ export async function GET() {
         thumbnail: course?.thumbnail,
         category: course?.category,
         level: course?.level,
-        totalHours: course?.totalHours,
+        totalHours: Math.ceil(computedDurationMinutes / 60),
+        formattedTime,
         totalLessons,
         completedLessons: completedCount,
         percentage,

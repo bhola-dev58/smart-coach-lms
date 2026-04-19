@@ -75,7 +75,13 @@ export default function LMSLayout({ children }) {
               </svg>
               <span className={styles.notifBadge}>2</span>
             </button>
-            <div className={styles.avatar}>{userInitial}</div>
+            <div className={styles.avatar} style={{ overflow: 'hidden' }}>
+              {session?.user?.image ? (
+                <img src={session.user.image} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              ) : (
+                userInitial
+              )}
+            </div>
           </div>
         </div>
 
