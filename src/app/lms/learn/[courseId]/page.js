@@ -425,6 +425,17 @@ export default function LearnCoursePage() {
                   onTimeUpdate={handleTimeUpdate}
                   onLoadedMetadata={(e) => {
                     const video = e.target;
+                    
+                    // Sync original video duration to backend so it perfectly fixes the runtime data
+                    fetch('/api/lms/lesson/duration', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        courseId,
+                        lessonId: activeLesson._id,
+                        duration: video.duration
+                      })
+                    }).catch(() => {});
 
                     const savedTime = localStorage.getItem(`meetme_resumeTime_${activeLesson.slug}`);
                     // If progress was saved and the video isn't practically finished already, resume!
@@ -948,10 +959,21 @@ export default function LearnCoursePage() {
                     src={l.videoUrl}
                     preload="metadata"
                     onLoadedMetadata={(e) => {
+                      const dur = e.target.duration;
                       setDurationsMap(prev => ({
                         ...prev,
-                        [l._id]: e.target.duration
+                        [l._id]: dur
                       }));
+                      // Automatically push precise duration to MongoDB so global cards get updated!
+                      fetch('/api/lms/lesson/duration', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          courseId,
+                          lessonId: l._id,
+                          duration: dur
+                        })
+                      }).catch(() => {});
                     }}
                   />
                 ) : null

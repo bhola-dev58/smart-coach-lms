@@ -130,10 +130,27 @@ export default function BrowseCoursesClient({ courses = [] }) {
                 </p>
 
                 {/* Meta */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem', color: 'var(--dash-text-muted)', fontSize: '0.75rem' }}>
-                  <span>⏱ {c.totalHours}h</span>
-                  <span>👥 {c.totalStudents?.toLocaleString('en-IN')}</span>
-                  <span>⭐ {c.rating}</span>
+                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', marginBottom: '0.75rem', color: 'var(--dash-text-muted)', fontSize: '0.75rem' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {c.formattedTime || `${c.totalHours}h`}
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    {c.totalLessons} Lessons
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    {c.totalStudents?.toLocaleString('en-IN')}
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                    {c.rating}
+                  </span>
                 </div>
 
                 {/* Price */}

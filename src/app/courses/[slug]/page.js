@@ -24,7 +24,28 @@ export default async function CourseDetailsPage({ params }) {
 
   if (!course) notFound();
 
+  let computedLessons = 0;
+  let computedDurationMinutes = 0;
+  if (course.chapters) {
+    course.chapters.forEach(ch => {
+      if (ch.lessons) {
+        ch.lessons.forEach(l => {
+          const isAssignment = l.title.toLowerCase().includes('assignment') || l.type === 'assignment';
+          if (!isAssignment) {
+            computedLessons += 1;
+            computedDurationMinutes += (l.duration || 0);
+          }
+        });
+      }
+    });
+  }
+  
+  course.totalLessons = computedLessons;
+  course.totalHours = Math.ceil(computedDurationMinutes / 60);
 
+  const hours = Math.floor(computedDurationMinutes / 60);
+  const mins = computedDurationMinutes % 60;
+  const formattedTime = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   return (
     <div className="course-details-page">
@@ -40,7 +61,15 @@ export default async function CourseDetailsPage({ params }) {
               <div className="course-meta" style={{ gap: '2rem' }}>
                 <span className="course-meta-item">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  {course.totalHours} Hours
+                  {formattedTime}
+                </span>
+                <span className="course-meta-item" style={{display: 'flex', alignItems: 'center', gap: '0.4rem'}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  {course.totalLessons} Lessons
                 </span>
                 <span className="course-meta-item">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
@@ -107,15 +136,19 @@ export default async function CourseDetailsPage({ params }) {
                   Chapter {i+1}: {chapter.title}
                 </div>
                 <div>
-                  {chapter.lessons?.map((lesson, j) => (
+                  {chapter.lessons?.map((lesson, j) => {
+                    const isAssignmentType = lesson.title.toLowerCase().includes('assignment') || lesson.type === 'assignment';
+                    return (
                     <div key={j} style={{ padding: '0.8rem 1rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                       <div style={{ display: 'flex', gap: '10px' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                         <span>{lesson.title}</span>
                       </div>
-                      <span style={{ color: 'var(--color-text-muted)' }}>{lesson.duration}m</span>
+                      <span style={{ color: 'var(--color-text-muted)' }}>
+                        {isAssignmentType ? 'Task' : (lesson.duration >= 60 ? `${Math.floor(lesson.duration / 60)}h ${lesson.duration % 60}m` : `${lesson.duration || 0}m`)}
+                      </span>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             ))}
