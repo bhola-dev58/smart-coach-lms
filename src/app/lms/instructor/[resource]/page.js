@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { schemaConfig } from '@/components/lms/instructor/schemaConfig';
 import DataTable from '@/components/lms/instructor/DataTable';
@@ -8,7 +8,8 @@ import SchemaFormModal from '@/components/lms/instructor/SchemaFormModal';
 
 export default function GenericResourcePage({ params }) {
   const router = useRouter();
-  const resource = params.resource.toLowerCase();
+  const unwrappedParams = use(params);
+  const resource = unwrappedParams.resource.toLowerCase();
   const config = schemaConfig[resource];
 
   const [data, setData] = useState([]);

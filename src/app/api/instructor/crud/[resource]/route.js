@@ -36,8 +36,9 @@ export async function GET(request, { params }) {
     const auth = await checkAuth();
     if (auth.error) return NextResponse.json({ success: false, error: auth.error }, { status: 401 });
 
+    const unwrappedParams = await params;
     await connectDB();
-    const Model = await getModel(params.resource);
+    const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
     // Try to fetch instructor specific resources if schema has instructor/user field, else generic fetch
@@ -46,7 +47,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    console.error(`Error fetching ${params.resource}:`, err);
+    console.error(`Error fetching resource:`, err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
@@ -57,8 +58,9 @@ export async function POST(request, { params }) {
     if (auth.error) return NextResponse.json({ success: false, error: auth.error }, { status: 401 });
 
     const body = await request.json();
+    const unwrappedParams = await params;
     await connectDB();
-    const Model = await getModel(params.resource);
+    const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
     // Auto-inject instructor ID if applicable
@@ -68,7 +70,7 @@ export async function POST(request, { params }) {
     const newItem = await Model.create(body);
     return NextResponse.json({ success: true, data: newItem });
   } catch (err) {
-    console.error(`Error creating ${params.resource}:`, err);
+    console.error(`Error creating resource:`, err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
@@ -82,14 +84,15 @@ export async function PUT(request, { params }) {
     const { _id, ...updateData } = body;
     if (!_id) return NextResponse.json({ success: false, error: 'Missing _id' }, { status: 400 });
 
+    const unwrappedParams = await params;
     await connectDB();
-    const Model = await getModel(params.resource);
+    const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
     const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { new: true, runValidators: true }).lean();
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (err) {
-    console.error(`Error updating ${params.resource}:`, err);
+    console.error(`Error updating resource:`, err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
@@ -103,14 +106,15 @@ export async function DELETE(request, { params }) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 });
 
+    const unwrappedParams = await params;
     await connectDB();
-    const Model = await getModel(params.resource);
+    const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
     await Model.findByIdAndDelete(id);
     return NextResponse.json({ success: true, message: 'Deleted successfully' });
   } catch (err) {
-    console.error(`Error deleting ${params.resource}:`, err);
+    console.error(`Error deleting resource:`, err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

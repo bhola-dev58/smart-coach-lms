@@ -11,8 +11,9 @@ export async function GET(req, { params }) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const unwrappedParams = await params;
     await connectDB();
-    const courseId = params.courseId;
+    const courseId = unwrappedParams.courseId;
     const course = await Course.findOne({ _id: courseId, instructor: session.user.id }).lean();
     
     if (!course && session.user.role !== 'admin') {
@@ -33,11 +34,12 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const unwrappedParams = await params;
     const { chapters } = await req.json();
     await connectDB();
     
     const course = await Course.findOneAndUpdate(
-      { _id: params.courseId, instructor: session.user.id },
+      { _id: unwrappedParams.courseId, instructor: session.user.id },
       { $set: { chapters } },
       { new: true, runValidators: true }
     );

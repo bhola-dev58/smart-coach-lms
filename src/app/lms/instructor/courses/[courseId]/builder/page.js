@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import CustomUploader from '@/components/lms/instructor/CustomUploader';
 
 export default function CourseCurriculumBuilder({ params }) {
-  const { courseId } = params;
+  const unwrappedParams = use(params);
+  const { courseId } = unwrappedParams;
   const router = useRouter();
   
   const [chapters, setChapters] = useState([]);
