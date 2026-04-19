@@ -6,18 +6,34 @@ import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import styles from '@/app/lms/lms.module.css';
 
+import { useSession } from 'next-auth/react';
+
 // ── Nav Items ──
-const navItems = [
-  { href: '/lms', label: 'Dashboard', icon: 'home' },
-  { href: '/lms/live', label: 'Live Classes', icon: 'video' },
-  { href: '/lms/courses', label: 'My Courses', icon: 'book' },
-  { href: '/lms/tests', label: 'My Test Series', icon: 'clipboard' },
-  { href: '/lms/browse', label: 'Browse Courses', icon: 'layers' },
-  { href: '/lms/materials', label: 'Study Materials', icon: 'file-text' },
-  { href: '/lms/practice', label: 'Practice', icon: 'target' },
-  { href: '/lms/certificates', label: 'Certificates', icon: 'award' },
-  { href: '/lms/profile', label: 'My Profile', icon: 'user' },
-];
+const getNavItems = (role) => {
+  const isInstructorAdmin = role === 'instructor' || role === 'admin';
+  let items = [];
+
+  if (isInstructorAdmin) {
+    items = [
+      { href: '/lms', label: 'Dashboard', icon: 'home' },
+      { href: '/lms/instructor', label: 'Instructor Panel', icon: 'briefcase' },
+      { href: '/lms/browse', label: 'Browse Courses', icon: 'layers' },
+    ];
+  } else {
+    items = [
+      { href: '/lms', label: 'Dashboard', icon: 'home' },
+      { href: '/lms/live', label: 'Live Classes', icon: 'video' },
+      { href: '/lms/courses', label: 'My Courses', icon: 'book' },
+      { href: '/lms/tests', label: 'My Test Series', icon: 'clipboard' },
+      { href: '/lms/browse', label: 'Browse Courses', icon: 'layers' },
+      { href: '/lms/materials', label: 'Study Materials', icon: 'file-text' },
+      { href: '/lms/practice', label: 'Practice', icon: 'target' },
+      { href: '/lms/certificates', label: 'Certificates', icon: 'award' },
+    ];
+  }
+  items.push({ href: '/lms/profile', label: 'My Profile', icon: 'user' });
+  return items;
+};
 
 // ── Simple SVG Icons ──
 function NavIcon({ name }) {
@@ -32,6 +48,7 @@ function NavIcon({ name }) {
     'file-text': <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></>,
     target: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
     user: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
+    briefcase: <><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>,
   };
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.navIcon}>
@@ -73,6 +90,9 @@ function CalendarWidget() {
 // ── Sidebar Component ──
 export default function DashboardSidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = session?.user?.role || 'student';
+  const currentNavItems = getNavItems(role);
 
   return (
     <>
@@ -102,7 +122,7 @@ export default function DashboardSidebar({ isOpen, onClose, isCollapsed, onToggl
 
         {/* Navigation */}
         <nav className={styles.navSection}>
-          {navItems.map((item) => (
+          {currentNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
