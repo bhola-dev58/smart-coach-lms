@@ -7,11 +7,35 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Connect to API route
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' }); // Clear form
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        setError(data.error || 'Failed to send message. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,8 +78,14 @@ export default function ContactPage() {
               <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)' }}>Have a question? Fill out the form below and we&apos;ll get back within 4 hours.</p>
 
               {submitted && (
-                <div style={{ background: 'rgba(46,213,115,0.1)', border: '1px solid #2ed573', padding: 'var(--space-4)', marginBottom: 'var(--space-4)', color: '#2ed573', fontWeight: 600, fontSize: 'var(--text-sm)' }}>
+                <div style={{ background: 'rgba(46,213,115,0.1)', border: '1px solid #2ed573', padding: 'var(--space-4)', marginBottom: 'var(--space-4)', color: '#2ed573', fontWeight: 600, fontSize: 'var(--text-sm)', borderRadius: '4px' }}>
                   ✓ Message sent successfully! We&apos;ll get back to you soon.
+                </div>
+              )}
+
+              {error && (
+                <div style={{ background: 'rgba(200,16,46,0.1)', border: '1px solid var(--color-primary)', padding: 'var(--space-4)', marginBottom: 'var(--space-4)', color: 'var(--color-primary)', fontWeight: 600, fontSize: 'var(--text-sm)', borderRadius: '4px' }}>
+                  ❌ {error}
                 </div>
               )}
 
@@ -91,8 +121,12 @@ export default function ContactPage() {
                   <label className="form-label">Your Message *</label>
                   <textarea className="form-textarea" required placeholder="Tell us how we can help..." rows="6" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
                 </div>
-                <button type="submit" className="btn btn-primary btn-lg">
-                  Send Message <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
+                  {isSubmitting ? 'Sending...' : (
+                    <>
+                      Send Message <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
