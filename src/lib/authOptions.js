@@ -1,10 +1,15 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 
 export const authOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -46,6 +51,26 @@ export const authOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account.provider === 'google') {
+        await connectDB();
+        let dbUser = await User.findOne({ email: user.email });
+        if (!dbUser) {
+          // Create new user if they don't exist
+          dbUser = await User.create({
+            name: user.name,
+            email: user.email,
+            role: 'student', // default role
+            // password is not required for google users
+          });
+        }
+        // Attach db properties to the user object for the jwt callback
+        user.id = dbUser._id.toString();
+        user.role = dbUser.role;
+        return true;
+      }
+      return true; // For credentials provider
+    },
     // 1. JWT callback is called whenever a token is created or updated
     async jwt({ token, user }) {
       if (user) {
