@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 import Enrollment from '@/models/Enrollment';
 import Course from '@/models/Course';
+import { dispatchJob } from '@/lib/queue';
 
 export async function POST(req) {
   try {
@@ -72,6 +73,13 @@ export async function POST(req) {
       if (enrollment.progress.percentage >= 100) {
         enrollment.status = 'completed';
         enrollment.completedAt = new Date();
+
+        // 🏆 Auto-trigger certificate generation!
+        if (!enrollment.certificateIssued) {
+          dispatchJob('/api/jobs/generate-certificate', {
+            enrollmentId: enrollment._id.toString(),
+          }).catch(err => console.error('Certificate dispatch failed:', err));
+        }
       }
     }
 
