@@ -7,6 +7,13 @@ export default withAuth(
     const isAuth = !!token;
     const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
 
+    // Public routes that bypass auth even under /lms
+    const publicPaths = ['/lms/certificates/verify', '/certificates/verify'];
+    const isPublicPath = publicPaths.some(p => req.nextUrl.pathname.startsWith(p));
+    if (isPublicPath) {
+      return NextResponse.next();
+    }
+
     // If the user is on an auth page and is already logged in, redirect to dashboard
     if (isAuthPage) {
       if (isAuth) {
@@ -36,12 +43,16 @@ export default withAuth(
   },
   {
     callbacks: {
-      // User is authorized if they have a token (except for auth pages which we handle manually above)
+      // User is authorized if they have a token (except for auth pages and public paths)
       authorized({ token, req }) {
         const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
-        if (isAuthPage) return true; // Let them through to Auth pages to login
+        if (isAuthPage) return true;
+
+        // Allow public certificate verification
+        const publicPaths = ['/lms/certificates/verify', '/certificates/verify'];
+        if (publicPaths.some(p => req.nextUrl.pathname.startsWith(p))) return true;
         
-        return !!token; // All other matched routes require a valid token
+        return !!token;
       },
     },
   }
