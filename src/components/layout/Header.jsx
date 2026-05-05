@@ -114,7 +114,7 @@ export default function Header() {
                         </Link>
                       )}
                       {session.user?.role === 'instructor' && (
-                        <Link href="/instructor" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                        <Link href="/lms/instructor" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                           Instructor Panel
                         </Link>
@@ -164,7 +164,7 @@ export default function Header() {
                 <Link href="/admin" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Admin Panel</Link>
               )}
               {session.user?.role === 'instructor' && (
-                <Link href="/instructor" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Instructor Panel</Link>
+                <Link href="/lms/instructor" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Instructor Panel</Link>
               )}
               <Link href="/lms" className="btn btn-primary btn-block" onClick={() => setMobileOpen(false)}>Student Portal</Link>
               <button onClick={() => signOut()} className="btn btn-outline btn-block">Logout</button>

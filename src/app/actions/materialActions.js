@@ -35,7 +35,7 @@ export async function uploadStudyMaterial(formData) {
       size
     });
 
-    revalidatePath('/instructor/materials');
+    revalidatePath('/lms/instructor/materials');
     revalidatePath('/lms/materials');
     
     return { success: true };
@@ -52,7 +52,7 @@ export async function deleteStudyMaterial(id) {
   await connectDB();
   await StudyMaterial.findOneAndDelete({ _id: id, instructor: session.user.id });
 
-  revalidatePath('/instructor/materials');
+  revalidatePath('/lms/instructor/materials');
   revalidatePath('/lms/materials');
   
   return { success: true };

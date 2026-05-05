@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }) {
   // Check if not admin
   if (session.user?.role !== 'admin') {
     if (session.user?.role === 'instructor') {
-      redirect('/instructor');
+      redirect('/lms/instructor');
     } else {
       redirect('/lms');
     }

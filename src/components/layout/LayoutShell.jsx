@@ -7,10 +7,10 @@ import Footer from '@/components/layout/Footer';
 export default function LayoutShell({ children }) {
   const pathname = usePathname();
   const isLMS = pathname.startsWith('/lms');
-  const isInstructor = pathname.startsWith('/instructor');
+  const isInstructor = pathname.startsWith('/lms/instructor');
   const isAdmin = pathname.startsWith('/admin');
 
-  if (isLMS || isInstructor || isAdmin) {
+  if (isLMS || isAdmin) {
     // Isolated application routes: handled by their respective layout files
     return <>{children}</>;
   }
