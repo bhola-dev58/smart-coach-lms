@@ -108,7 +108,7 @@ export async function scheduleLiveSession(formData) {
     newSession.joinUrl = startUrl || joinUrl; 
     await newSession.save();
 
-    revalidatePath('/instructor/live');
+    revalidatePath('/lms/instructor/live');
     revalidatePath('/lms/live'); // Instantly updates student dashboard
 
     return { success: true };
@@ -128,7 +128,7 @@ export async function deleteLiveSession(sessionId) {
   await connectDB();
   await LiveSession.findOneAndDelete({ _id: sessionId, instructor: session.user.id });
 
-  revalidatePath('/instructor/live');
+  revalidatePath('/lms/instructor/live');
   revalidatePath('/lms/live');
   
   return { success: true };

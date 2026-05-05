@@ -20,7 +20,7 @@ export default function CourseDashboardClient({ courses }) {
     if (res.success) {
       setIsModalOpen(false);
       e.target.reset();
-      // Optionally redirect to edit page `/instructor/courses/${res.courseId}/edit`
+      // Optionally redirect to edit page `/lms/instructor/courses/${res.courseId}/edit`
       // but for now, the list simply re-renders from server action revalidatePath.
     } else {
       setError(res.error || 'Failed to create course');

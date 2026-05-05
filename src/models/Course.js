@@ -32,6 +32,9 @@ const chapterSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   order: { type: Number, default: 0 },
   lessons: [lessonSchema],
+  // ── Drip Content Engine ──
+  dripDays: { type: Number, default: 0 },    // Days after enrollment to unlock (0 = instant)
+  dripDate: { type: Date },                   // Specific calendar date to unlock
 });
 
 // ── FAQ for course page ──

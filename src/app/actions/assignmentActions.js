@@ -33,7 +33,7 @@ export async function createAssignment(formData) {
       dueDate: new Date(dueDate)
     });
 
-    revalidatePath('/instructor/assignments');
+    revalidatePath('/lms/instructor/assignments');
     revalidatePath('/lms/tests'); // Assume student views assignments in tests module
     
     return { success: true };

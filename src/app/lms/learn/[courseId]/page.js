@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import styles from '@/app/lms/player.module.css';
 import AssignmentDropzone from '@/components/lms/AssignmentDropzone';
+import { getStreamingUrls } from '@/lib/videoStream';
 
 export default function LearnCoursePage() {
   const { courseId } = useParams();
@@ -50,6 +51,11 @@ export default function LearnCoursePage() {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [expandedAssignment, setExpandedAssignment] = useState(null);
+
+  // Enterprise: HLS + PiP + Theater Mode
+  const hlsRef = useRef(null);
+  const [isPiP, setIsPiP] = useState(false);
+  const [theaterMode, setTheaterMode] = useState(false);
 
   const { data: session } = useSession();
   const [watermarkPos, setWatermarkPos] = useState({ top: '80%', left: '15%', transform: 'rotate(-30deg)' });
@@ -237,6 +243,97 @@ export default function LearnCoursePage() {
     a.href = dataURI;
     a.download = `MeetMeCenter_${activeLesson?.slug}_Snapshot.png`;
     a.click();
+  };
+
+  // ── Enterprise: HLS.js Initialization ──
+  useEffect(() => {
+    if (!activeLesson?.videoUrl || !videoRef.current) return;
+
+    const { hlsUrl, isCloudinary } = getStreamingUrls(activeLesson.videoUrl);
+
+    if (hlsUrl && isCloudinary) {
+      import('hls.js').then(({ default: Hls }) => {
+        if (Hls.isSupported()) {
+          if (hlsRef.current) hlsRef.current.destroy();
+
+          const hls = new Hls({
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            startLevel: -1,
+          });
+          hls.loadSource(hlsUrl);
+          hls.attachMedia(videoRef.current);
+
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              console.warn('HLS error, falling back to MP4');
+              hls.destroy();
+            }
+          });
+
+          hlsRef.current = hls;
+        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+          videoRef.current.src = hlsUrl;
+        }
+      }).catch(() => {});
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [activeLesson]);
+
+  // ── Keyboard Shortcuts (T=Theater, P=PiP, F=Fullscreen) ──
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key.toLowerCase()) {
+        case 't':
+          e.preventDefault();
+          setTheaterMode(prev => !prev);
+          setDesktopSidebarOpen(prev => !prev);
+          break;
+        case 'p':
+          e.preventDefault();
+          togglePiP();
+          break;
+        case 'f':
+          e.preventDefault();
+          if (videoRef.current) {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else videoRef.current.requestFullscreen?.();
+          }
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // ── Picture-in-Picture Toggle ──
+  const togglePiP = async () => {
+    if (!videoRef.current) return;
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPiP(false);
+      } else if (document.pictureInPictureEnabled) {
+        await videoRef.current.requestPictureInPicture();
+        setIsPiP(true);
+        videoRef.current.addEventListener('leavepictureinpicture', () => setIsPiP(false), { once: true });
+      }
+    } catch (err) {
+      console.error('PiP error:', err);
+    }
+  };
+
+  // ── Theater Mode Toggle ──
+  const toggleTheater = () => {
+    setTheaterMode(prev => !prev);
+    setDesktopSidebarOpen(prev => !prev);
   };
 
   // ── Phase 5.5: Q&A Functions ──
@@ -519,6 +616,22 @@ export default function LearnCoursePage() {
                     onClick={() => goToLesson(1)}
                   >
                     Next →
+                  </button>
+                  <button
+                    className={styles.prevNextBtn}
+                    onClick={togglePiP}
+                    title="Picture-in-Picture (P)"
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    {isPiP ? '📌 Exit PiP' : '📺 PiP'}
+                  </button>
+                  <button
+                    className={styles.prevNextBtn}
+                    onClick={toggleTheater}
+                    title="Theater Mode (T)"
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    {theaterMode ? '🔲 Normal' : '🖥️ Theater'}
                   </button>
                 </div>
               </div>

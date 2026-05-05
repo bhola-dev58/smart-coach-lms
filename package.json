@@ -9,9 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@upstash/qstash": "^2.10.1",
+    "@upstash/redis": "^1.37.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "dotenv": "^17.4.2",
+    "hls.js": "^1.6.16",
     "mongoose": "^9.4.1",
     "next": "16.2.3",
     "next-auth": "^4.24.13",

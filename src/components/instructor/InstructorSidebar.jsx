@@ -26,13 +26,13 @@ export default function InstructorSidebar({ isOpen, onClose, isCollapsed, onTogg
   const pathname = usePathname();
 
   const navItems = [
-    { href: '/instructor', label: 'Dashboard', icon: 'home' },
-    { href: '/instructor/courses', label: 'My Courses', icon: 'book' },
-    { href: '/instructor/live', label: 'Live Sessions', icon: 'video' },
-    { href: '/instructor/materials', label: 'Study Materials', icon: 'clipboard' },
-    { href: '/instructor/students', label: 'Students', icon: 'users' },
-    { href: '/instructor/assignments', label: 'Assignments', icon: 'clipboard' },
-    { href: '/instructor/earnings', label: 'Earnings', icon: 'money' },
+    { href: '/lms/instructor', label: 'Dashboard', icon: 'home' },
+    { href: '/lms/instructor/courses', label: 'My Courses', icon: 'book' },
+    { href: '/lms/instructor/live', label: 'Live Sessions', icon: 'video' },
+    { href: '/lms/instructor/materials', label: 'Study Materials', icon: 'clipboard' },
+    { href: '/lms/instructor/students', label: 'Students', icon: 'users' },
+    { href: '/lms/instructor/assignments', label: 'Assignments', icon: 'clipboard' },
+    { href: '/lms/instructor/earnings', label: 'Earnings', icon: 'money' },
   ];
 
   return (

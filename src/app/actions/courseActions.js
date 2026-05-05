@@ -49,7 +49,7 @@ export async function createCourseDraft(formData) {
       isPublished: false,
     });
 
-    revalidatePath('/instructor/courses');
+    revalidatePath('/lms/instructor/courses');
     return { success: true, courseId: newCourse._id.toString() };
   } catch (err) {
     console.error('Failed to create course draft', err);
@@ -72,7 +72,7 @@ export async function updateCourse(courseId, updateData) {
       { $set: updateData }
     );
     
-    revalidatePath(`/instructor/courses`);
+    revalidatePath(`/lms/instructor/courses`);
     revalidatePath(`/lms/browse`);
     revalidatePath(`/lms/courses`);
     revalidatePath(`/`); // Update public home

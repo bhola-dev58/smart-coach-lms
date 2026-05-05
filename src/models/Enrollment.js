@@ -36,6 +36,7 @@ const enrollmentSchema = new mongoose.Schema(
       {
         lessonSlug: { type: String, required: true },
         content: { type: String, default: '' },
+        timestamp: { type: Number, default: 0 }, // Video timestamp in seconds for bookmarks
         updatedAt: { type: Date, default: Date.now },
       },
     ],
