@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     isActive: { type: Boolean, default: true },
     isEmailVerified: { type: Boolean, default: false },
+    hasSelectedRole: { type: Boolean, default: false }, // For Google users — role selection popup
     lastLoginAt: { type: Date },
 
     // ── Student-specific fields ──

@@ -2,6 +2,7 @@ import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/components/providers/AuthProvider';
 import AuthModal from '@/components/auth/AuthModal';
+import RoleSelectModal from '@/components/auth/RoleSelectModal';
 import LayoutShell from '@/components/layout/LayoutShell';
 
 const inter = Inter({
@@ -27,10 +28,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body>
         <AuthProvider>
           <AuthModal />
+          <RoleSelectModal />
           <LayoutShell>{children}</LayoutShell>
         </AuthProvider>
       </body>
