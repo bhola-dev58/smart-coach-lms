@@ -11,14 +11,36 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 });
     }
 
-    const { role } = await request.json();
+    const { role, name, phone } = await request.json();
 
+    // ── Validate role ──
     if (!['student', 'instructor'].includes(role)) {
-      return NextResponse.json({ success: false, error: 'Invalid role' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Invalid role. Must be student or instructor.' }, { status: 400 });
+    }
+
+    // ── Validate name ──
+    const trimmedName = (name || '').trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      return NextResponse.json({ success: false, error: 'Full name is required (at least 2 characters).' }, { status: 400 });
+    }
+
+    // ── Validate phone ──
+    const trimmedPhone = (phone || '').trim();
+    if (!trimmedPhone) {
+      return NextResponse.json({ success: false, error: 'Phone number is required.' }, { status: 400 });
+    }
+    const phoneDigits = trimmedPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid phone number (at least 10 digits).' }, { status: 400 });
     }
 
     await connectDB();
-    await User.findByIdAndUpdate(session.user.id, { role, hasSelectedRole: true });
+    await User.findByIdAndUpdate(session.user.id, {
+      role,
+      name: trimmedName,
+      phone: trimmedPhone,
+      hasSelectedRole: true,
+    });
 
     return NextResponse.json({ success: true, role });
   } catch (error) {

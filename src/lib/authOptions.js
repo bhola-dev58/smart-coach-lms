@@ -100,9 +100,10 @@ export const authOptions = {
         token.avatar = user.avatar || '';
         token.needsRoleSelection = user.needsRoleSelection || false;
       }
-      // Handle session update (called after role is selected)
+      // Handle session update (called after role/profile is set during onboarding)
       if (trigger === 'update' && sessionUpdate) {
         if (sessionUpdate.role) token.role = sessionUpdate.role;
+        if (sessionUpdate.name) token.name = sessionUpdate.name;
         if (sessionUpdate.needsRoleSelection === false) token.needsRoleSelection = false;
       }
       return token;
