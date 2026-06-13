@@ -1048,3 +1048,93 @@
     padding: 0.4rem 0.6rem;
   }
 }
+
+/* ---- Profile Pill Button & Dropdown ---- */
+.profileWrapper {
+  position: relative;
+}
+
+.profileBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--dash-surface);
+  border: 1px solid var(--dash-border);
+  padding: 0.25rem 0.65rem 0.25rem 0.25rem;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all var(--dash-transition);
+  color: var(--dash-text);
+}
+
+.profileBtn:hover {
+  border-color: var(--dash-accent);
+  box-shadow: var(--dash-shadow);
+}
+
+.profileName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dash-text);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--dash-surface);
+  border: 1px solid var(--dash-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  min-width: 220px;
+  padding: 0.5rem 0;
+  z-index: 1010;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownHeader {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--dash-border);
+  margin-bottom: 0.5rem;
+}
+
+.dropdownName {
+  font-weight: 700;
+  color: var(--dash-text);
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.dropdownEmail {
+  font-size: 0.8rem;
+  color: var(--dash-text-secondary);
+  word-break: break-all;
+  text-align: left;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--dash-text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dash-transition);
+  text-align: left;
+  text-decoration: none;
+}
+
+.dropdownItem:hover {
+  background: rgba(200, 16, 46, 0.08);
+  color: var(--dash-accent);
+}

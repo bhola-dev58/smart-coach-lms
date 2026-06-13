@@ -52,10 +52,10 @@ export default function ContactPage() {
         <div className="container">
           <div className="grid grid-4">
             {[
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>, title: 'Visit Us', text: 'Block A, Tech Park Road,\nBengaluru 560001' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>, title: 'Call Us', text: '+91 98765 43210\n+91 98765 43211' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, title: 'Email Us', text: 'info@meetmecenter.com\nsupport@meetmecenter.com' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, title: 'Working Hours', text: 'Mon – Fri: 8AM – 8PM\nSat: 9AM – 6PM' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>, title: 'Visit Us', text: 'Block A, Tech Park Road,\nBengaluru 560001' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>, title: 'Call Us', text: '+91 98765 43210\n+91 98765 43211' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>, title: 'Email Us', text: 'info@meetmecenter.com\nsupport@meetmecenter.com' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8102E" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>, title: 'Working Hours', text: 'Mon – Fri: 8AM – 8PM\nSat: 9AM – 6PM' },
             ].map((card, i) => (
               <div key={i} style={{ background: 'white', padding: 'var(--space-6)', border: '1px solid var(--color-border)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
                 <div style={{ width: 56, height: 56, background: 'rgba(200,16,46,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto var(--space-4)' }}>
@@ -93,21 +93,33 @@ export default function ContactPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)', marginBottom: 'var(--space-5)' }}>
                   <div className="form-group">
                     <label className="form-label">Full Name *</label>
-                    <input type="text" className="form-input" required placeholder="Your name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                    <input type="text" className="form-input" required placeholder="Your name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Email Address *</label>
-                    <input type="email" className="form-input" required placeholder="you@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                    <input type="email" className="form-input" required placeholder="you@example.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)', marginBottom: 'var(--space-5)' }}>
                   <div className="form-group">
                     <label className="form-label">Phone Number</label>
-                    <input type="tel" className="form-input" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="Your Phone Number"
+                      value={formData.phone}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        if (val.length <= 10) {
+                          setFormData({ ...formData, phone: val });
+                        }
+                      }}
+                      maxLength={10}
+                    />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Subject *</label>
-                    <select className="form-select" required value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}>
+                    <select className="form-select" required value={formData.subject} onChange={e => setFormData({ ...formData, subject: e.target.value })}>
                       <option value="" disabled>Choose a topic</option>
                       <option>Course Inquiry</option>
                       <option>Payment Issue</option>
@@ -119,12 +131,12 @@ export default function ContactPage() {
                 </div>
                 <div className="form-group" style={{ marginBottom: 'var(--space-5)' }}>
                   <label className="form-label">Your Message *</label>
-                  <textarea className="form-textarea" required placeholder="Tell us how we can help..." rows="6" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} />
+                  <textarea className="form-textarea" required placeholder="Tell us how we can help..." rows="6" value={formData.message} onChange={e => setFormData({ ...formData, message: e.target.value })} />
                 </div>
                 <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
                   {isSubmitting ? 'Sending...' : (
                     <>
-                      Send Message <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                      Send Message <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                     </>
                   )}
                 </button>

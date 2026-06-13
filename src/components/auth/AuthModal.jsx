@@ -168,7 +168,19 @@ function AuthModalInner() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Phone</label>
-                  <input type="tel" className="form-input" placeholder="+91 98765 43210" value={formData.phone} onChange={e => update('phone', e.target.value)} />
+                  <input
+                    type="tel"
+                    className="form-input"
+                    placeholder="+91 xxxxxxxxxx"
+                    value={formData.phone}
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      if (val.length <= 10) {
+                        update('phone', val);
+                      }
+                    }}
+                    maxLength={10}
+                  />
                 </div>
               </div>
               <div className="form-group">

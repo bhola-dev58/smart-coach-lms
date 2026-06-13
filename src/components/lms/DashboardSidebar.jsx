@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import styles from '@/app/lms/lms.module.css';
 
@@ -138,47 +137,6 @@ export default function DashboardSidebar({ isOpen, onClose, isCollapsed, onToggl
 
         {/* Calendar */}
         {!isCollapsed && <CalendarWidget />}
-
-        {/* Logout Button */}
-        <div style={{ padding: isCollapsed ? '1.5rem 0.6rem' : '1.5rem 1.25rem', marginTop: 'auto' }}>
-          <button 
-            onClick={() => signOut({ callbackUrl: '/' })}
-            title={isCollapsed ? 'Logout' : ''}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isCollapsed ? 'center' : 'flex-start',
-              gap: '0.75rem',
-              padding: isCollapsed ? '0.75rem 0' : '0.75rem 1rem',
-              background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '8px',
-              color: '#d0d0d0',
-              fontSize: '0.9rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => { 
-              e.currentTarget.style.background = 'rgba(200,16,46,0.1)'; 
-              e.currentTarget.style.color = 'var(--color-primary)'; 
-              e.currentTarget.style.borderColor = 'var(--color-primary)'; 
-            }}
-            onMouseOut={(e) => { 
-              e.currentTarget.style.background = 'transparent'; 
-              e.currentTarget.style.color = '#d0d0d0'; 
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; 
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: isCollapsed ? '0' : '' }}>
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            {!isCollapsed && 'Logout'}
-          </button>
-        </div>
       </aside>
     </>
   );

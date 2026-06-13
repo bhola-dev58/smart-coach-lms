@@ -2,7 +2,7 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const token = req.nextauth.token;
     const isAuth = !!token;
     const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
@@ -58,12 +58,12 @@ export default withAuth(
   }
 );
 
-// Define which routes this middleware applies to
+// Define which routes this proxy applies to
 export const config = {
   matcher: [
     '/lms/:path*', 
     '/admin/:path*',
     '/profile/:path*',
-    '/auth/:path*' // We run middleware on auth to redirect if already logged in
+    '/auth/:path*' // We run proxy on auth to redirect if already logged in
   ],
 };
