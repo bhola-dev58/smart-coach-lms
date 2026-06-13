@@ -111,8 +111,8 @@ export default function RoleSelectModal() {
               margin: '0 auto 1rem', color: '#C8102E',
             }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.4rem', color: '#1A1A1A' }}>
@@ -166,8 +166,14 @@ export default function RoleSelectModal() {
               <input
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  if (val.length <= 10) {
+                    setPhone(val);
+                  }
+                }}
+                maxLength={10}
+                placeholder="+91 xxxxxxxxxx"
                 required
                 style={{
                   width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
@@ -206,8 +212,8 @@ export default function RoleSelectModal() {
                     margin: '0 auto 0.5rem', color: '#C8102E',
                   }}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
                     </svg>
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1A1A1A', marginBottom: 2 }}>
@@ -238,9 +244,9 @@ export default function RoleSelectModal() {
                     margin: '0 auto 0.5rem', color: '#C8102E',
                   }}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="2" y="3" width="20" height="14" rx="2"/>
-                      <path d="M8 21h8M12 17v4"/>
-                      <path d="M7 8h10M7 12h5"/>
+                      <rect x="2" y="3" width="20" height="14" rx="2" />
+                      <path d="M8 21h8M12 17v4" />
+                      <path d="M7 8h10M7 12h5" />
                     </svg>
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1A1A1A', marginBottom: 2 }}>

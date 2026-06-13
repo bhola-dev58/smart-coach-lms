@@ -165,9 +165,9 @@ export default function ProfilePage() {
   // Verification badge config
   const verificationConfig = {
     unverified: { label: 'Not Verified', color: '#6b7280', bg: 'rgba(107,114,128,0.1)', icon: '○' },
-    pending:    { label: 'Under Review', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  icon: '⏳' },
-    approved:   { label: 'Verified',     color: '#10b981', bg: 'rgba(16,185,129,0.12)', icon: '✓' },
-    rejected:   { label: 'Rejected',     color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   icon: '✕' },
+    pending: { label: 'Under Review', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', icon: '⏳' },
+    approved: { label: 'Verified', color: '#10b981', bg: 'rgba(16,185,129,0.12)', icon: '✓' },
+    rejected: { label: 'Rejected', color: '#ef4444', bg: 'rgba(239,68,68,0.1)', icon: '✕' },
   };
   const vc = verificationConfig[vStatus];
 
@@ -201,8 +201,10 @@ export default function ProfilePage() {
         border: '1px solid var(--dash-border)', padding: '2rem',
         marginBottom: '1.5rem', position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
-          background: 'linear-gradient(90deg, var(--dash-accent), #ff6b6b, var(--dash-accent))' }} />
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
+          background: 'linear-gradient(90deg, var(--dash-accent), #ff6b6b, var(--dash-accent))'
+        }} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
           {/* Avatar */}
@@ -233,7 +235,7 @@ export default function ProfilePage() {
               }}>
               {uploading
                 ? <div style={{ width: '14px', height: '14px', border: '2px solid white', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>}
+                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>}
             </div>
             <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleAvatarUpload} style={{ display: 'none' }} />
           </div>
@@ -244,7 +246,7 @@ export default function ProfilePage() {
               {/* Verified badge next to name */}
               {vStatus === 'approved' && (
                 <span title="Identity Verified" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700, background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                   VERIFIED
                 </span>
               )}
@@ -275,7 +277,7 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Personal Info ── */}
-      <SectionCard title="Personal Information" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}>
+      <SectionCard title="Personal Information" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1.25rem' }}>
           <FieldGroup label="Full Name" required>
             {editMode ? <StyledInput value={form.name} onChange={e => handleChange('name', e.target.value)} placeholder="Your full name" /> : <FieldValue>{profile?.name || '—'}</FieldValue>}
@@ -284,7 +286,21 @@ export default function ProfilePage() {
             <FieldValue>{profile?.email}</FieldValue>
           </FieldGroup>
           <FieldGroup label="Phone Number">
-            {editMode ? <StyledInput value={form.phone} onChange={e => handleChange('phone', e.target.value)} placeholder="+91 9876543210" /> : <FieldValue>{profile?.phone || 'Not provided'}</FieldValue>}
+            {editMode ? (
+              <StyledInput
+                value={form.phone}
+                onChange={e => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  if (val.length <= 10) {
+                    handleChange('phone', val);
+                  }
+                }}
+                maxLength={10}
+                placeholder="+91 xxxxxxxxxx"
+              />
+            ) : (
+              <FieldValue>{profile?.phone || 'Not provided'}</FieldValue>
+            )}
           </FieldGroup>
           <FieldGroup label="Login Method">
             <FieldValue>{profile?.provider === 'google' ? '🔗 Google' : '🔐 Email & Password'}</FieldValue>
@@ -294,7 +310,7 @@ export default function ProfilePage() {
 
       {/* ── Academic Details (Student only) ── */}
       {isStudent && (
-        <SectionCard title="Academic Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>}>
+        <SectionCard title="Academic Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1.25rem' }}>
             <FieldGroup label="College / University">
               {editMode ? <StyledInput value={form.college} onChange={e => handleChange('college', e.target.value)} placeholder="e.g. IIT Delhi" /> : <FieldValue>{profile?.college || 'Not provided'}</FieldValue>}
@@ -312,7 +328,7 @@ export default function ProfilePage() {
                   <option value="4">4th Year</option>
                 </select>
               ) : (
-                <FieldValue>{profile?.year ? `${profile.year}${[,'st','nd','rd'][profile.year] || 'th'} Year` : 'Not specified'}</FieldValue>
+                <FieldValue>{profile?.year ? `${profile.year}${[, 'st', 'nd', 'rd'][profile.year] || 'th'} Year` : 'Not specified'}</FieldValue>
               )}
             </FieldGroup>
             <FieldGroup label="Enrolled Courses">
@@ -324,7 +340,7 @@ export default function ProfilePage() {
 
       {/* ── Instructor Bio & Social ── */}
       {isInstructor && (
-        <SectionCard title="Bio & Social Links" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>}>
+        <SectionCard title="Bio & Social Links" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>}>
           <div style={{ display: 'grid', gap: '1.25rem' }}>
             <FieldGroup label="Bio / About You">
               {editMode ? (
@@ -345,7 +361,7 @@ export default function ProfilePage() {
 
       {/* ── Instructor Payout Info ── */}
       {isInstructor && (
-        <SectionCard title="Payout Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
+        <SectionCard title="Payout Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>}
           badge={<span style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(245,158,11,0.12)', color: '#f59e0b', fontWeight: 600 }}>🔒 Encrypted</span>}>
           <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.82rem', marginBottom: '1.25rem' }}>
             Add your bank/UPI details to receive course revenue payouts. This information is stored securely and never shared.
@@ -368,7 +384,7 @@ export default function ProfilePage() {
       )}
 
       {/* ── KYC / Identity Verification ── */}
-      <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}>
+      <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}>
         {/* Status Banner */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: '0.75rem',
@@ -432,7 +448,7 @@ export default function ProfilePage() {
                 }}>
                 {kycUploading
                   ? <><div style={{ width: '16px', height: '16px', border: '2px solid currentColor', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Uploading...</>
-                  : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload Document</>}
+                  : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg> Upload Document</>}
               </label>
               <input ref={kycFileInputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleKycUpload} style={{ display: 'none' }} />
             </div>
