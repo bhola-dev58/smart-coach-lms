@@ -452,14 +452,16 @@ h6 {
 /* ---- Feature Card ---- */
 .feature-card {
   padding: var(--space-8);
-  background: white;
-  border: 1px solid var(--color-border);
-  transition: all 0.2s;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  transition: all 0.5s;
 }
 
 .feature-card:hover {
   border-color: var(--color-primary);
-  transform: translateY(-2px);
+  box-shadow: rgba(93, 50, 50, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  transform: translateY(-15px);
 }
 
 .feature-card h3 {
@@ -478,6 +480,7 @@ h6 {
   height: 48px;
   background: var(--color-primary-light);
   display: flex;
+  border-radius: 50%;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-4);
@@ -516,9 +519,32 @@ h6 {
 
 /* ---- CTA Banner ---- */
 .cta-banner {
-  background: var(--color-primary);
+  position: relative;
   padding: var(--space-12) 0;
   color: white;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Background image with reduced opacity */
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/cta-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  z-index: -2;
+}
+
+/* Dark overlay on top of image for readability */
+.cta-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1A1A1A 0%, rgba(200, 16, 46, 0.85) 100%);
+  z-index: -1;
 }
 
 .cta-banner .container {

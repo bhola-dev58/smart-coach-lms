@@ -150,13 +150,133 @@ export default function GenericResourcePage({ params }) {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--dash-text-muted)' }}>
           Loading {config.name}...
         </div>
+
+      ) : resource === 'courses' ? (
+        /* ── COURSES: Card Grid View ── */
+        <>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 700, color: 'var(--dash-text)' }}>My Courses</h2>
+              <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--dash-text-muted)' }}>{data.length} course{data.length !== 1 ? 's' : ''}</p>
+            </div>
+            <button
+              onClick={() => { setEditingRow(null); setIsModalOpen(true); }}
+              style={{ padding: '0.6rem 1.25rem', background: 'var(--dash-accent)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
+            >
+              + Add New Course
+            </button>
+          </div>
+
+          {/* Empty State */}
+          {data.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '4rem', background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+              <p style={{ color: 'var(--dash-text-muted)', marginBottom: '1rem' }}>No courses yet.</p>
+              <button onClick={() => { setEditingRow(null); setIsModalOpen(true); }} style={{ padding: '0.6rem 1.25rem', background: 'var(--dash-accent)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }}>
+                + Create First Course
+              </button>
+            </div>
+          )}
+
+          {/* Cards Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.25rem' }}>
+            {data.map(course => (
+              <div key={course._id} style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 14,
+                overflow: 'hidden',
+                display: 'flex', flexDirection: 'column',
+                transition: 'border-color 0.2s, transform 0.2s',
+              }}>
+                {/* Thumbnail */}
+                <div style={{ position: 'relative', height: 155, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', flexShrink: 0 }}>
+                  {course.thumbnail ? (
+                    <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>📖</div>
+                  )}
+                  {/* Published/Draft badge */}
+                  <span style={{
+                    position: 'absolute', top: 10, right: 10,
+                    padding: '0.2rem 0.65rem', borderRadius: 50, fontSize: '0.7rem', fontWeight: 700,
+                    background: course.isPublished ? 'rgba(46,213,115,0.15)' : 'rgba(255,171,0,0.15)',
+                    color: course.isPublished ? '#2ed573' : '#ffab00',
+                    border: `1px solid ${course.isPublished ? 'rgba(46,213,115,0.3)' : 'rgba(255,171,0,0.3)'}`,
+                    backdropFilter: 'blur(4px)',
+                  }}>
+                    {course.isPublished ? '✓ Published' : '⏸ Draft'}
+                  </span>
+                  {/* Category badge */}
+                  {course.category && (
+                    <span style={{ position: 'absolute', top: 10, left: 10, padding: '0.2rem 0.6rem', borderRadius: 6, fontSize: '0.68rem', fontWeight: 700, background: 'var(--dash-accent)', color: 'white', letterSpacing: '0.04em' }}>
+                      {course.category}
+                    </span>
+                  )}
+                </div>
+
+                {/* Body */}
+                <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--dash-text)', lineHeight: 1.4, margin: 0 }}>
+                    {course.title || 'Untitled Course'}
+                  </h3>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--dash-text-muted)', margin: 0 }}>/{course.slug}</p>
+
+                  {/* Meta */}
+                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: 4, fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>
+                    <span>⏱ {course.totalHours || 0}h</span>
+                    <span>👥 {(course.totalStudents || 0).toLocaleString()}</span>
+                    <span>⭐ {course.rating || 0}</span>
+                  </div>
+
+                  {/* Price */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                    <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--dash-accent)' }}>
+                      ₹{(course.price || 0).toLocaleString('en-IN')}
+                    </span>
+                    {course.originalPrice > 0 && (
+                      <span style={{ fontSize: '0.78rem', color: 'var(--dash-text-muted)', textDecoration: 'line-through' }}>
+                        ₹{course.originalPrice.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Footer Actions */}
+                <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => { setEditingRow(course); setIsModalOpen(true); }}
+                    style={{ flex: 1, padding: '0.45rem', background: 'rgba(255,255,255,0.07)', color: 'var(--dash-text)', border: 'none', borderRadius: 7, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => router.push(`/lms/instructor/courses/${course._id}/builder`)}
+                    style={{ flex: 1, padding: '0.45rem', background: 'rgba(var(--dash-accent-rgb, 200,16,46),0.12)', color: 'var(--dash-accent)', border: 'none', borderRadius: 7, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    ⚙️ Builder
+                  </button>
+                  <button
+                    onClick={() => handleDelete(course._id)}
+                    style={{ padding: '0.45rem 0.7rem', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', borderRadius: 7, fontSize: '0.8rem', cursor: 'pointer' }}
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+
       ) : (
-        <DataTable 
+        /* ── ALL OTHER RESOURCES: DataTable ── */
+        <DataTable
           resourceName={config.name}
           columns={columns}
           data={data}
@@ -167,7 +287,7 @@ export default function GenericResourcePage({ params }) {
       )}
 
       {isModalOpen && (
-        <SchemaFormModal 
+        <SchemaFormModal
           config={config}
           initialData={editingRow}
           onClose={() => setIsModalOpen(false)}

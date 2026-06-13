@@ -22,12 +22,17 @@ export const authOptions = {
         }
 
         await connectDB();
-        
+
         // Find user by email and explicitly select the +password field
-        const user = await User.findOne({ email: credentials.email }).select('+password');
-        
+        const user = await User.findOne({ email: credentials.email.toLowerCase() }).select('+password');
+
         if (!user) {
           throw new Error('No user found with this email');
+        }
+
+        // Block inactive/suspended accounts
+        if (!user.isActive) {
+          throw new Error('Your account has been suspended. Please contact support.');
         }
 
         if (!user.password) {
@@ -35,47 +40,71 @@ export const authOptions = {
         }
 
         const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);
-        
+
         if (!isPasswordMatch) {
           throw new Error('Incorrect password');
         }
 
-        // Return user object without password
+        // Update last login timestamp
+        await User.findByIdAndUpdate(user._id, { lastLoginAt: new Date() });
+
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar || '',
         };
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account.provider === 'google') {
         await connectDB();
         let dbUser = await User.findOne({ email: user.email });
+        let isNew = false;
         if (!dbUser) {
-          // Create new user if they don't exist
+          isNew = true;
           dbUser = await User.create({
             name: user.name,
             email: user.email,
-            role: 'student', // default role
-            // password is not required for google users
+            avatar: user.image || '',
+            role: 'student',
+            provider: 'google',
+            isEmailVerified: true,
+            hasSelectedRole: false, // Must select role on first login
+            lastLoginAt: new Date(),
+          });
+        } else {
+          if (!dbUser.isActive) return false;
+          await User.findByIdAndUpdate(dbUser._id, {
+            lastLoginAt: new Date(),
+            avatar: dbUser.avatar || user.image || '',
           });
         }
-        // Attach db properties to the user object for the jwt callback
         user.id = dbUser._id.toString();
         user.role = dbUser.role;
+        user.avatar = dbUser.avatar || user.image || '';
+        // Show role selection popup if Google user hasn't chosen a role yet
+        user.needsRoleSelection = isNew || !dbUser.hasSelectedRole;
         return true;
       }
-      return true; // For credentials provider
+      return true;
     },
     // 1. JWT callback is called whenever a token is created or updated
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session: sessionUpdate }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.avatar = user.avatar || '';
+        token.needsRoleSelection = user.needsRoleSelection || false;
+      }
+      // Handle session update (called after role/profile is set during onboarding)
+      if (trigger === 'update' && sessionUpdate) {
+        if (sessionUpdate.role) token.role = sessionUpdate.role;
+        if (sessionUpdate.name) token.name = sessionUpdate.name;
+        if (sessionUpdate.needsRoleSelection === false) token.needsRoleSelection = false;
       }
       return token;
     },
@@ -84,6 +113,8 @@ export const authOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.avatar = token.avatar || '';
+        session.user.needsRoleSelection = token.needsRoleSelection || false;
       }
       return session;
     },
