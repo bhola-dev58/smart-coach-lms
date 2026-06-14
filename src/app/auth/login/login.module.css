@@ -9,7 +9,7 @@
 
 .authCard {
   width: 100%;
-  max-width: 450px;
+  max-width: 680px;
   background: white;
   padding: var(--space-8);
   border: 1px solid var(--color-border);

@@ -28,6 +28,7 @@ export default function ProfilePage() {
     bio: '',
     socialLinks: { linkedin: '', youtube: '', website: '' },
     payoutInfo: { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
+    location: { country: '', state: '', city: '' },
   });
 
   useEffect(() => { fetchProfile(); }, []);
@@ -47,6 +48,7 @@ export default function ProfilePage() {
           bio: data.user.bio || '',
           socialLinks: data.user.socialLinks || { linkedin: '', youtube: '', website: '' },
           payoutInfo: data.user.payoutInfo || { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
+          location: data.user.location || { country: '', state: '', city: '' },
         });
       }
     } catch (err) {
@@ -64,6 +66,7 @@ export default function ProfilePage() {
   const handleChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
   const handleSocialChange = (field, value) => setForm(prev => ({ ...prev, socialLinks: { ...prev.socialLinks, [field]: value } }));
   const handlePayoutChange = (field, value) => setForm(prev => ({ ...prev, payoutInfo: { ...prev.payoutInfo, [field]: value } }));
+  const handleLocationChange = (field, value) => setForm(prev => ({ ...prev, location: { ...prev.location, [field]: value } }));
 
   const handleSave = async () => {
     setSaving(true);
@@ -308,6 +311,39 @@ export default function ProfilePage() {
         </div>
       </SectionCard>
 
+      {/* ── Location ── */}
+      <SectionCard title="Location" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+          <FieldGroup label="Country">
+            {editMode ? (
+              <select
+                value={form.location.country}
+                onChange={e => handleLocationChange('country', e.target.value)}
+                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}
+              >
+                <option value="">Select Country</option>
+                <option value="India">🇮🇳 India</option>
+                <option value="Nepal">🇳🇵 Nepal</option>
+                <option value="USA">🇺🇸 USA</option>
+                <option value="UK">🇬🇧 UK</option>
+                <option value="Canada">🇨🇦 Canada</option>
+                <option value="Australia">🇦🇺 Australia</option>
+                <option value="Germany">🇩🇪 Germany</option>
+                <option value="UAE">🇦🇪 UAE</option>
+                <option value="Singapore">🇸🇬 Singapore</option>
+                <option value="Other">🌍 Other</option>
+              </select>
+            ) : <FieldValue>{profile?.location?.country || 'Not provided'}</FieldValue>}
+          </FieldGroup>
+          <FieldGroup label="State / Province">
+            {editMode ? <StyledInput value={form.location.state} onChange={e => handleLocationChange('state', e.target.value)} placeholder="e.g. Maharashtra" /> : <FieldValue>{profile?.location?.state || 'Not provided'}</FieldValue>}
+          </FieldGroup>
+          <FieldGroup label="City">
+            {editMode ? <StyledInput value={form.location.city} onChange={e => handleLocationChange('city', e.target.value)} placeholder="e.g. Mumbai" /> : <FieldValue>{profile?.location?.city || 'Not provided'}</FieldValue>}
+          </FieldGroup>
+        </div>
+      </SectionCard>
+
       {/* ── Academic Details (Student only) ── */}
       {isStudent && (
         <SectionCard title="Academic Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>}>
@@ -468,6 +504,7 @@ export default function ProfilePage() {
                 year: profile?.year || '', bio: profile?.bio || '',
                 socialLinks: profile?.socialLinks || { linkedin: '', youtube: '', website: '' },
                 payoutInfo: profile?.payoutInfo || { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
+                location: profile?.location || { country: '', state: '', city: '' },
               });
             }}
             style={{ padding: '0.7rem 1.5rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'transparent', color: 'var(--dash-text-muted)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}

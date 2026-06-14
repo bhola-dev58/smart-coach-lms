@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'CSE', year: '1' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'CSE', year: '1', role: 'student', country: '', state: '', city: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -30,7 +30,10 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          location: { country: formData.country, state: formData.state, city: formData.city },
+        }),
       });
       const data = await res.json();
 
@@ -109,6 +112,14 @@ export default function RegisterPage() {
               <input type="text" className="form-input" required placeholder="Your full name" value={formData.name} onChange={e => update('name', e.target.value)} />
             </div>
 
+            <div className="form-group">
+              <label className="form-label">Register As</label>
+              <select className="form-select" value={formData.role} onChange={e => update('role', e.target.value)}>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+              </select>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="form-group">
                 <label className="form-label">Email *</label>
@@ -161,6 +172,34 @@ export default function RegisterPage() {
             <div className="form-group">
               <label className="form-label">College Name</label>
               <input type="text" className="form-input" placeholder="Your college/university" value={formData.college} onChange={e => update('college', e.target.value)} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+              <div className="form-group">
+                <label className="form-label">Country</label>
+                <select className="form-select" value={formData.country} onChange={e => update('country', e.target.value)}>
+                  <option value="">Select Country</option>
+                  <option value="India">🇮🇳 India</option>
+                  <option value="Nepal">🇳🇵 Nepal</option>
+                  <option value="USA">🇺🇸 USA</option>
+                  <option value="UK">🇬🇧 UK</option>
+                  <option value="Canada">🇨🇦 Canada</option>
+                  <option value="Australia">🇦🇺 Australia</option>
+                  <option value="Germany">🇩🇪 Germany</option>
+                  <option value="UAE">🇦🇪 UAE</option>
+                  <option value="Singapore">🇸🇬 Singapore</option>
+                  <option value="Other">🌍 Other</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">State</label>
+                <input type="text" className="form-input" placeholder="e.g. Maharashtra" value={formData.state} onChange={e => update('state', e.target.value)} />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">City</label>
+              <input type="text" className="form-input" placeholder="e.g. Mumbai" value={formData.city} onChange={e => update('city', e.target.value)} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>

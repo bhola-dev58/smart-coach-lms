@@ -41,6 +41,7 @@ export async function GET() {
         enrolledCourses: user.enrolledCourses || [],
         verification: user.verification || { status: 'unverified' },
         payoutInfo: user.payoutInfo || { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
+        location: user.location || { country: '', state: '', city: '' },
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
@@ -63,7 +64,7 @@ export async function PUT(req) {
     const body = await req.json();
 
     // Whitelist: Only these fields can be updated by the user themselves
-    const allowedFields = ['name', 'phone', 'avatar', 'college', 'branch', 'year', 'bio', 'socialLinks', 'payoutInfo'];
+    const allowedFields = ['name', 'phone', 'avatar', 'college', 'branch', 'year', 'bio', 'socialLinks', 'payoutInfo', 'location'];
     const updateData = {};
 
     for (const key of allowedFields) {
@@ -90,6 +91,12 @@ export async function PUT(req) {
             bankAccount: (body[key].bankAccount || '').trim(),
             ifscCode: (body[key].ifscCode || '').trim().toUpperCase(),
             bankName: (body[key].bankName || '').trim(),
+          };
+        } else if (key === 'location' && typeof body[key] === 'object') {
+          updateData[key] = {
+            country: (body[key].country || '').trim(),
+            state: (body[key].state || '').trim(),
+            city: (body[key].city || '').trim(),
           };
         } else {
           updateData[key] = body[key];
@@ -133,6 +140,7 @@ export async function PUT(req) {
         bio: updatedUser.bio || '',
         specialization: updatedUser.specialization || [],
         socialLinks: updatedUser.socialLinks || { linkedin: '', youtube: '', website: '' },
+        location: updatedUser.location || { country: '', state: '', city: '' },
       }
     });
   } catch (err) {
