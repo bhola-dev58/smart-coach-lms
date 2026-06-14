@@ -6,15 +6,19 @@ import User from '@/models/User';
 export async function POST(request) {
   try {
     await connectDB();
-    const { name, email, phone, password, college, branch, year } = await request.json();
+    const { name, email, phone, password, college, branch, year, role, country, state, city } = await request.json();
 
-    // ── Validation ──
+    // ── Basic Validation ──
     if (!name || !email || !password) {
       return NextResponse.json({ success: false, error: 'Name, email and password are required.' }, { status: 400 });
     }
     if (password.length < 8) {
       return NextResponse.json({ success: false, error: 'Password must be at least 8 characters.' }, { status: 400 });
     }
+
+    // ── Role Handling — Admin cannot be created via public API ──
+    const allowedRoles = ['student', 'instructor'];
+    const userRole = allowedRoles.includes(role) ? role : 'student';
 
     // ── Check duplicate email ──
     const existing = await User.findOne({ email: email.toLowerCase() });
@@ -34,9 +38,15 @@ export async function POST(request) {
       college: college || '',
       branch: branch || 'CSE',
       year: year ? parseInt(year) : 1,
-      role: 'student',
+      role: userRole,
       provider: 'credentials',
       isEmailVerified: false,
+      hasSelectedRole: true,
+      location: {
+        country: country || '',
+        state: state || '',
+        city: city || '',
+      },
     });
 
     return NextResponse.json({
@@ -50,3 +60,4 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
+

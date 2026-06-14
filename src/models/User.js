@@ -43,6 +43,13 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     ],
 
+    // ── Location ──
+    location: {
+      country: { type: String, default: '', trim: true },
+      state: { type: String, default: '', trim: true },
+      city: { type: String, default: '', trim: true },
+    },
+
     // ── KYC / Verification ──
     verification: {
       status: {
