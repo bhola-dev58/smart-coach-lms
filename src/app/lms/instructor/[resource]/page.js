@@ -243,39 +243,39 @@ export default function GenericResourcePage({ params }) {
         }
 
         /* ── LIGHT MODE OVERRIDES ── */
-        :global([data-theme='light']) .course-card {
+        [data-theme='light'] .course-card {
           background: #ffffff !important;
-          border: 1px solid var(--dash-border) !important;
+          border: 1px solid #d1d5db !important;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
         }
-        :global([data-theme='light']) .course-card:hover {
+        [data-theme='light'] .course-card:hover {
           border-color: var(--dash-accent) !important;
           box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08), 0 0 12px rgba(200, 16, 46, 0.1) !important;
         }
-        :global([data-theme='light']) .btn-edit {
+        [data-theme='light'] .btn-edit {
           background: #ffffff !important;
           color: #1a1a1a !important;
           border: 1px solid #d1d5db !important;
         }
-        :global([data-theme='light']) .btn-edit:hover {
+        [data-theme='light'] .btn-edit:hover {
           background: #f3f4f6 !important;
           border-color: #9ca3af !important;
         }
-        :global([data-theme='light']) .btn-builder {
+        [data-theme='light'] .btn-builder {
           background: rgba(200, 16, 46, 0.04) !important;
           color: var(--dash-accent) !important;
           border: 1px solid rgba(200, 16, 46, 0.25) !important;
         }
-        :global([data-theme='light']) .btn-builder:hover {
+        [data-theme='light'] .btn-builder:hover {
           background: rgba(200, 16, 46, 0.1) !important;
           border-color: var(--dash-accent) !important;
         }
-        :global([data-theme='light']) .btn-delete {
+        [data-theme='light'] .btn-delete {
           background: rgba(239, 68, 68, 0.03) !important;
           color: #ef4444 !important;
           border: 1px solid rgba(239, 68, 68, 0.2) !important;
         }
-        :global([data-theme='light']) .btn-delete:hover {
+        [data-theme='light'] .btn-delete:hover {
           background: rgba(239, 68, 68, 0.08) !important;
           border-color: #ef4444 !important;
         }
