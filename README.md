@@ -1,18 +1,18 @@
-# 🎓 MeetMe Center — Smart Coaching LMS
+#  MeetMe Center — Smart Coaching LMS
 
 A modern, scalable Learning Management System (LMS) built for coaching centers. Students can browse courses, enroll via Razorpay payments, and access video content — all through a premium dark-themed UI.
 
-## ✨ Features
+##  Features
 
-- 🎨 **Premium UI/UX** — Modern, responsive design with glassmorphism and micro-animations.
-- 🎓 **LMS Dashboard & Course Player** — A dedicated dark-themed learner environment (`/lms`) with a "Continue Learning" dashboard and a full-featured video course player (`/lms/learn/[courseId]`) including lesson sidebars and progress tracking.
-- 📚 **Course Management & Browsing** — Browse, search, and view dynamic course pages fetched from MongoDB with deep serialization. Dashboard users get an internal, dark-mode course browser.
-- 💳 **Razorpay Payment Integration** — Secure, automated online enrollment directly via course cards. Built-in support for UPI apps (GPay, PhonePe, Paytm), Netbanking, Wallets, and Cards with extensive error handling and webhook verification.
-- 🔐 **Stateless JWT Authentication** — NextAuth-powered secure popup login/signup (No page reloads) and a smart top-right Profile dropdown menu.
-- 📹 **Video Hosting Ready** — Course content delivery tailored for heavy video storage.
-- ⚙️ **Database Seeding** — Built-in seeding scripts for quick prototyping (`courses` and `enrollments`).
+-  **Premium UI/UX** — Modern, responsive design with glassmorphism and micro-animations.
+-  **LMS Dashboard & Course Player** — A dedicated dark-themed learner environment (`/lms`) with a "Continue Learning" dashboard and a full-featured video course player (`/lms/learn/[courseId]`) including lesson sidebars and progress tracking.
+-  **Course Management & Browsing** — Browse, search, and view dynamic course pages fetched from MongoDB with deep serialization. Dashboard users get an internal, dark-mode course browser.
+-  **Razorpay Payment Integration** — Secure, automated online enrollment directly via course cards. Built-in support for UPI apps (GPay, PhonePe, Paytm), Netbanking, Wallets, and Cards with extensive error handling and webhook verification.
+-  **Stateless JWT Authentication** — NextAuth-powered secure popup login/signup (No page reloads) and a smart top-right Profile dropdown menu.
+-  **Video Hosting Ready** — Course content delivery tailored for heavy video storage.
+-  **Database Seeding** — Built-in seeding scripts for quick prototyping (`courses` and `enrollments`).
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer      | Technology                          |
 |------------|-------------------------------------|
@@ -22,38 +22,38 @@ A modern, scalable Learning Management System (LMS) built for coaching centers. 
 | Payments   | Razorpay                            |
 | DevOps     | Docker, Kubernetes (K8s), HPA       |
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 src/
 ├── app/                  # Pages & API Routes
-│   ├── api/              # ⚙️ Backend API endpoints (auth, payment, lms data)
-│   ├── courses/          # 📚 Public Course pages
-│   ├── lms/              # 🎓 Protected Student Dashboard & Learning Portal
+│   ├── api/              #  Backend API endpoints (auth, payment, lms data)
+│   ├── courses/          #  Public Course pages
+│   ├── lms/              #  Protected Student Dashboard & Learning Portal
 │   │   ├── browse/       # In-dashboard course search
 │   │   ├── courses/      # Enrolled courses view
-│   │   └── learn/        # 🎬 Course Video Player 
-│   ├── auth/             # 🔐 Login/Signup
+│   │   └── learn/        #  Course Video Player 
+│   ├── auth/             #  Login/Signup
 │   └── globals.css       # Global styles
-├── components/           # 🎨 Reusable UI components
+├── components/           #  Reusable UI components
 │   ├── home/             # Landing page sections
 │   ├── courses/          # Course cards & enrollment buttons
 │   ├── layout/           # Global Header & Footer (with Profile dropdown)
 │   └── lms/              # Dashboard sidebars & learning widgets
-├── models/               # 🗄️ MongoDB Schemas
+├── models/               #  MongoDB Schemas
 │   ├── User.js
 │   ├── Course.js
 │   ├── Enrollment.js
 │   └── Payment.js
-└── lib/                  # ⚙️ DB config & utilities
+└── lib/                  #  DB config & utilities
     ├── db.js             # MongoDB connection
     ├── seed_courses.js   # Seed initial courses catalog
     └── seed_enrollment.js# Seed test enrollments for student accounts
 
-k8s/                      # ☸️ Kubernetes manifests (Optional)
+k8s/                      #  Kubernetes manifests (Optional)
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -84,13 +84,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-## 💳 Testing Payments
+##  Testing Payments
 
 We use **Razorpay SDK** for processing. To test UPI intent flows, netbanking, or cards without spending money:
 1. Ensure your `.env.local` contains `NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_...`
 2. Browse a course and click `Enroll Now`.
 3. In Test Mode, enter any UPI ID or select Google Pay/PhonePe (app opening intent works on mobile browsers). Payments will auto-verify as successful to test your DB write flow.
 
-## 📄 License
+##  License
 
 This project is private and proprietary.
