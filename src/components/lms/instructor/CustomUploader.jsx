@@ -9,25 +9,18 @@ export default function CustomUploader({ onUploadSuccess, label = "Upload File" 
     setUploading(true);
     const data = new FormData();
     data.append('file', file);
-    data.append('upload_preset', 'ml_default'); // Must map to a Cloudinary unauthenticated preset
 
     try {
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      if (!cloudName) throw new Error('Cloudinary not configured in .env.local');
-
-      // Use video endpoint if it's a video, else generic auto
-      const resourceType = file.type.startsWith('video/') ? 'video' : 'auto';
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: data
       });
       
       const result = await res.json();
-      if (result.secure_url) {
-        onUploadSuccess(result.secure_url);
+      if (result.success && result.url) {
+        onUploadSuccess(result.url);
       } else {
-        alert(result.error?.message || 'Failed to upload file');
+        alert(result.error || 'Failed to upload file');
       }
     } catch (err) {
       console.error('Upload Error:', err);

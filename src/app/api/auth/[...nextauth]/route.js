@@ -1,3 +1,8 @@
+import dns from 'dns';
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 import NextAuth from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 

@@ -1,3 +1,8 @@
+import dns from 'dns';
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
@@ -9,6 +14,9 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      httpOptions: {
+        timeout: 10000, // 10 seconds timeout instead of the default 3.5 seconds
+      },
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -60,35 +68,53 @@ export const authOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
+      console.log('🔑 [NextAuth] signIn callback triggered for provider:', account?.provider, 'email:', user?.email);
       if (account.provider === 'google') {
-        await connectDB();
-        let dbUser = await User.findOne({ email: user.email });
-        let isNew = false;
-        if (!dbUser) {
-          isNew = true;
-          dbUser = await User.create({
-            name: user.name,
-            email: user.email,
-            avatar: user.image || '',
-            role: 'student',
-            provider: 'google',
-            isEmailVerified: true,
-            hasSelectedRole: false, // Must select role on first login
-            lastLoginAt: new Date(),
-          });
-        } else {
-          if (!dbUser.isActive) return false;
-          await User.findByIdAndUpdate(dbUser._id, {
-            lastLoginAt: new Date(),
-            avatar: dbUser.avatar || user.image || '',
-          });
+        try {
+          console.log('🔑 [NextAuth] Connecting to MongoDB...');
+          await connectDB();
+          console.log('🔑 [NextAuth] Connected to MongoDB. Finding user by email...');
+          let dbUser = await User.findOne({ email: user.email });
+          console.log('🔑 [NextAuth] FindOne query completed. User found:', !!dbUser);
+          
+          let isNew = false;
+          if (!dbUser) {
+            isNew = true;
+            console.log('🔑 [NextAuth] Existing user not found. Creating new student user...');
+            dbUser = await User.create({
+              name: user.name,
+              email: user.email,
+              avatar: user.image || '',
+              role: 'student',
+              provider: 'google',
+              isEmailVerified: true,
+              hasSelectedRole: false, // Must select role on first login
+              lastLoginAt: new Date(),
+            });
+            console.log('🔑 [NextAuth] New student user created successfully, ID:', dbUser._id);
+          } else {
+            if (!dbUser.isActive) {
+              console.log('🔑 [NextAuth] User is suspended/inactive. Rejecting sign-in.');
+              return false;
+            }
+            console.log('🔑 [NextAuth] User exists. Updating last login and profile avatar if needed...');
+            await User.findByIdAndUpdate(dbUser._id, {
+              lastLoginAt: new Date(),
+              avatar: dbUser.avatar || user.image || '',
+            });
+            console.log('🔑 [NextAuth] User update completed successfully.');
+          }
+          user.id = dbUser._id.toString();
+          user.role = dbUser.role;
+          user.avatar = dbUser.avatar || user.image || '';
+          // Show role selection popup if Google user hasn't chosen a role yet
+          user.needsRoleSelection = isNew || !dbUser.hasSelectedRole;
+          console.log('🔑 [NextAuth] signIn callback returning true. needsRoleSelection:', user.needsRoleSelection);
+          return true;
+        } catch (error) {
+          console.error('❌ [NextAuth] Error inside signIn callback:', error);
+          return false;
         }
-        user.id = dbUser._id.toString();
-        user.role = dbUser.role;
-        user.avatar = dbUser.avatar || user.image || '';
-        // Show role selection popup if Google user hasn't chosen a role yet
-        user.needsRoleSelection = isNew || !dbUser.hasSelectedRole;
-        return true;
       }
       return true;
     },
