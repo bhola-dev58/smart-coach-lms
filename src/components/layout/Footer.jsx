@@ -11,7 +11,7 @@ export default function Footer() {
                 <img 
                   src="/images/logo-only.png" 
                   alt="Gradify Academy" 
-                  style={{ height: '48px', width: 'auto', display: 'block' }} 
+                  style={{ height: '48px', width: 'auto', display: 'block', borderRadius: '10px' }} 
                 />
               </Link>
               <p>Empowering students with expert coaching, industry-relevant courses, and personalized mentorship — From Concepts to Creation.</p>
