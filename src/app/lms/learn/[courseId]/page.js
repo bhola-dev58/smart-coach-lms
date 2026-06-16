@@ -249,37 +249,83 @@ export default function LearnCoursePage() {
   useEffect(() => {
     if (!activeLesson?.videoUrl || !videoRef.current) return;
 
-    const { hlsUrl, isCloudinary } = getStreamingUrls(activeLesson.videoUrl);
+    // Reset video source first to tear down previous states
+    videoRef.current.src = '';
+    if (hlsRef.current) {
+      hlsRef.current.detachMedia();
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    const { hlsUrl, isCloudinary, mp4Url } = getStreamingUrls(activeLesson.videoUrl);
 
     if (hlsUrl && isCloudinary) {
-      import('hls.js').then(({ default: Hls }) => {
-        if (Hls.isSupported()) {
-          if (hlsRef.current) hlsRef.current.destroy();
+      // Pre-check if HLS is active & generated on Cloudinary to avoid loading delays/buffering
+      fetch(hlsUrl, { method: 'HEAD' })
+        .then((res) => {
+          if (res.ok && videoRef.current) {
+            import('hls.js').then(({ default: Hls }) => {
+              if (Hls.isSupported()) {
+                const hls = new Hls({
+                  maxBufferLength: 30,
+                  maxMaxBufferLength: 60,
+                  startLevel: -1,
+                });
+                hls.loadSource(hlsUrl);
+                hls.attachMedia(videoRef.current);
 
-          const hls = new Hls({
-            maxBufferLength: 30,
-            maxMaxBufferLength: 60,
-            startLevel: -1,
-          });
-          hls.loadSource(hlsUrl);
-          hls.attachMedia(videoRef.current);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                  if (data.fatal) {
+                    console.warn('HLS error, falling back to MP4:', data);
+                    hls.detachMedia();
+                    hls.destroy();
+                    hlsRef.current = null;
+                    if (videoRef.current) {
+                      videoRef.current.src = mp4Url || activeLesson.videoUrl;
+                      videoRef.current.load();
+                      videoRef.current.play().catch(() => {});
+                    }
+                  }
+                });
 
-          hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) {
-              console.warn('HLS error, falling back to MP4');
-              hls.destroy();
+                hlsRef.current = hls;
+              } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+                videoRef.current.src = hlsUrl;
+              } else {
+                videoRef.current.src = mp4Url || activeLesson.videoUrl;
+                videoRef.current.load();
+              }
+            }).catch((err) => {
+              console.error('HLS load error, falling back:', err);
+              if (videoRef.current) {
+                videoRef.current.src = mp4Url || activeLesson.videoUrl;
+                videoRef.current.load();
+              }
+            });
+          } else {
+            // HLS is not enabled on Cloudinary (returns 400/404), stream MP4 directly
+            if (videoRef.current) {
+              videoRef.current.src = mp4Url || activeLesson.videoUrl;
+              videoRef.current.load();
             }
-          });
-
-          hlsRef.current = hls;
-        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-          videoRef.current.src = hlsUrl;
-        }
-      }).catch(() => {});
+          }
+        })
+        .catch((err) => {
+          console.warn('HLS profile check failed, playing MP4 directly:', err);
+          if (videoRef.current) {
+            videoRef.current.src = mp4Url || activeLesson.videoUrl;
+            videoRef.current.load();
+          }
+        });
+    } else {
+      // Non-Cloudinary / Local storage URL
+      videoRef.current.src = mp4Url || activeLesson.videoUrl;
+      videoRef.current.load();
     }
 
     return () => {
       if (hlsRef.current) {
+        hlsRef.current.detachMedia();
         hlsRef.current.destroy();
         hlsRef.current = null;
       }

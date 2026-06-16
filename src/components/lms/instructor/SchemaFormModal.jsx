@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 export default function SchemaFormModal({ config, initialData, onClose, onSave }) {
   const [formData, setFormData] = useState({});
   const [uploading, setUploading] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -21,6 +23,23 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
     }
   }, [initialData, config]);
 
+  // Load courses if 'course' field exists in the form configuration
+  useEffect(() => {
+    const hasCourseField = config.fields.some(f => f.key === 'course');
+    if (hasCourseField) {
+      setLoadingCourses(true);
+      fetch('/api/instructor/crud/courses')
+        .then(res => res.json())
+        .then(json => {
+          if (json.success) {
+            setCourses(json.data || []);
+          }
+        })
+        .catch(err => console.error('Failed to load courses for selection dropdown:', err))
+        .finally(() => setLoadingCourses(false));
+    }
+  }, [config]);
+
   const handleChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
@@ -29,20 +48,18 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
     setUploading(true);
     const data = new FormData();
     data.append('file', file);
-    data.append('upload_preset', 'ml_default'); // Must match user's Cloudinary preset config later
 
     try {
-      // Use standard cloudinary upload via the browser directly or our own endpoint
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      if (!cloudName) { throw new Error('Cloudinary not configured'); }
-      
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+      // Upload using our secure server-side proxy route
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: data
       });
       const result = await res.json();
-      if (result.secure_url) {
-        handleChange(key, result.secure_url);
+      if (result.success && result.url) {
+        handleChange(key, result.url);
+      } else {
+        alert(result.error || 'Upload failed');
       }
     } catch (err) {
       console.error('Upload Error:', err);
@@ -87,7 +104,21 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                   {field.label} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
                 </label>
                 
-                {field.type === 'textarea' ? (
+                {field.key === 'course' ? (
+                  <select 
+                    value={formData[field.key] || ''}
+                    onChange={e => handleChange(field.key, e.target.value)}
+                    required={field.required}
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--dash-border)', borderRadius: '6px', padding: '0.75rem', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}
+                  >
+                    <option value="">{loadingCourses ? 'Loading courses...' : 'Select a course'}</option>
+                    {courses.map(c => (
+                      <option key={c._id} value={c._id}>
+                        {c.title} {c.slug ? `(${c.slug})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                ) : field.type === 'textarea' ? (
                   <textarea 
                     value={formData[field.key] || ''}
                     onChange={e => handleChange(field.key, e.target.value)}

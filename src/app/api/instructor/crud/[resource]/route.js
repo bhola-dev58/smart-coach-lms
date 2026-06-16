@@ -41,9 +41,17 @@ export async function GET(request, { params }) {
     const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
-    // Try to fetch instructor specific resources if schema has instructor/user field, else generic fetch
-    // For now we do a simple .find() but limit to avoid enormous paylaods
-    const data = await Model.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    // Filter to instructor-specific data if applicable
+    const query = {};
+    if (Model.schema.paths.instructor) {
+      query.instructor = auth.session.user.id;
+    } else if (Model.schema.paths.user) {
+      query.user = auth.session.user.id;
+    } else if (Model.schema.paths.createdBy) {
+      query.createdBy = auth.session.user.id;
+    }
+
+    const data = await Model.find(query).sort({ createdAt: -1 }).limit(100).lean();
 
     return NextResponse.json({ success: true, data });
   } catch (err) {
@@ -66,6 +74,7 @@ export async function POST(request, { params }) {
     // Auto-inject instructor ID if applicable
     if (Model.schema.paths.instructor) body.instructor = auth.session.user.id;
     if (Model.schema.paths.user) body.user = auth.session.user.id;
+    if (Model.schema.paths.createdBy) body.createdBy = auth.session.user.id;
 
     const newItem = await Model.create(body);
     return NextResponse.json({ success: true, data: newItem });
