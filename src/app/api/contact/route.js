@@ -1,3 +1,8 @@
+import dns from 'dns';
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
 
