@@ -10,14 +10,25 @@ export async function POST(request) {
     }
 
     // Configure the nodemailer transporter
-    // For this to work with Gmail, you need an App Password if 2FA is enabled.
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com', // Sender email
-        pass: process.env.SMTP_PASSWORD, // App password from Google Account
-      },
-    });
+    const transporter = nodemailer.createTransport(
+      process.env.SMTP_HOST
+        ? {
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT || '465', 10),
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+              user: process.env.SMTP_EMAIL,
+              pass: process.env.SMTP_PASSWORD,
+            },
+          }
+        : {
+            service: 'gmail',
+            auth: {
+              user: process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com',
+              pass: process.env.SMTP_PASSWORD,
+            },
+          }
+    );
 
     const mailOptions = {
       from: `"${name}" <${process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com'}>`, // Send from the authenticated email to avoid spam blocks

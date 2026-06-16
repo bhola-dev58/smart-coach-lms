@@ -15,13 +15,25 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Missing required fields: to, subject, html' }, { status: 400 });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com',
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    const transporter = nodemailer.createTransport(
+      process.env.SMTP_HOST
+        ? {
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT || '465', 10),
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+              user: process.env.SMTP_EMAIL,
+              pass: process.env.SMTP_PASSWORD,
+            },
+          }
+        : {
+            service: 'gmail',
+            auth: {
+              user: process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com',
+              pass: process.env.SMTP_PASSWORD,
+            },
+          }
+    );
 
     await transporter.sendMail({
       from: from || `"Gradify Academy" <${process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com'}>`,
