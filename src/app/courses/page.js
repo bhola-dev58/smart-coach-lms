@@ -5,9 +5,9 @@ import '@/models/User'; // Register User schema for populate('instructor')
 import EnrollButton from '@/components/courses/EnrollButton';
 
 export const metadata = {
-  title: 'All Courses | MeetMe Center',
+  title: 'All Courses | Gradify Academy',
   description:
-    'Explore 50+ B.Tech courses at MeetMe Center — CSE, ECE, Mechanical, GATE Prep. Expert faculty, affordable pricing.',
+    'Explore 50+ courses at Gradify Academy — CSE, ECE, Mechanical, GATE Prep. Expert faculty, affordable pricing. From Concepts to Creation.',
 };
 
 export default async function CoursesPage({ searchParams }) {

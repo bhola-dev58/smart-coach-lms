@@ -10,7 +10,7 @@ export default function AdminSettingsPage() {
   const [config, setConfig] = useState({
     maintenanceMode: false,
     allowRegistrations: true,
-    supportEmail: 'support@meetmecenter.com',
+    supportEmail: 'support@gradifyacademy.com',
     paymentGateway: 'Razorpay / UPI Apps',
     appVersion: 'v2.1.0-stable'
   });

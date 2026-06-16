@@ -25,7 +25,7 @@ export async function POST(request) {
       to: 'bhola.dev58@gmail.com', // Admin email receiving the message
       subject: `New Contact Form Submission: ${subject}`,
       html: `
-        <h2>New Message from Meetme Center Contact Form</h2>
+        <h2>New Message from Gradify Academy Contact Form</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>

@@ -48,8 +48,10 @@ export default function InstructorSidebar({ isOpen, onClose, isCollapsed, onTogg
         
         {/* Logo */}
         <div className={styles.sidebarLogo}>
-          <div className={styles.logoIcon} style={{ background: 'var(--dash-accent)', color: 'white' }}>IN</div>
-          {!isCollapsed && <span className={styles.logoText}>Instructor</span>}
+          {!isCollapsed 
+            ? <img src="/images/logo-only.png" alt="Gradify Academy" style={{ height: '38px', width: 'auto' }} />
+            : <img src="/images/logo-only.png" alt="GA" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+          }
           {/* Desktop Collapse Toggle */}
           <button className={styles.collapseBtn} onClick={onToggle} aria-label="Toggle Sidebar">
             {isCollapsed ? (
@@ -61,7 +63,7 @@ export default function InstructorSidebar({ isOpen, onClose, isCollapsed, onTogg
         </div>
 
         {/* Plan CTA (Optional, but let's match the student one) */}
-        {!isCollapsed && <button className={styles.planBtn} style={{ background: 'rgba(200,16,46,0.1)', color: 'var(--dash-accent)' }}>🎙️ Start Broadcast</button>}
+        {!isCollapsed && <button className={styles.planBtn} style={{ background: 'var(--color-secondary-light)', color: 'var(--color-secondary)' }}>🎙️ Start Broadcast</button>}
 
         {/* Navigation */}
         <nav className={styles.navSection}>

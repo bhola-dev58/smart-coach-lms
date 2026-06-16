@@ -22,8 +22,7 @@ export default function AdminSidebar({ userRole }) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <div className={styles.logoBox}>MC</div>
-        <div className={styles.brandText}>MeetMe Admin</div>
+        <img src="/images/logo-only.png" alt="Gradify Academy" style={{ height: '40px', width: 'auto' }} />
       </div>
       
       <nav className={styles.navConfig}>

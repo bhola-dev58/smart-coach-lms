@@ -176,7 +176,7 @@ function AuthModalInner() {
             {isRegister ? 'Create Account' : 'Welcome Back'}
           </h1>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-light)' }}>
-            {isRegister ? 'Join 10,000+ B.Tech students at MeetMe Center' : 'Sign in to continue to your dashboard'}
+            {isRegister ? 'Join 10,000+ students at Gradify Academy' : 'Sign in to continue to your dashboard'}
           </p>
         </div>
 
@@ -221,14 +221,14 @@ function AuthModalInner() {
                   <label className="form-label" style={{ fontSize: '0.72rem' }}>Password *</label>
                   <PasswordInput id="reg-password" value={formData.password} onChange={e => update('password', e.target.value)} required minLength={8} placeholder="Min. 8 characters" />
                   {formData.password.length > 0 && formData.password.length < 8 && (
-                    <p style={{ fontSize: '0.7rem', color: '#C8102E', margin: '0.15rem 0 0' }}>Too short</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--color-primary)', margin: '0.15rem 0 0' }}>Too short</p>
                   )}
                 </div>
                 <div style={{ margin: 0 }}>
                   <label className="form-label" style={{ fontSize: '0.72rem' }}>Confirm Password *</label>
                   <PasswordInput id="reg-confirm-password" value={formData.confirmPassword} onChange={e => update('confirmPassword', e.target.value)} required placeholder="Re-enter password" />
                   {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
-                    <p style={{ fontSize: '0.7rem', color: '#C8102E', margin: '0.15rem 0 0' }}>Passwords don't match</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--color-primary)', margin: '0.15rem 0 0' }}>Passwords don't match</p>
                   )}
                 </div>
               </div>

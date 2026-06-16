@@ -10,9 +10,9 @@ import Course from '@/models/Course';
 import '@/models/User'; // Register User schema for populate('instructor')
 
 export const metadata = {
-  title: 'MeetMe Center — Smart Coaching LMS',
+  title: 'Gradify Academy — From Concepts to Creation',
   description:
-    'Join India\'s fastest-growing B.Tech coaching platform. Expert faculty from IITs & NITs, industry-relevant curriculum, and guaranteed placement assistance.',
+    'Join India\'s fastest-growing coaching platform. Expert faculty from IITs & NITs, industry-relevant curriculum, and guaranteed placement assistance. From Concepts to Creation.',
 };
 
 export default async function HomePage() {

@@ -10,7 +10,7 @@ export async function generateMetadata({ params }) {
   const course = await Course.findOne({ slug }).lean();
   if (!course) return { title: 'Course Not Found' };
   return {
-    title: `${course.title} — MeetMe Center`,
+    title: `${course.title} — Gradify Academy`,
     description: course.shortDescription || course.description,
   };
 }

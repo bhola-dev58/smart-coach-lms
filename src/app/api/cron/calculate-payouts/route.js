@@ -126,7 +126,7 @@ export async function GET(request) {
       if (data.instructor.email) {
         await dispatchJob('/api/jobs/send-email', {
           to: data.instructor.email,
-          subject: `💰 Payout Summary for ${periodLabel} - MeetMe Center`,
+          subject: `💰 Payout Summary for ${periodLabel} - Gradify Academy`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #27ae60;">💰 Payout Summary</h2>
