@@ -72,7 +72,7 @@ export default async function VerifyCertificatePage({ params }) {
           </div>
           <h1 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Certificate Verified ✅</h1>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>
-            This certificate is authentic and issued by MeetMe Center
+            This certificate is authentic and issued by Gradify Academy
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default async function VerifyCertificatePage({ params }) {
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>
               Instructor
             </p>
-            <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>{certificate.instructorName || 'MeetMe Center'}</p>
+            <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>{certificate.instructorName || 'Gradify Academy'}</p>
           </div>
           <div>
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>
@@ -138,13 +138,13 @@ export default async function VerifyCertificatePage({ params }) {
         {/* Footer */}
         <div style={{ textAlign: 'center' }}>
           <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>
-            Issued on {completionDate} • MeetMe Center Learning Platform
+            Issued on {completionDate} • Gradify Academy Learning Platform
           </p>
           <Link href="/" style={{
             display: 'inline-block', marginTop: '1rem',
-            color: '#C8102E', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem',
+            color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem',
           }}>
-            ← Back to MeetMe Center
+            ← Back to Gradify Academy
           </Link>
         </div>
       </div>

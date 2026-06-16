@@ -59,7 +59,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
         key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'MeetMe Center',
+        name: 'Gradify Academy',
         description: `Enrollment: ${courseTitle}`,
         order_id: orderData.orderId,
         handler: async function (response) {
@@ -121,7 +121,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
             },
           },
         },
-        theme: { color: '#C8102E' },
+        theme: { color: '#1B2B6B' },
         modal: {
           ondismiss: function () {
             setLoading(false);

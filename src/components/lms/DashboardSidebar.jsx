@@ -104,8 +104,10 @@ export default function DashboardSidebar({ isOpen, onClose, isCollapsed, onToggl
       <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''} ${isCollapsed ? styles.sidebarCollapsed : ''}`}>
         {/* Logo */}
         <div className={styles.sidebarLogo}>
-          <div className={styles.logoIcon}>MC</div>
-          {!isCollapsed && <span className={styles.logoText}>MeetMe Center</span>}
+          {!isCollapsed 
+            ? <img src="/images/logo-only.png" alt="Gradify Academy" style={{ height: '38px', width: 'auto' }} />
+            : <img src="/images/logo-only.png" alt="GA" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+          }
           {/* Desktop Collapse Toggle */}
           <button className={styles.collapseBtn} onClick={onToggleCollapse} aria-label="Toggle Sidebar">
             {isCollapsed ? (

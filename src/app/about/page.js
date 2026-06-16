@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'About Us',
-  description: 'Learn about MeetMe Center — India\'s premier B.Tech coaching institute. Our story, mission, expert faculty since 2018.',
+  description: 'Learn about Gradify Academy — India\'s premier coaching platform. Our story, mission, expert faculty, and commitment to student success.',
 };
 
 export default function AboutPage() {
@@ -10,7 +10,7 @@ export default function AboutPage() {
     <>
       <div className="page-banner">
         <div className="container">
-          <h1>About MeetMe Center</h1>
+          <h1>About Gradify Academy</h1>
           <nav className="breadcrumb"><Link href="/">Home</Link><span className="separator">/</span><span className="current">About Us</span></nav>
         </div>
       </div>
@@ -23,7 +23,7 @@ export default function AboutPage() {
               <span className="section-label">Our Story</span>
               <h2 style={{ marginTop: 'var(--space-2)' }}>Building India&apos;s Best B.Tech Coaching Platform</h2>
               <div className="section-divider" style={{ margin: 'var(--space-4) 0' }} />
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>Founded in 2018, MeetMe Center started with a simple mission — to make quality engineering education accessible to every B.Tech student in India, regardless of their college tier or financial background.</p>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>Founded with a clear mission — Gradify Academy brings quality engineering education to every student across India, regardless of college tier or financial background.</p>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>What began as a small coaching center in Bengaluru with 3 faculty and 50 students has grown into a comprehensive edtech platform serving over 10,000 students across 150+ cities.</p>
               <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                 <Link href="/courses" className="btn btn-primary">Explore Courses</Link>
@@ -31,10 +31,10 @@ export default function AboutPage() {
               </div>
             </div>
             <div style={{ position: 'relative' }}>
-              <img src="/images/hero/hero-bg.jpg" alt="MeetMe Center Campus" style={{ width: '100%', height: 400, objectFit: 'cover', border: '1px solid var(--color-border)' }} />
+              <img src="/images/hero/hero-bg.jpg" alt="Gradify Academy Campus" style={{ width: '100%', height: 400, objectFit: 'cover', border: '1px solid var(--color-border)' }} />
               <div style={{ position: 'absolute', bottom: -20, right: -20, background: 'var(--color-primary)', color: 'white', padding: 'var(--space-6)', textAlign:'center' }}>
                 <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-3xl)', fontWeight: 800 }}>8+</div>
-                <div style={{ fontSize: 'var(--text-sm)', opacity: 0.9 }}>Years of Excellence</div>
+                <Link href="/about" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ About Gradify Academy</Link>
               </div>
             </div>
           </div>

@@ -24,7 +24,7 @@ export async function POST(request) {
     });
 
     await transporter.sendMail({
-      from: from || `"MeetMe Center" <${process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com'}>`,
+      from: from || `"Gradify Academy" <${process.env.SMTP_EMAIL || 'bhola.dev58@gmail.com'}>`,
       replyTo: replyTo || undefined,
       to,
       subject,

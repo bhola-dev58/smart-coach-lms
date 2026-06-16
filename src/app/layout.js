@@ -19,11 +19,11 @@ const outfit = Outfit({
 
 export const metadata = {
   title: {
-    default: 'MeetMe Center — Premier B.Tech Coaching Institute',
-    template: '%s — MeetMe Center',
+    default: 'Gradify Academy — From Concepts to Creation',
+    template: '%s — Gradify Academy',
   },
-  description: 'India\'s premier B.Tech coaching institute offering 50+ courses, expert faculty, GATE preparation, and placement assistance for engineering students.',
-  keywords: ['B.Tech coaching', 'engineering courses', 'GATE preparation', 'DSA course', 'MeetMe Center'],
+  description: 'Gradify Academy — India\'s premier coaching platform. Expert faculty from IITs & NITs, 50+ industry-relevant courses, GATE preparation, and placement assistance for engineering students.',
+  keywords: ['B.Tech coaching', 'engineering courses', 'GATE preparation', 'DSA course', 'Gradify Academy', 'online learning'],
 };
 
 export default function RootLayout({ children }) {

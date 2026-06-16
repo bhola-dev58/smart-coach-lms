@@ -50,11 +50,11 @@ export async function GET(request) {
               <p>To continue learning, please renew your subscription or contact support.</p>
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/lms/courses"
-                   style="background: #C8102E; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                   style="background: #1B2B6B; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600;">
                   Renew Access
                 </a>
               </div>
-              <p style="font-size: 12px; color: #999;">MeetMe Center - Your Learning Partner</p>
+              <p style="font-size: 12px; color: #999;">Gradify Academy - Your Learning Partner</p>
             </div>
           `,
         });

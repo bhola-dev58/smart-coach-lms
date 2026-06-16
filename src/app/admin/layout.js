@@ -6,7 +6,7 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import styles from './admin.module.css';
 
 export const metadata = {
-  title: 'Admin Panel — MeetMe Center',
+  title: 'Admin Panel — Gradify Academy',
 };
 
 export default async function AdminLayout({ children }) {
