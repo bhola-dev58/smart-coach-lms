@@ -150,6 +150,136 @@ export default function GenericResourcePage({ params }) {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <style>{`
+        .course-card {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 14px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .course-card:hover {
+          border-color: var(--dash-accent) !important;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(200, 16, 46, 0.15);
+        }
+        .btn-edit {
+          flex: 1;
+          padding: 0.5rem;
+          background: rgba(255, 255, 255, 0.05);
+          color: var(--dash-text);
+          border: 1px solid rgba(255, 255, 255, 0.18) !important;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .btn-edit:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgba(255, 255, 255, 0.35) !important;
+        }
+        .btn-builder {
+          flex: 1;
+          padding: 0.5rem;
+          background: rgba(200, 16, 46, 0.08);
+          color: var(--dash-accent);
+          border: 1px solid rgba(200, 16, 46, 0.35) !important;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .btn-builder:hover {
+          background: rgba(200, 16, 46, 0.16) !important;
+          border-color: var(--dash-accent) !important;
+        }
+        .btn-delete {
+          padding: 0.5rem 0.75rem;
+          background: rgba(239, 68, 68, 0.06);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.25) !important;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .btn-delete:hover {
+          background: rgba(239, 68, 68, 0.15) !important;
+          border-color: #ef4444 !important;
+        }
+        .btn-add-course {
+          padding: 0.6rem 1.25rem;
+          background: var(--dash-accent);
+          color: white;
+          border: 1px solid var(--dash-accent);
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 0.9rem;
+          transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .btn-add-course:hover {
+          background: var(--dash-accent-hover);
+          border-color: var(--dash-accent-hover);
+          transform: translateY(-1px);
+        }
+        .btn-create-first {
+          padding: 0.6rem 1.25rem;
+          background: var(--dash-accent);
+          color: white;
+          border: 1px solid var(--dash-accent);
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s, border-color 0.2s;
+        }
+        .btn-create-first:hover {
+          background: var(--dash-accent-hover);
+          border-color: var(--dash-accent-hover);
+        }
+
+        /* ── LIGHT MODE OVERRIDES ── */
+        [data-theme='light'] .course-card {
+          background: #ffffff !important;
+          border: 1px solid #d1d5db !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        }
+        [data-theme='light'] .course-card:hover {
+          border-color: var(--dash-accent) !important;
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08), 0 0 12px rgba(200, 16, 46, 0.1) !important;
+        }
+        [data-theme='light'] .btn-edit {
+          background: #ffffff !important;
+          color: #1a1a1a !important;
+          border: 1px solid #d1d5db !important;
+        }
+        [data-theme='light'] .btn-edit:hover {
+          background: #f3f4f6 !important;
+          border-color: #9ca3af !important;
+        }
+        [data-theme='light'] .btn-builder {
+          background: rgba(200, 16, 46, 0.04) !important;
+          color: var(--dash-accent) !important;
+          border: 1px solid rgba(200, 16, 46, 0.25) !important;
+        }
+        [data-theme='light'] .btn-builder:hover {
+          background: rgba(200, 16, 46, 0.1) !important;
+          border-color: var(--dash-accent) !important;
+        }
+        [data-theme='light'] .btn-delete {
+          background: rgba(239, 68, 68, 0.03) !important;
+          color: #ef4444 !important;
+          border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        }
+        [data-theme='light'] .btn-delete:hover {
+          background: rgba(239, 68, 68, 0.08) !important;
+          border-color: #ef4444 !important;
+        }
+      `}</style>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--dash-text-muted)' }}>
@@ -167,7 +297,7 @@ export default function GenericResourcePage({ params }) {
             </div>
             <button
               onClick={() => { setEditingRow(null); setIsModalOpen(true); }}
-              style={{ padding: '0.6rem 1.25rem', background: 'var(--dash-accent)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
+              className="btn-add-course"
             >
               + Add New Course
             </button>
@@ -178,7 +308,7 @@ export default function GenericResourcePage({ params }) {
             <div style={{ textAlign: 'center', padding: '4rem', background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
               <p style={{ color: 'var(--dash-text-muted)', marginBottom: '1rem' }}>No courses yet.</p>
-              <button onClick={() => { setEditingRow(null); setIsModalOpen(true); }} style={{ padding: '0.6rem 1.25rem', background: 'var(--dash-accent)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => { setEditingRow(null); setIsModalOpen(true); }} className="btn-create-first">
                 + Create First Course
               </button>
             </div>
@@ -187,14 +317,7 @@ export default function GenericResourcePage({ params }) {
           {/* Cards Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.25rem' }}>
             {data.map(course => (
-              <div key={course._id} style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 14,
-                overflow: 'hidden',
-                display: 'flex', flexDirection: 'column',
-                transition: 'border-color 0.2s, transform 0.2s',
-              }}>
+              <div key={course._id} className="course-card">
                 {/* Thumbnail */}
                 <div style={{ position: 'relative', height: 155, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', flexShrink: 0 }}>
                   {course.thumbnail ? (
@@ -252,19 +375,19 @@ export default function GenericResourcePage({ params }) {
                 <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: 8 }}>
                   <button
                     onClick={() => { setEditingRow(course); setIsModalOpen(true); }}
-                    style={{ flex: 1, padding: '0.45rem', background: 'rgba(255,255,255,0.07)', color: 'var(--dash-text)', border: 'none', borderRadius: 7, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                    className="btn-edit"
                   >
                     ✏️ Edit
                   </button>
                   <button
                     onClick={() => router.push(`/lms/instructor/courses/${course._id}/builder`)}
-                    style={{ flex: 1, padding: '0.45rem', background: 'rgba(var(--dash-accent-rgb, 200,16,46),0.12)', color: 'var(--dash-accent)', border: 'none', borderRadius: 7, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                    className="btn-builder"
                   >
                     ⚙️ Builder
                   </button>
                   <button
                     onClick={() => handleDelete(course._id)}
-                    style={{ padding: '0.45rem 0.7rem', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', borderRadius: 7, fontSize: '0.8rem', cursor: 'pointer' }}
+                    className="btn-delete"
                   >
                     🗑
                   </button>
