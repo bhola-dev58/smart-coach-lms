@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'CSE', year: '1', role: 'student', country: '', state: '', city: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', college: '', branch: 'Science', year: '1', role: 'student', country: '', state: '', city: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -206,10 +206,10 @@ export default function RegisterPage() {
               <div className="form-group">
                 <label className="form-label">Stream / Subject</label>
                 <select className="form-select" value={formData.branch} onChange={e => update('branch', e.target.value)}>
-                  <option value="CSE">Science (PCMB / PCMC)</option>
-                  <option value="ECE">Commerce</option>
-                  <option value="Mechanical">Arts / Humanities</option>
-                  <option value="Civil">Class 8-10 General</option>
+                  <option value="Science">Science (PCMB / PCMC)</option>
+                  <option value="Commerce">Commerce</option>
+                  <option value="Arts">Arts / Humanities</option>
+                  <option value="General">Class 8-10 General</option>
                   <option value="Other">Other</option>
                 </select>
               </div>

@@ -36,7 +36,7 @@ export async function POST(request) {
       password: hashedPassword,
       phone: phone || '',
       college: college || '',
-      branch: branch || 'CSE',
+      branch: branch || 'Science',
       year: year ? parseInt(year) : 1,
       role: userRole,
       provider: 'credentials',

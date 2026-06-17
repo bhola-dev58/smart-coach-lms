@@ -62,7 +62,7 @@ function AuthModalInner() {
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', password: '', confirmPassword: '',
-    college: '', branch: 'CSE', year: '1', role: 'student',
+    college: '', branch: 'Science', year: '1', role: 'student',
     country: '', state: '', city: '',
   });
   const [error, setError] = useState('');
@@ -283,10 +283,10 @@ function AuthModalInner() {
               <div style={{ marginBottom: '0.75rem' }}>
                 <label className="form-label" style={{ fontSize: '0.72rem' }}>Stream / Subject</label>
                 <select className="form-select" value={formData.branch} onChange={e => update('branch', e.target.value)}>
-                  <option value="CSE">Science (PCMB / PCMC)</option>
-                  <option value="ECE">Commerce</option>
-                  <option value="Mechanical">Arts / Humanities</option>
-                  <option value="Civil">Class 8-10 General</option>
+                  <option value="Science">Science (PCMB / PCMC)</option>
+                  <option value="Commerce">Commerce</option>
+                  <option value="Arts">Arts / Humanities</option>
+                  <option value="General">Class 8-10 General</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
