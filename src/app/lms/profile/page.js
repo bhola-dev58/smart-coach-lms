@@ -396,30 +396,6 @@ export default function ProfilePage() {
         </SectionCard>
       )}
 
-      {/* ── Instructor Payout Info ── */}
-      {isInstructor && (
-        <SectionCard title="Payout Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>}
-          badge={<span style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(245,158,11,0.12)', color: '#f59e0b', fontWeight: 600 }}>🔒 Encrypted</span>}>
-          <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.82rem', marginBottom: '1.25rem' }}>
-            Add your bank/UPI details to receive course revenue payouts. This information is stored securely and never shared.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1.25rem' }}>
-            <FieldGroup label="UPI ID">
-              {editMode ? <StyledInput value={form.payoutInfo.upiId} onChange={e => handlePayoutChange('upiId', e.target.value)} placeholder="yourname@upi" /> : <FieldValue>{profile?.payoutInfo?.upiId || 'Not set'}</FieldValue>}
-            </FieldGroup>
-            <FieldGroup label="Bank Name">
-              {editMode ? <StyledInput value={form.payoutInfo.bankName} onChange={e => handlePayoutChange('bankName', e.target.value)} placeholder="e.g. SBI, HDFC" /> : <FieldValue>{profile?.payoutInfo?.bankName || 'Not set'}</FieldValue>}
-            </FieldGroup>
-            <FieldGroup label="Account Number">
-              {editMode ? <StyledInput value={form.payoutInfo.bankAccount} onChange={e => handlePayoutChange('bankAccount', e.target.value)} placeholder="Account number" /> : <FieldValue>{profile?.payoutInfo?.bankAccount ? '••••••' + profile?.payoutInfo?.bankAccount?.slice(-4) : 'Not set'}</FieldValue>}
-            </FieldGroup>
-            <FieldGroup label="IFSC Code">
-              {editMode ? <StyledInput value={form.payoutInfo.ifscCode} onChange={e => handlePayoutChange('ifscCode', e.target.value.toUpperCase())} placeholder="e.g. SBIN0001234" /> : <FieldValue>{profile?.payoutInfo?.ifscCode || 'Not set'}</FieldValue>}
-            </FieldGroup>
-          </div>
-        </SectionCard>
-      )}
-
       {/* ── KYC / Identity Verification ── */}
       <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}>
         {/* Status Banner */}
