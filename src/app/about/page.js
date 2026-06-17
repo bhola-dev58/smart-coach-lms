@@ -26,8 +26,8 @@ export default function AboutPage() {
               <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>Founded with a clear mission — Gradify Academy brings quality school education to every student across India, building solid foundations regardless of school tier or financial background.</p>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>What began as a small coaching center in Bengaluru with 3 faculty and 50 students has grown into a comprehensive edtech platform serving over 10,000 students across 150+ cities.</p>
               <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                <Link href="/courses" className="btn btn-primary">Explore Courses</Link>
-                <Link href="/contact" className="btn btn-outline">Contact Us</Link>
+                <Link href="/courses" className="btn btn-primary btn-md">Explore Courses</Link>
+                <Link href="/contact" className="btn btn-outline btn-md">Contact Us</Link>
               </div>
             </div>
             <div style={{ position: 'relative' }}>

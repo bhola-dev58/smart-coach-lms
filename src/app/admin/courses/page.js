@@ -19,7 +19,7 @@ export default async function AdminCoursesPage() {
             {courses.length} course{courses.length !== 1 ? 's' : ''} total
           </p>
         </div>
-        <Link href="/admin/courses/new" className="btn btn-primary" style={{ textDecoration: 'none' }}>
+        <Link href="/admin/courses/new" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>
           + Add New Course
         </Link>
       </div>
@@ -29,7 +29,7 @@ export default async function AdminCoursesPage() {
         <div style={{ textAlign: 'center', padding: '4rem 2rem', background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
           <p style={{ color: '#888', marginBottom: '1rem' }}>No courses yet. Add your first course!</p>
-          <Link href="/admin/courses/new" className="btn btn-primary" style={{ textDecoration: 'none' }}>+ Add New Course</Link>
+          <Link href="/admin/courses/new" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>+ Add New Course</Link>
         </div>
       )}
 
