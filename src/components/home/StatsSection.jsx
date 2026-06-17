@@ -6,7 +6,7 @@ const stats = [
   { number: 10000, suffix: '+', label: 'Students Enrolled' },
   { number: 50, suffix: '+', label: 'Expert Courses' },
   { number: 150, suffix: '+', label: 'Cities Covered' },
-  { number: 95, suffix: '%', label: 'Placement Rate' },
+  { number: 95, suffix: '%', label: 'Academic Success Rate' },
 ];
 
 function AnimatedNumber({ target, suffix }) {

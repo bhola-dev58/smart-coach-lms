@@ -14,7 +14,7 @@ export default function Footer() {
                   style={{ height: '48px', width: 'auto', display: 'block', borderRadius: '10px' }}
                 />
               </Link>
-              <p>Empowering students with expert coaching, industry-relevant courses, and personalized mentorship — From Concepts to Creation.</p>
+              <p>Empowering school students with expert coaching, conceptual academic courses, and personalized mentorship — From Concepts to Creation.</p>
             </div>
 
             <div className="footer-col">
@@ -28,12 +28,12 @@ export default function Footer() {
             </div>
 
             <div className="footer-col">
-              <h4>Popular Courses</h4>
+              <h4>Popular Classes</h4>
               <ul className="footer-links">
-                <li><Link href="/courses">Data Structures & Algorithms</Link></li>
-                <li><Link href="/courses">Full Stack Web Development</Link></li>
-                <li><Link href="/courses">Machine Learning & AI</Link></li>
-                <li><Link href="/courses">GATE Preparation</Link></li>
+                <li><Link href="/courses">Class 8-10 Math & Science</Link></li>
+                <li><Link href="/courses">Class 11-12 Physics & Chemistry</Link></li>
+                <li><Link href="/courses">IIT-JEE & NEET Foundations</Link></li>
+                <li><Link href="/courses">Olympiad & NTSE Prep</Link></li>
               </ul>
             </div>
 

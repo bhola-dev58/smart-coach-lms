@@ -7,7 +7,7 @@ import EnrollButton from '@/components/courses/EnrollButton';
 export const metadata = {
   title: 'All Courses | Gradify Academy',
   description:
-    'Explore 50+ courses at Gradify Academy — CSE, ECE, Mechanical, GATE Prep. Expert faculty, affordable pricing. From Concepts to Creation.',
+    'Explore courses at Gradify Academy — Mathematics, Physics, Chemistry, Biology, Olympiad & Board Prep for Class 8, 9, 10, 11, and 12. Expert faculty, affordable pricing.',
 };
 
 export default async function CoursesPage({ searchParams }) {

@@ -236,16 +236,16 @@ function AuthModalInner() {
               {/* Row 4: College + Year — 2 columns */}
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.72rem' }}>College Name</label>
-                  <input type="text" className="form-input" placeholder="Your college/university" value={formData.college} onChange={e => update('college', e.target.value)} />
+                  <label className="form-label" style={{ fontSize: '0.72rem' }}>School / College Name</label>
+                  <input type="text" className="form-input" placeholder="Your school or college" value={formData.college} onChange={e => update('college', e.target.value)} />
                 </div>
                 <div style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.72rem' }}>Year</label>
+                  <label className="form-label" style={{ fontSize: '0.72rem' }}>Class</label>
                   <select className="form-select" value={formData.year} onChange={e => update('year', e.target.value)}>
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
+                    <option value="1">Class 8</option>
+                    <option value="2">Class 9</option>
+                    <option value="3">Class 10</option>
+                    <option value="4">Class 11 & 12</option>
                   </select>
                 </div>
               </div>
@@ -280,9 +280,13 @@ function AuthModalInner() {
 
               {/* Row 6: Branch — full width (small select) */}
               <div style={{ marginBottom: '0.75rem' }}>
-                <label className="form-label" style={{ fontSize: '0.72rem' }}>Branch</label>
+                <label className="form-label" style={{ fontSize: '0.72rem' }}>Stream / Subject</label>
                 <select className="form-select" value={formData.branch} onChange={e => update('branch', e.target.value)}>
-                  <option>CSE</option><option>ECE</option><option>Mechanical</option><option>Civil</option><option>Other</option>
+                  <option value="CSE">Science (PCM/PCB)</option>
+                  <option value="ECE">Commerce</option>
+                  <option value="Mechanical">Arts/Humanities</option>
+                  <option value="Civil">Class 8-10 General</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 

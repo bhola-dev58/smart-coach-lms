@@ -6,10 +6,10 @@ export default function HeroSection() {
     <section className={styles.hero}>
       <div className={styles.heroOverlay} />
       <div className={`container ${styles.heroContent}`}>
-        <h1>Master Your <span className={styles.highlight}>Engineering</span> Career With Expert Coaching</h1>
+        <h1>Master Your <span className={styles.highlight}>Academic</span> Journey With Expert Coaching</h1>
         <p className={styles.subtitle}>
-          Join India&apos;s fastest-growing B.Tech coaching platform. Expert faculty from IITs & NITs,
-          industry-relevant curriculum, and guaranteed placement assistance.
+          Join India&apos;s premium coaching platform for school students. Expert guidance for Class 8, 9, 10, 11, and 12,
+          building a strong foundation for board exams and competitive entries.
         </p>
         <div className={styles.heroActions}>
           <Link href="/courses" className="btn btn-primary btn-lg">

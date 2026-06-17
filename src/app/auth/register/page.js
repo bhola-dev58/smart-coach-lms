@@ -66,7 +66,7 @@ export default function RegisterPage() {
       <div className="container" style={{ maxWidth: 520, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
           <h1 style={{ fontSize: 'var(--text-3xl)', marginBottom: 'var(--space-2)' }}>Create Account</h1>
-          <p style={{ color: 'var(--color-text-light)' }}>Join 10,000+ B.Tech students at MeetMe Center</p>
+          <p style={{ color: 'var(--color-text-light)' }}>Join 10,000+ students at Gradify Academy</p>
         </div>
 
         <div style={{ border: '1px solid var(--color-border)', padding: 'var(--space-8)', background: 'white', borderRadius: 'var(--radius-lg)' }}>
@@ -170,8 +170,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">College Name</label>
-              <input type="text" className="form-input" placeholder="Your college/university" value={formData.college} onChange={e => update('college', e.target.value)} />
+              <label className="form-label">School / College Name</label>
+              <input type="text" className="form-input" placeholder="Your school or college" value={formData.college} onChange={e => update('college', e.target.value)} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
@@ -204,15 +204,22 @@ export default function RegisterPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="form-group">
-                <label className="form-label">Branch</label>
+                <label className="form-label">Stream / Subject</label>
                 <select className="form-select" value={formData.branch} onChange={e => update('branch', e.target.value)}>
-                  <option>CSE</option><option>ECE</option><option>Mechanical</option><option>Civil</option><option>Other</option>
+                  <option value="CSE">Science (PCM/PCB)</option>
+                  <option value="ECE">Commerce</option>
+                  <option value="Mechanical">Arts/Humanities</option>
+                  <option value="Civil">Class 8-10 General</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Year</label>
+                <label className="form-label">Class</label>
                 <select className="form-select" value={formData.year} onChange={e => update('year', e.target.value)}>
-                  <option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option>
+                  <option value="1">Class 8</option>
+                  <option value="2">Class 9</option>
+                  <option value="3">Class 10</option>
+                  <option value="4">Class 11 & 12</option>
                 </select>
               </div>
             </div>

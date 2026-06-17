@@ -5,8 +5,8 @@ export default function CTASection() {
     <section className="cta-banner">
       <div className="container">
         <div>
-          <h2>Ready to Accelerate Your Engineering Career?</h2>
-          <p>Join 10,000+ students who chose Gradify Academy for their academic and career success.</p>
+          <h2>Ready to Excel in Your School and Board Exams?</h2>
+          <p>Join 10,000+ students who chose Gradify Academy for conceptual clarity and academic success.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', flexShrink: 0 }}>
           <Link href="/courses" className="btn btn-white btn-lg">Browse Courses</Link>

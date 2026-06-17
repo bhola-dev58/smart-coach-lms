@@ -348,23 +348,23 @@ export default function ProfilePage() {
       {isStudent && (
         <SectionCard title="Academic Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1.25rem' }}>
-            <FieldGroup label="College / University">
-              {editMode ? <StyledInput value={form.college} onChange={e => handleChange('college', e.target.value)} placeholder="e.g. IIT Delhi" /> : <FieldValue>{profile?.college || 'Not provided'}</FieldValue>}
+            <FieldGroup label="School / College Name">
+              {editMode ? <StyledInput value={form.college} onChange={e => handleChange('college', e.target.value)} placeholder="e.g. Kendriya Vidyalaya" /> : <FieldValue>{profile?.college || 'Not provided'}</FieldValue>}
             </FieldGroup>
-            <FieldGroup label="Branch / Stream">
-              {editMode ? <StyledInput value={form.branch} onChange={e => handleChange('branch', e.target.value)} placeholder="e.g. Computer Science" /> : <FieldValue>{profile?.branch || 'Not provided'}</FieldValue>}
+            <FieldGroup label="Stream / Subject">
+              {editMode ? <StyledInput value={form.branch} onChange={e => handleChange('branch', e.target.value)} placeholder="e.g. Science / General" /> : <FieldValue>{profile?.branch || 'Not provided'}</FieldValue>}
             </FieldGroup>
-            <FieldGroup label="Year">
+            <FieldGroup label="Class">
               {editMode ? (
                 <select value={form.year} onChange={e => handleChange('year', e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}>
-                  <option value="">Select Year</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
+                  <option value="">Select Class</option>
+                  <option value="1">Class 8</option>
+                  <option value="2">Class 9</option>
+                  <option value="3">Class 10</option>
+                  <option value="4">Class 11 & 12</option>
                 </select>
               ) : (
-                <FieldValue>{profile?.year ? `${profile.year}${[, 'st', 'nd', 'rd'][profile.year] || 'th'} Year` : 'Not specified'}</FieldValue>
+                <FieldValue>{profile?.year ? (profile.year === '1' ? 'Class 8' : profile.year === '2' ? 'Class 9' : profile.year === '3' ? 'Class 10' : profile.year === '4' ? 'Class 11 & 12' : profile.year) : 'Not specified'}</FieldValue>
               )}
             </FieldGroup>
             <FieldGroup label="Enrolled Courses">

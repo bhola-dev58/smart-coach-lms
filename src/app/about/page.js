@@ -21,9 +21,9 @@ export default function AboutPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
             <div>
               <span className="section-label">Our Story</span>
-              <h2 style={{ marginTop: 'var(--space-2)' }}>Building India&apos;s Best B.Tech Coaching Platform</h2>
+              <h2 style={{ marginTop: 'var(--space-2)' }}>Building India&apos;s Best School Coaching Platform</h2>
               <div className="section-divider" style={{ margin: 'var(--space-4) 0' }} />
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>Founded with a clear mission — Gradify Academy brings quality engineering education to every student across India, regardless of college tier or financial background.</p>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-4)' }}>Founded with a clear mission — Gradify Academy brings quality school education to every student across India, building solid foundations regardless of school tier or financial background.</p>
               <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)', marginBottom: 'var(--space-6)' }}>What began as a small coaching center in Bengaluru with 3 faculty and 50 students has grown into a comprehensive edtech platform serving over 10,000 students across 150+ cities.</p>
               <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
                 <Link href="/courses" className="btn btn-primary">Explore Courses</Link>
@@ -51,9 +51,9 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-3">
             {[
-              { name: 'Dr. Rajesh Kumar', role: 'Head of CSE', image: '/images/faculty/faculty-1.jpg' },
-              { name: 'Prof. Sneha Patel', role: 'AI/ML Expert', image: '/images/faculty/faculty-2.jpg' },
-              { name: 'Dr. Amit Bansal', role: 'GATE Specialist', image: '/images/faculty/faculty-3.jpg' },
+              { name: 'Dr. Rajesh Kumar', role: 'Head of Mathematics', image: '/images/faculty/faculty-1.jpg' },
+              { name: 'Prof. Sneha Patel', role: 'Head of Physics', image: '/images/faculty/faculty-2.jpg' },
+              { name: 'Dr. Amit Bansal', role: 'Head of Chemistry', image: '/images/faculty/faculty-3.jpg' },
             ].map((f, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <img src={f.image} alt={f.name} style={{ width: '100%', height: 300, objectFit: 'cover', marginBottom: 'var(--space-4)', border: '1px solid var(--color-border)' }} />
@@ -76,11 +76,11 @@ export default function AboutPage() {
           <div className="grid grid-2">
             <div style={{ background: 'white', padding: 'var(--space-8)', border: '1px solid var(--color-border)', borderTop: '4px solid var(--color-primary)' }}>
               <h3 style={{ marginBottom: 'var(--space-3)' }}>Our Mission</h3>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To democratize quality engineering education by providing affordable, accessible, and industry-relevant coaching that empowers B.Tech students to achieve academic excellence and career success.</p>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To democratize quality school education by providing affordable, accessible, and comprehensive coaching that empowers Class 8 to 12 students to achieve academic excellence and succeed in their careers.</p>
             </div>
             <div style={{ background: 'white', padding: 'var(--space-8)', border: '1px solid var(--color-border)', borderTop: '4px solid var(--color-dark)' }}>
               <h3 style={{ marginBottom: 'var(--space-3)' }}>Our Vision</h3>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To become India&apos;s most trusted engineering education platform by 2030, producing 100,000+ industry-ready engineers equipped with knowledge, skills, and confidence to drive innovation globally.</p>
+              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To become India&apos;s most trusted school coaching platform by 2030, empowering 100,000+ students equipped with deep knowledge, critical thinking, and confidence to succeed globally.</p>
             </div>
           </div>
         </div>
