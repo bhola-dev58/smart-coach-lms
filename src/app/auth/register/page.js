@@ -206,21 +206,21 @@ export default function RegisterPage() {
               <div className="form-group">
                 <label className="form-label">Stream / Subject</label>
                 <select className="form-select" value={formData.branch} onChange={e => update('branch', e.target.value)}>
-                  <option value="CSE">Science (PCM/PCB)</option>
+                  <option value="CSE">Science (PCMB / PCMC)</option>
                   <option value="ECE">Commerce</option>
-                  <option value="Mechanical">Arts/Humanities</option>
+                  <option value="Mechanical">Arts / Humanities</option>
                   <option value="Civil">Class 8-10 General</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Class</label>
+                <label className="form-label">Class / PUC</label>
                 <select className="form-select" value={formData.year} onChange={e => update('year', e.target.value)}>
                   <option value="1">Class 8</option>
                   <option value="2">Class 9</option>
-                  <option value="3">Class 10</option>
-                  <option value="4">Class 11</option>
-                  <option value="5">Class 12</option>
+                  <option value="3">Class 10 (SSLC)</option>
+                  <option value="4">1st PUC (Class 11)</option>
+                  <option value="5">2nd PUC (Class 12)</option>
                 </select>
               </div>
             </div>

@@ -354,18 +354,18 @@ export default function ProfilePage() {
             <FieldGroup label="Stream / Subject">
               {editMode ? <StyledInput value={form.branch} onChange={e => handleChange('branch', e.target.value)} placeholder="e.g. Science / General" /> : <FieldValue>{profile?.branch || 'Not provided'}</FieldValue>}
             </FieldGroup>
-            <FieldGroup label="Class">
+            <FieldGroup label="Class / PUC">
               {editMode ? (
                 <select value={form.year} onChange={e => handleChange('year', e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}>
-                  <option value="">Select Class</option>
+                  <option value="">Select Class / PUC</option>
                   <option value="1">Class 8</option>
                   <option value="2">Class 9</option>
-                  <option value="3">Class 10</option>
-                  <option value="4">Class 11</option>
-                  <option value="5">Class 12</option>
+                  <option value="3">Class 10 (SSLC)</option>
+                  <option value="4">1st PUC (Class 11)</option>
+                  <option value="5">2nd PUC (Class 12)</option>
                 </select>
               ) : (
-                <FieldValue>{profile?.year ? (profile.year.toString() === '1' ? 'Class 8' : profile.year.toString() === '2' ? 'Class 9' : profile.year.toString() === '3' ? 'Class 10' : profile.year.toString() === '4' ? 'Class 11' : profile.year.toString() === '5' ? 'Class 12' : profile.year) : 'Not specified'}</FieldValue>
+                <FieldValue>{profile?.year ? (profile.year.toString() === '1' ? 'Class 8' : profile.year.toString() === '2' ? 'Class 9' : profile.year.toString() === '3' ? 'Class 10 (SSLC)' : profile.year.toString() === '4' ? '1st PUC (Class 11)' : profile.year.toString() === '5' ? '2nd PUC (Class 12)' : profile.year) : 'Not specified'}</FieldValue>
               )}
             </FieldGroup>
             <FieldGroup label="Enrolled Courses">
