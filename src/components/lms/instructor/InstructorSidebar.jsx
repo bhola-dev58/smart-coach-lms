@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const menuGroups = [
   {
@@ -41,6 +42,8 @@ const menuGroups = [
 
 export default function InstructorSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
 
   return (
     <aside style={{
@@ -63,7 +66,9 @@ export default function InstructorSidebar() {
         💼 Instructor Panel
       </Link>
 
-      {menuGroups.map((group, idx) => (
+      {menuGroups
+        .filter(group => group.title !== 'Finance & Ops' || isAdmin)
+        .map((group, idx) => (
         <div key={idx} style={{ marginBottom: '1.5rem' }}>
           <h4 style={{
             fontSize: '0.75rem',
