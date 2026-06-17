@@ -152,25 +152,26 @@ export default function GenericResourcePage({ params }) {
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <style>{`
         .course-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: #ffffff;
+          border: 1px solid #d1d5db;
           border-radius: 14px;
           overflow: hidden;
           display: flex;
           flex-direction: column;
           transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         }
         .course-card:hover {
           border-color: var(--dash-accent) !important;
           transform: translateY(-3px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(200, 16, 46, 0.15);
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08), 0 0 12px rgba(200, 16, 46, 0.1);
         }
         .btn-edit {
           flex: 1;
           padding: 0.5rem;
-          background: rgba(255, 255, 255, 0.05);
-          color: var(--dash-text);
-          border: 1px solid rgba(255, 255, 255, 0.18) !important;
+          background: #ffffff;
+          color: #1a1a1a;
+          border: 1px solid #d1d5db !important;
           border-radius: 8px;
           font-size: 0.8rem;
           font-weight: 600;
@@ -178,15 +179,15 @@ export default function GenericResourcePage({ params }) {
           transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
         .btn-edit:hover {
-          background: rgba(255, 255, 255, 0.1) !important;
-          border-color: rgba(255, 255, 255, 0.35) !important;
+          background: #f3f4f6 !important;
+          border-color: #9ca3af !important;
         }
         .btn-builder {
           flex: 1;
           padding: 0.5rem;
-          background: rgba(200, 16, 46, 0.08);
+          background: rgba(200, 16, 46, 0.04);
           color: var(--dash-accent);
-          border: 1px solid rgba(200, 16, 46, 0.35) !important;
+          border: 1px solid rgba(200, 16, 46, 0.25) !important;
           border-radius: 8px;
           font-size: 0.8rem;
           font-weight: 600;
@@ -194,21 +195,21 @@ export default function GenericResourcePage({ params }) {
           transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
         .btn-builder:hover {
-          background: rgba(200, 16, 46, 0.16) !important;
+          background: rgba(200, 16, 46, 0.1) !important;
           border-color: var(--dash-accent) !important;
         }
         .btn-delete {
           padding: 0.5rem 0.75rem;
-          background: rgba(239, 68, 68, 0.06);
+          background: rgba(239, 68, 68, 0.03);
           color: #ef4444;
-          border: 1px solid rgba(239, 68, 68, 0.25) !important;
+          border: 1px solid rgba(239, 68, 68, 0.2) !important;
           border-radius: 8px;
           font-size: 0.8rem;
           cursor: pointer;
           transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
         .btn-delete:hover {
-          background: rgba(239, 68, 68, 0.15) !important;
+          background: rgba(239, 68, 68, 0.08) !important;
           border-color: #ef4444 !important;
         }
         .btn-add-course {
@@ -242,41 +243,41 @@ export default function GenericResourcePage({ params }) {
           border-color: var(--dash-accent-hover);
         }
 
-        /* ── LIGHT MODE OVERRIDES ── */
-        [data-theme='light'] .course-card {
-          background: #ffffff !important;
-          border: 1px solid #d1d5db !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        /* ── DARK MODE OVERRIDES ── */
+        [data-theme='dark'] .course-card {
+          background: rgba(255, 255, 255, 0.03) !important;
+          border: 1px solid rgba(255, 255, 255, 0.16) !important;
+          box-shadow: none !important;
         }
-        [data-theme='light'] .course-card:hover {
+        [data-theme='dark'] .course-card:hover {
           border-color: var(--dash-accent) !important;
-          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08), 0 0 12px rgba(200, 16, 46, 0.1) !important;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(200, 16, 46, 0.15) !important;
         }
-        [data-theme='light'] .btn-edit {
-          background: #ffffff !important;
-          color: #1a1a1a !important;
-          border: 1px solid #d1d5db !important;
+        [data-theme='dark'] .btn-edit {
+          background: rgba(255, 255, 255, 0.05) !important;
+          color: var(--dash-text) !important;
+          border: 1px solid rgba(255, 255, 255, 0.18) !important;
         }
-        [data-theme='light'] .btn-edit:hover {
-          background: #f3f4f6 !important;
-          border-color: #9ca3af !important;
+        [data-theme='dark'] .btn-edit:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgba(255, 255, 255, 0.35) !important;
         }
-        [data-theme='light'] .btn-builder {
-          background: rgba(200, 16, 46, 0.04) !important;
+        [data-theme='dark'] .btn-builder {
+          background: rgba(200, 16, 46, 0.08) !important;
           color: var(--dash-accent) !important;
-          border: 1px solid rgba(200, 16, 46, 0.25) !important;
+          border: 1px solid rgba(200, 16, 46, 0.35) !important;
         }
-        [data-theme='light'] .btn-builder:hover {
-          background: rgba(200, 16, 46, 0.1) !important;
+        [data-theme='dark'] .btn-builder:hover {
+          background: rgba(200, 16, 46, 0.16) !important;
           border-color: var(--dash-accent) !important;
         }
-        [data-theme='light'] .btn-delete {
-          background: rgba(239, 68, 68, 0.03) !important;
+        [data-theme='dark'] .btn-delete {
+          background: rgba(239, 68, 68, 0.06) !important;
           color: #ef4444 !important;
-          border: 1px solid rgba(239, 68, 68, 0.2) !important;
+          border: 1px solid rgba(239, 68, 68, 0.25) !important;
         }
-        [data-theme='light'] .btn-delete:hover {
-          background: rgba(239, 68, 68, 0.08) !important;
+        [data-theme='dark'] .btn-delete:hover {
+          background: rgba(239, 68, 68, 0.15) !important;
           border-color: #ef4444 !important;
         }
       `}</style>

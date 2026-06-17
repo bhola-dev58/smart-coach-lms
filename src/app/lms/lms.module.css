@@ -3,26 +3,8 @@
    Uses CSS variables from globals.css (Navy/Green/Amber Identity)
    ================================================================ */
 
-/* ---- Dashboard Dark Theme Variables ---- */
+/* ---- Dashboard Light Theme Variables (Default) ---- */
 .lmsWrapper {
-  --dash-bg: #111111;
-  --dash-surface: #1A1A1A;
-  --dash-surface-hover: #222222;
-  --dash-border: rgba(255, 255, 255, 0.08);
-  --dash-text: #f0f0f0;
-  --dash-text-secondary: #a0a0a0;
-  --dash-text-muted: #666666;
-  --dash-accent: var(--color-primary);
-  --dash-accent-hover: var(--color-primary-hover);
-  --dash-radius: 14px;
-  --dash-radius-sm: 10px;
-  --dash-radius-xs: 8px;
-  --dash-transition: 0.25s ease;
-  --dash-shadow: none;
-}
-
-/* ---- Dashboard Light Theme Variables ---- */
-:global([data-theme='light']) .lmsWrapper {
   --dash-bg: #F4F6F8;
   --dash-surface: #FFFFFF;
   --dash-surface-hover: #EEF1F6;
@@ -34,6 +16,24 @@
   --dash-accent-hover: var(--color-primary-hover);
   --dash-accent-light: rgba(27, 43, 107, 0.08);
   --dash-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Slight shadow to make cards pop */
+  --dash-radius: 14px;
+  --dash-radius-sm: 10px;
+  --dash-radius-xs: 8px;
+  --dash-transition: 0.25s ease;
+}
+
+/* ---- Dashboard Dark Theme Variables ---- */
+:global([data-theme='dark']) .lmsWrapper {
+  --dash-bg: #111111;
+  --dash-surface: #1A1A1A;
+  --dash-surface-hover: #222222;
+  --dash-border: rgba(255, 255, 255, 0.08);
+  --dash-text: #f0f0f0;
+  --dash-text-secondary: #a0a0a0;
+  --dash-text-muted: #666666;
+  --dash-accent: var(--color-primary);
+  --dash-accent-hover: var(--color-primary-hover);
+  --dash-shadow: none;
 }
 
 /* ---- Layout ---- */

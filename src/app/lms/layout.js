@@ -14,7 +14,7 @@ export default function LMSLayout({ children }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile drawer
   const [isCollapsed, setIsCollapsed] = useState(false); // Desktop collapse
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -23,6 +23,9 @@ export default function LMSLayout({ children }) {
     if (saved) {
       setTheme(saved);
       document.documentElement.setAttribute('data-theme', saved);
+    } else {
+      setTheme('light');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 
