@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
     // ── Student-specific fields ──
     college: { type: String, default: '', trim: true },
     branch: { type: String, default: '', trim: true },
-    year: { type: Number, min: 1, max: 4 },
+    year: { type: Number, min: 1, max: 5 },
     enrolledCourses: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     ],

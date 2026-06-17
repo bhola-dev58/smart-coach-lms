@@ -361,10 +361,11 @@ export default function ProfilePage() {
                   <option value="1">Class 8</option>
                   <option value="2">Class 9</option>
                   <option value="3">Class 10</option>
-                  <option value="4">Class 11 & 12</option>
+                  <option value="4">Class 11</option>
+                  <option value="5">Class 12</option>
                 </select>
               ) : (
-                <FieldValue>{profile?.year ? (profile.year === '1' ? 'Class 8' : profile.year === '2' ? 'Class 9' : profile.year === '3' ? 'Class 10' : profile.year === '4' ? 'Class 11 & 12' : profile.year) : 'Not specified'}</FieldValue>
+                <FieldValue>{profile?.year ? (profile.year.toString() === '1' ? 'Class 8' : profile.year.toString() === '2' ? 'Class 9' : profile.year.toString() === '3' ? 'Class 10' : profile.year.toString() === '4' ? 'Class 11' : profile.year.toString() === '5' ? 'Class 12' : profile.year) : 'Not specified'}</FieldValue>
               )}
             </FieldGroup>
             <FieldGroup label="Enrolled Courses">

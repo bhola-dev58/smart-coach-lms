@@ -245,7 +245,8 @@ function AuthModalInner() {
                     <option value="1">Class 8</option>
                     <option value="2">Class 9</option>
                     <option value="3">Class 10</option>
-                    <option value="4">Class 11 & 12</option>
+                    <option value="4">Class 11</option>
+                    <option value="5">Class 12</option>
                   </select>
                 </div>
               </div>
