@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/app/lms/player.module.css';
 
-export default function MyCoursesPage() {
+export default function MyEnrollmentsPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchMyCourses() {
+    async function fetchEnrollments() {
       try {
         const res = await fetch('/api/lms/my-courses');
         const data = await res.json();
@@ -17,16 +17,16 @@ export default function MyCoursesPage() {
           setCourses(data.courses || []);
         }
       } catch (err) {
-        console.error('Failed to fetch my courses:', err);
+        console.error('Failed to fetch enrolled courses:', err);
       } finally {
         setLoading(false);
       }
     }
-    fetchMyCourses();
+    fetchEnrollments();
   }, []);
 
   if (loading) {
-    return <div className={styles.loading}>⏳ Loading your courses...</div>;
+    return <div className={styles.loading}>⏳ Loading your enrollments...</div>;
   }
 
   return (
@@ -35,10 +35,10 @@ export default function MyCoursesPage() {
         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
           <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.3 }}>📚</div>
           <h2 style={{ color: 'var(--dash-text)', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
-            No Courses Yet
+            No Active Enrollments
           </h2>
           <p style={{ color: 'var(--dash-text-secondary)', marginBottom: '1.5rem' }}>
-            Explore our catalog and enroll in your first course!
+            Explore our curriculum and enroll in your preferred course to get started!
           </p>
           <Link href="/lms/browse" style={{
             display: 'inline-block',
@@ -88,13 +88,16 @@ export default function MyCoursesPage() {
                   </span>
                   <span>📊 {c.level}</span>
                 </div>
+                
                 <div className={`${styles.myCourseProgress} ${c.percentage >= 100 ? styles.myCourseProgressComplete : ''}`}>
                   <div className={styles.myCourseProgressFill} style={{ width: `${c.percentage}%` }} />
                 </div>
+                
                 <div className={styles.myCourseProgressText}>
                   <span>{c.percentage}% complete</span>
                   <span>{c.completedLessons} of {c.totalLessons} lessons</span>
                 </div>
+                
                 <span className={styles.myCourseBtn}>
                   {c.percentage >= 100 ? 'Review Course' : c.percentage > 0 ? 'Continue Learning' : 'Start Learning'}
                 </span>

@@ -23,6 +23,7 @@ const getNavItems = (role) => {
       { href: '/lms', label: 'Dashboard', icon: 'home' },
       { href: '/lms/live', label: 'Live Classes', icon: 'video' },
       { href: '/lms/courses', label: 'My Courses', icon: 'book' },
+      { href: '/lms/enrollments', label: 'My Enrollments', icon: 'check-square' },
       { href: '/lms/tests', label: 'My Test Series', icon: 'clipboard' },
       { href: '/lms/browse', label: 'Browse Courses', icon: 'layers' },
       { href: '/lms/materials', label: 'Study Materials', icon: 'file-text' },
@@ -48,6 +49,7 @@ function NavIcon({ name }) {
     target: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
     user: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
     briefcase: <><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>,
+    'check-square': <><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></>,
   };
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.navIcon}>

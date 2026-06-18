@@ -1,56 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import EnrollButton from '@/components/courses/EnrollButton';
 import styles from '@/app/lms/lms.module.css';
 
 export default function BrowseCoursesClient({ courses = [] }) {
-  const [filter, setFilter] = useState('All');
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('category') || 'All';
 
-  const categories = ['All', ...new Set(courses.map(c => c.category))];
-  const filtered = filter === 'All' ? courses : courses.filter(c => c.category === filter);
+  const filtered = (filter === 'All' || !filter) 
+    ? courses 
+    : courses.filter(c => c.category.toUpperCase() === filter.toUpperCase());
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{
-          fontFamily: 'var(--font-heading)',
-          fontSize: 'var(--text-2xl)',
-          color: 'var(--dash-text)',
-          marginBottom: '0.5rem',
-        }}>
-          Browse Courses
-        </h1>
-        <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)' }}>
-          Explore {courses.length} courses and start learning today
-        </p>
-      </div>
-
-      {/* Category Filter */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        {categories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setFilter(cat)}
-            style={{
-              padding: '0.4rem 1rem',
-              borderRadius: '8px',
-              border: '1px solid',
-              borderColor: filter === cat ? 'var(--dash-accent)' : 'var(--dash-border)',
-              background: filter === cat ? 'var(--dash-accent-light)' : 'var(--dash-surface)',
-              color: filter === cat ? 'var(--dash-accent)' : 'var(--dash-text-secondary)',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
 
       {/* Courses Grid */}
       {filtered.length === 0 ? (

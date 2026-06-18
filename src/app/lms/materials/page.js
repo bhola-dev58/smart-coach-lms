@@ -26,16 +26,6 @@ export default async function MaterialsPage() {
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: 'var(--dash-text)', marginBottom: '0.4rem', fontWeight: 700 }}>
-          Study Materials
-        </h1>
-        <p style={{ color: 'var(--dash-text-secondary)', fontSize: '0.9rem' }}>
-          Downloadable resources, cheatsheets, and question banks provided by your instructors.
-        </p>
-      </div>
-
       {/* Materials Grid */}
       {materials.length === 0 ? (
         <div style={{ background: 'var(--dash-surface)', border: '1px dashed var(--dash-border)', borderRadius: '12px', padding: '3rem 2rem', textAlign: 'center' }}>

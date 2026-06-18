@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import '@/models/User';
@@ -44,5 +45,9 @@ export default async function BrowseCoursesPage() {
   // Deep serialize — converts ALL nested ObjectIds to plain strings
   const serialized = JSON.parse(JSON.stringify(courses));
 
-  return <BrowseCoursesClient courses={serialized} />;
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', color: 'var(--dash-text-muted)' }}>Loading...</div>}>
+      <BrowseCoursesClient courses={serialized} />
+    </Suspense>
+  );
 }

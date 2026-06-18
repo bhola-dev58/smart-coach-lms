@@ -1,12 +1,44 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import DashboardSidebar from '@/components/lms/DashboardSidebar';
 import styles from './lms.module.css';
 
+function CategorySelect() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentCategory = searchParams.get('category') || 'All';
+
+  const handleCategoryChange = (e) => {
+    const val = e.target.value;
+    if (val === 'All') {
+      router.push('/lms/browse');
+    } else {
+      router.push(`/lms/browse?category=${val}`);
+    }
+  };
+
+  return (
+    <select 
+      className={styles.filterSelect}
+      value={currentCategory}
+      onChange={handleCategoryChange}
+    >
+      <option value="All">All Courses</option>
+      <option value="MATHS">Mathematics</option>
+      <option value="SCIENCE">Science</option>
+      <option value="COMMERCE">Commerce</option>
+      <option value="ARTS">Arts</option>
+      <option value="GENERAL">General</option>
+    </select>
+  );
+}
+
 export default function LMSLayout({ children }) {
+  const pathname = usePathname();
   const { data: session } = useSession();
   const userName = session?.user?.name || 'Student';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -16,6 +48,7 @@ export default function LMSLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false); // Desktop collapse
   const [theme, setTheme] = useState('light');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [enrolledCount, setEnrolledCount] = useState(null);
 
   useEffect(() => {
     // Check saved theme or system preference
@@ -35,12 +68,106 @@ export default function LMSLayout({ children }) {
     return () => window.removeEventListener('click', handleCloseDropdown);
   }, []);
 
+  useEffect(() => {
+    if (pathname === '/lms/courses' || pathname === '/lms/enrollments') {
+      fetch('/api/lms/my-courses')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setEnrolledCount(data.courses?.length || 0);
+          }
+        })
+        .catch(err => console.error(err));
+    }
+  }, [pathname]);
+
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     localStorage.setItem('lmsTheme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
   };
+
+  const getHeaderContent = () => {
+    if (pathname === '/lms') {
+      return {
+        title: `Welcome back, ${userName}!`,
+        subtitle: "Let's conquer new heights today."
+      };
+    }
+    if (pathname === '/lms/courses') {
+      const countText = enrolledCount === null 
+        ? "Loading your courses..." 
+        : enrolledCount > 0 
+          ? `You have ${enrolledCount} enrolled course${enrolledCount > 1 ? 's' : ''}`
+          : "No enrolled courses yet";
+      return {
+        title: "My Courses",
+        subtitle: countText
+      };
+    }
+    if (pathname === '/lms/enrollments') {
+      const countText = enrolledCount === null 
+        ? "Loading your enrollments..." 
+        : enrolledCount > 0 
+          ? `You have ${enrolledCount} active enrollment${enrolledCount > 1 ? 's' : ''}`
+          : "No enrolled courses yet";
+      return {
+        title: "My Enrollments",
+        subtitle: countText
+      };
+    }
+    if (pathname === '/lms/browse') {
+      return {
+        title: "Browse Courses",
+        subtitle: "Explore our catalog and start learning online from home."
+      };
+    }
+    if (pathname === '/lms/materials') {
+      return {
+        title: "Study Materials",
+        subtitle: "Downloadable resources, cheatsheets, and question banks provided by your instructors."
+      };
+    }
+    if (pathname === '/lms/profile') {
+      return {
+        title: "My Profile",
+        subtitle: "Manage your personal details, academic preferences, and credentials."
+      };
+    }
+    if (pathname === '/lms/practice') {
+      return {
+        title: "Practice Arena",
+        subtitle: "Sharpen your skills with mock questions and tests."
+      };
+    }
+    if (pathname === '/lms/certificates') {
+      return {
+        title: "My Certificates",
+        subtitle: "View and share your earned course certificates."
+      };
+    }
+    if (pathname === '/lms/tests') {
+      return {
+        title: "Assignments & Tests",
+        subtitle: "Complete required tasks to earn a certificate of completion."
+      };
+    }
+    if (pathname?.startsWith('/lms/instructor')) {
+      return {
+        title: "Instructor Panel",
+        subtitle: "Manage your courses, assignments, and student reviews."
+      };
+    }
+    
+    // Fallback/Default
+    return {
+      title: "LMS Portal",
+      subtitle: "Gradify Academy — India's Premier Online Coaching."
+    };
+  };
+
+  const header = getHeaderContent();
 
   return (
     <div className={styles.lmsWrapper}>
@@ -55,18 +182,13 @@ export default function LMSLayout({ children }) {
         {/* Universal Top Bar */}
         <div className={styles.topBar}>
           <div className={styles.welcomeText}>
-            <h1>Welcome back, {userName}!</h1>
-            <p>Let&apos;s conquer new heights today.</p>
+            <h1>{header.title}</h1>
+            <p>{header.subtitle}</p>
           </div>
           <div className={styles.topBarActions}>
-            <select className={styles.filterSelect}>
-              <option>All Courses</option>
-              <option>Mathematics</option>
-              <option>Science</option>
-              <option>Commerce</option>
-              <option>Arts</option>
-              <option>General</option>
-            </select>
+            <Suspense fallback={<select className={styles.filterSelect}><option>All Courses</option></select>}>
+              <CategorySelect />
+            </Suspense>
             <div className={styles.searchBox}>
               <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />

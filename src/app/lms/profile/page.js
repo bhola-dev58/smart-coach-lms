@@ -175,7 +175,7 @@ export default function ProfilePage() {
   const vc = verificationConfig[vStatus];
 
   return (
-    <div style={{ padding: '0 1.5rem 3rem', maxWidth: '900px' }}>
+    <div style={{ padding: '1.5rem 1.5rem 3rem', maxWidth: '900px' }}>
       {/* Toast */}
       {message.text && (
         <div style={{
@@ -190,13 +190,6 @@ export default function ProfilePage() {
           {message.text}
         </div>
       )}
-
-      <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>
-        My Profile
-      </h2>
-      <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-        Manage your personal information, verification & account settings
-      </p>
 
       {/* ── Avatar + Header ── */}
       <div style={{

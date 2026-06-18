@@ -35,15 +35,6 @@ export default async function MyTestSeriesPage() {
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', color: 'var(--dash-text)', marginBottom: '0.4rem', fontWeight: 700 }}>
-          Assignments & Tests
-        </h1>
-        <p style={{ color: 'var(--dash-text-secondary)', fontSize: '0.9rem' }}>
-          Complete required tasks to earn a certificate of completion.
-        </p>
-      </div>
-
       {assignmentsRaw.length === 0 ? (
         <div style={{ background: 'var(--dash-surface)', border: '1px dashed var(--dash-border)', borderRadius: '12px', padding: '4rem 2rem', textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>📝</div>
