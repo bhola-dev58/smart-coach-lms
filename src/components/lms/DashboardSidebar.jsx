@@ -29,6 +29,7 @@ const getNavItems = (role) => {
       { href: '/lms/materials', label: 'Study Materials', icon: 'file-text' },
       { href: '/lms/practice', label: 'Practice', icon: 'target' },
       { href: '/lms/certificates', label: 'Certificates', icon: 'award' },
+      { href: '/lms/notifications', label: 'Notifications', icon: 'bell' },
     ];
   }
   items.push({ href: '/lms/profile', label: 'My Profile', icon: 'user' });
@@ -50,6 +51,7 @@ function NavIcon({ name }) {
     user: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>,
     briefcase: <><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>,
     'check-square': <><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></>,
+    bell: <><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></>,
   };
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.navIcon}>

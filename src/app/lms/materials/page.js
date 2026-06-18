@@ -10,7 +10,7 @@ export const metadata = { title: 'Study Materials | LMS' };
 
 export default async function MaterialsPage() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect('/?auth=login');
+  if (!session) redirect('/auth/login');
 
   await connectDB();
 

@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import DashboardSidebar from '@/components/lms/DashboardSidebar';
+import NotificationBell from '@/components/layout/NotificationBell';
 import styles from './lms.module.css';
 
 function CategorySelect() {
@@ -160,6 +161,13 @@ export default function LMSLayout({ children }) {
       };
     }
     
+    if (pathname === '/lms/notifications') {
+      return {
+        title: '🔔 Notifications',
+        subtitle: 'Stay updated on your enrollments, announcements, and course activity.',
+      };
+    }
+    
     // Fallback/Default
     return {
       title: "LMS Portal",
@@ -204,13 +212,9 @@ export default function LMSLayout({ children }) {
               )}
             </button>
             
-            <button className={styles.notifBtn}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              <span className={styles.notifBadge}>2</span>
-            </button>
+            {/* 🔔 Live Notification Bell */}
+            <NotificationBell />
+
             <div className={styles.profileWrapper} onClick={(e) => e.stopPropagation()}>
               <button 
                 className={styles.profileBtn}

@@ -4,66 +4,72 @@ import { NextResponse } from 'next/server';
 export default withAuth(
   function proxy(req) {
     const token = req.nextauth.token;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
+    const { pathname } = req.nextUrl;
 
-    // Public routes that bypass auth even under /lms
+    // ── Public paths that bypass all checks ──
     const publicPaths = ['/lms/certificates/verify', '/certificates/verify'];
-    const isPublicPath = publicPaths.some(p => req.nextUrl.pathname.startsWith(p));
-    if (isPublicPath) {
+    if (publicPaths.some(p => pathname.startsWith(p))) {
       return NextResponse.next();
     }
 
-    // If the user is on an auth page and is already logged in, redirect to dashboard
-    if (isAuthPage) {
-      if (isAuth) {
-        return NextResponse.redirect(new URL('/lms', req.url));
-      }
-      return null;
+    // ── OTP Verification Gate ──
+    // If user is logged in but email not yet verified, send them to OTP page.
+    // Allow /auth/verify-email itself so they don't get redirect-looped.
+    if (
+      token?.needsOtpVerification &&
+      !pathname.startsWith('/auth/verify-email') &&
+      !pathname.startsWith('/api/')
+    ) {
+      // Show OTP as modal on home page (same UX as login modal)
+      const verifyUrl = new URL('/', req.url);
+      verifyUrl.searchParams.set('auth', 'verify-otp');
+      return NextResponse.redirect(verifyUrl);
     }
 
-    const headers = new Headers();
-    // Security Headers
-    headers.set('X-XSS-Protection', '1; mode=block');
-    headers.set('X-Frame-Options', 'DENY');
-    headers.set('X-Content-Type-Options', 'nosniff');
-    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-    // Role-based protection: Admin routes only accessible by admins
-    if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'admin') {
-      return NextResponse.rewrite(new URL('/404', req.url), { headers }); // Hide the route completely if not admin
+    // ── If already logged-in + verified, redirect away from auth pages ──
+    if (pathname.startsWith('/auth') && token && !token.needsOtpVerification) {
+      return NextResponse.redirect(new URL('/lms', req.url));
     }
 
+    // ── Security headers ──
     const response = NextResponse.next();
-    // Apply headers to normal responses
     response.headers.set('X-XSS-Protection', '1; mode=block');
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // ── Role-based: admin routes only for admins ──
+    if (pathname.startsWith('/admin') && token?.role !== 'admin') {
+      return NextResponse.rewrite(new URL('/404', req.url));
+    }
+
     return response;
   },
   {
     callbacks: {
-      // User is authorized if they have a token (except for auth pages and public paths)
       authorized({ token, req }) {
-        const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
-        if (isAuthPage) return true;
+        const { pathname } = req.nextUrl;
 
-        // Allow public certificate verification
+        // Auth pages are always accessible (login, register, verify-email)
+        if (pathname.startsWith('/auth')) return true;
+
+        // Public certificate verification
         const publicPaths = ['/lms/certificates/verify', '/certificates/verify'];
-        if (publicPaths.some(p => req.nextUrl.pathname.startsWith(p))) return true;
-        
+        if (publicPaths.some(p => pathname.startsWith(p))) return true;
+
+        // Everything else requires a session token
         return !!token;
       },
     },
   }
 );
 
-// Define which routes this proxy applies to
+// Routes this middleware applies to
 export const config = {
   matcher: [
-    '/lms/:path*', 
+    '/lms/:path*',
     '/admin/:path*',
     '/profile/:path*',
-    '/auth/:path*' // We run proxy on auth to redirect if already logged in
+    '/auth/:path*',
   ],
 };

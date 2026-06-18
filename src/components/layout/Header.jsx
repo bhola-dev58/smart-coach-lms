@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Header.module.css';
+import NotificationBell from './NotificationBell';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -93,7 +94,11 @@ export default function Header() {
 
             <div className={styles.actions}>
               {status === 'loading' ? null : session ? (
-                <div className={styles.profileWrapper}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {/* 🔔 Notification Bell */}
+                  <NotificationBell />
+
+                  <div className={styles.profileWrapper}>
                   <button
                     className={styles.profileBtn}
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -130,6 +135,7 @@ export default function Header() {
                       </button>
                     </div>
                   )}
+                  </div>
                 </div>
               ) : (
                 <button

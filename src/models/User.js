@@ -35,6 +35,13 @@ const userSchema = new mongoose.Schema(
     hasSelectedRole: { type: Boolean, default: false }, // For Google users — role selection popup
     lastLoginAt: { type: Date },
 
+    // ── OTP Email Verification ──
+    emailOtp: {
+      code: { type: String, default: '' },          // bcrypt-hashed OTP
+      expiresAt: { type: Date },                     // 10-min expiry
+      attempts: { type: Number, default: 0 },        // brute-force counter
+    },
+
     // ── Student-specific fields ──
     college: { type: String, default: '', trim: true },
     branch: { type: String, default: '', trim: true },

@@ -14,7 +14,7 @@ export default async function AdminLayout({ children }) {
 
   // Base check if unauthenticated
   if (!session) {
-    redirect('/?auth=login');
+    redirect('/auth/login');
   }
 
   // Check if not admin

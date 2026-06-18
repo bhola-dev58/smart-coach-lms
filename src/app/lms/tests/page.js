@@ -10,7 +10,7 @@ export const metadata = { title: 'My Assignments & Tests — MeetMe Center' };
 
 export default async function MyTestSeriesPage() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect('/?auth=login');
+  if (!session) redirect('/auth/login');
 
   await connectDB();
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
+import { sendOTPEmail } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -29,7 +30,12 @@ export async function POST(request) {
     // ── Hash Password ──
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // ── Create User ──
+    // ── Generate OTP ──
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const hashedOtp = await bcrypt.hash(otp, 10);
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // ── Create User (unverified) ──
     const user = await User.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
@@ -42,6 +48,7 @@ export async function POST(request) {
       provider: 'credentials',
       isEmailVerified: false,
       hasSelectedRole: true,
+      emailOtp: { code: hashedOtp, expiresAt: otpExpiresAt, attempts: 0 },
       location: {
         country: country || '',
         state: state || '',
@@ -49,10 +56,16 @@ export async function POST(request) {
       },
     });
 
+    // ── Send OTP email (non-blocking on failure) ──
+    sendOTPEmail(user.email, user.name, otp).catch(err =>
+      console.error('[Register] OTP email failed:', err.message)
+    );
+
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully! Please log in.',
-      userId: user._id.toString(),
+      message: 'Account created! Please verify your email with the OTP sent to your inbox.',
+      requiresOtp: true,
+      email: user.email,
     }, { status: 201 });
 
   } catch (error) {
@@ -60,4 +73,3 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
-

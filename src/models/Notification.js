@@ -21,6 +21,9 @@ const notificationSchema = new mongoose.Schema(
         'announcement',   // General admin announcement
         'reminder',       // "Complete your course, 80% done!"
         'system',         // System-level notifications
+        'new_course',     // New course launched
+        'login',          // New login detected
+        'otp_verified',   // Email verification success
       ],
       required: true,
     },
