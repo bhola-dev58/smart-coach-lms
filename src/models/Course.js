@@ -63,8 +63,7 @@ const courseSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        'CSE', 'ECE', 'MECH', 'CIVIL', 'AI/ML',
-        'GATE', 'MATHS', 'GENERAL', 'SCIENCE', 'COMMERCE',
+        'MATHS', 'SCIENCE', 'COMMERCE', 'GENERAL', 'ARTS',
       ],
       required: true,
     },

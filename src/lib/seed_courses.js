@@ -1,6 +1,6 @@
 /**
  * ============================================
- * 🌱 Seed Featured Courses + Instructor into MongoDB
+ * 🌱 Seed Featured School Courses + Instructors into MongoDB
  * Run: node src/lib/seed_courses.js
  * ============================================
  */
@@ -56,7 +56,7 @@ const courseSchema = new mongoose.Schema(
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     category: String,
     level: String,
-    language: { type: String, default: 'Hindi' },
+    language: { type: String, default: 'English' },
     price: Number,
     originalPrice: Number,
     isFree: { type: Boolean, default: false },
@@ -85,6 +85,10 @@ async function seed() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB Atlas\n');
 
+    // ── Clear old courses ──
+    await Course.deleteMany({});
+    console.log('🗑️  Cleared old courses from database\n');
+
     // ── Create/find instructor ──
     let instructor = await User.findOne({ email: 'rajesh@meetme.center' });
     if (!instructor) {
@@ -92,12 +96,15 @@ async function seed() {
         name: 'Dr. Rajesh Kumar',
         email: 'rajesh@meetme.center',
         role: 'instructor',
-        bio: 'IIT Delhi professor with 15+ years of teaching experience in CSE.',
-        specialization: ['DSA', 'Web Development', 'Machine Learning'],
+        bio: 'Senior Science Faculty with 15+ years of teaching board & foundation courses.',
+        specialization: ['Physics', 'Chemistry', 'Mathematics Foundation'],
       });
       console.log('✅ Created instructor: Dr. Rajesh Kumar');
     } else {
-      console.log('⏭️  Instructor already exists: Dr. Rajesh Kumar');
+      instructor.bio = 'Senior Science Faculty with 15+ years of teaching board & foundation courses.';
+      instructor.specialization = ['Physics', 'Chemistry', 'Mathematics Foundation'];
+      await instructor.save();
+      console.log('⏭️  Instructor updated: Dr. Rajesh Kumar');
     }
 
     // ── Create second instructor ──
@@ -107,346 +114,469 @@ async function seed() {
         name: 'Prof. Priya Sharma',
         email: 'priya@meetme.center',
         role: 'instructor',
-        bio: 'NIT Trichy alumna, GATE AIR 12, 10+ years coaching experience.',
-        specialization: ['GATE', 'Mathematics', 'Digital Electronics'],
+        bio: 'Experienced Mathematics expert, specializing in Board Exams and KCET/NEET coaching.',
+        specialization: ['Mathematics', 'Biology', 'Science Foundation'],
       });
       console.log('✅ Created instructor: Prof. Priya Sharma');
     } else {
-      console.log('⏭️  Instructor already exists: Prof. Priya Sharma');
+      instructor2.bio = 'Experienced Mathematics expert, specializing in Board Exams and KCET/NEET coaching.';
+      instructor2.specialization = ['Mathematics', 'Biology', 'Science Foundation'];
+      await instructor2.save();
+      console.log('⏭️  Instructor updated: Prof. Priya Sharma');
     }
 
     // ── Course Data ──
     const coursesData = [
       {
-        title: 'Data Structures & Algorithms',
-        slug: 'dsa-masterclass',
+        title: 'Class 10 Mathematics (Karnataka SSLC)',
+        slug: 'class-10-math-sslc',
         description:
-          'Master arrays, linked lists, trees, graphs, sorting, and dynamic programming with hands-on coding practice. Build a strong foundation for coding interviews at FAANG companies.',
-        shortDescription: 'Master DSA for coding interviews',
-        thumbnail: '/images/courses/dsa.jpg',
-        instructor: instructor._id,
-        category: 'CSE',
-        level: 'Intermediate',
-        language: 'Hindi',
-        price: 4999,
-        originalPrice: 9999,
-        totalHours: 120,
-        totalLessons: 85,
-        totalStudents: 2400,
-        totalRatings: 380,
-        rating: 4.8,
-        isPublished: true,
-        isFeatured: true, // ← POPULAR
-        publishedAt: new Date('2025-06-15'),
-        prerequisites: ['Basic C/C++ knowledge', 'Logical thinking'],
-        learningOutcomes: [
-          'Master all major data structures',
-          'Solve 300+ coding problems',
-          'Crack FAANG coding interviews',
-          'Dynamic programming mastery',
-          'Graph algorithms & shortest paths',
-          'Time & space complexity analysis',
-        ],
-        tags: ['DSA', 'Coding', 'Interview', 'C++', 'Competitive Programming'],
-        faqs: [
-          { question: 'Which language is used?', answer: 'C++ with explanations in Hindi.' },
-          { question: 'Is this course for beginners?', answer: 'You should know basics of C/C++. This is Intermediate level.' },
-        ],
-        chapters: [
-          {
-            title: 'Arrays & Strings',
-            description: 'Foundation of data structures',
-            order: 1,
-            lessons: [
-              { title: 'Introduction to Arrays', slug: 'intro-arrays', duration: 25, order: 1, isFree: true },
-              { title: 'Two Pointer Technique', slug: 'two-pointer', duration: 35, order: 2 },
-              { title: 'Sliding Window', slug: 'sliding-window', duration: 40, order: 3 },
-            ],
-          },
-          {
-            title: 'Linked Lists',
-            description: 'Singly, Doubly, and Circular',
-            order: 2,
-            lessons: [
-              { title: 'Singly Linked List', slug: 'singly-ll', duration: 30, order: 1 },
-              { title: 'Doubly Linked List', slug: 'doubly-ll', duration: 25, order: 2 },
-              { title: 'Reverse a Linked List', slug: 'reverse-ll', duration: 20, order: 3, isFree: true },
-            ],
-          },
-          {
-            title: 'Trees & Graphs',
-            description: 'Binary Trees, BST, BFS, DFS',
-            order: 3,
-            lessons: [
-              { title: 'Binary Tree Basics', slug: 'binary-tree', duration: 35, order: 1 },
-              { title: 'BST Operations', slug: 'bst-ops', duration: 40, order: 2 },
-              { title: 'Graph BFS & DFS', slug: 'graph-bfs-dfs', duration: 45, order: 3 },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Full Stack Web Development',
-        slug: 'full-stack-web',
-        description:
-          'Build modern web apps with HTML, CSS, JavaScript, React, Node.js, MongoDB and deploy to production. A complete bootcamp from zero to deployment.',
-        shortDescription: 'Build modern web apps from scratch',
-        thumbnail: '/images/courses/webdev.jpg',
-        instructor: instructor._id,
-        category: 'CSE',
-        level: 'Beginner',
-        language: 'Hindi',
-        price: 6999,
-        originalPrice: 14999,
-        totalHours: 180,
-        totalLessons: 120,
-        totalStudents: 3100,
-        totalRatings: 520,
-        rating: 4.9,
-        isPublished: true,
-        isFeatured: true, // ← POPULAR
-        publishedAt: new Date('2025-03-10'),
-        prerequisites: ['No prior experience needed', 'Basic computer skills'],
-        learningOutcomes: [
-          'Build production-ready web applications',
-          'Master React.js & Next.js',
-          'Backend development with Node.js',
-          'Database design with MongoDB',
-          'Deploy apps to cloud platforms',
-          'REST API development',
-        ],
-        tags: ['Web Development', 'React', 'Node.js', 'MongoDB', 'Full Stack'],
-        faqs: [
-          { question: 'Do I need prior coding experience?', answer: 'No, this course starts from absolute basics.' },
-          { question: 'Will I build real projects?', answer: 'Yes, you will build 5+ production-grade projects.' },
-        ],
-        chapters: [
-          {
-            title: 'HTML & CSS Fundamentals',
-            description: 'Build solid web foundations',
-            order: 1,
-            lessons: [
-              { title: 'HTML Structure', slug: 'html-basics', duration: 30, order: 1, isFree: true },
-              { title: 'CSS Styling', slug: 'css-basics', duration: 40, order: 2. },
-              { title: 'Responsive Design', slug: 'responsive', duration: 35, order: 3 },
-            ],
-          },
-          {
-            title: 'JavaScript Deep Dive',
-            description: 'Core JS concepts',
-            order: 2,
-            lessons: [
-              { title: 'Variables & Functions', slug: 'js-fundamentals', duration: 35, order: 1 },
-              { title: 'DOM Manipulation', slug: 'dom', duration: 40, order: 2 },
-              { title: 'Async/Await & Fetch', slug: 'async-js', duration: 45, order: 3 },
-            ],
-          },
-          {
-            title: 'React.js & Next.js',
-            description: 'Frontend frameworks',
-            order: 3,
-            lessons: [
-              { title: 'React Components', slug: 'react-components', duration: 40, order: 1 },
-              { title: 'State Management', slug: 'state-mgmt', duration: 35, order: 2 },
-              { title: 'Next.js App Router', slug: 'nextjs-router', duration: 50, order: 3 },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Machine Learning & AI',
-        slug: 'ml-ai-course',
-        description:
-          'Learn neural networks, NLP, computer vision with Python & TensorFlow through real-world industry projects. From basics to advanced deep learning.',
-        shortDescription: 'Learn AI and ML with Python',
-        thumbnail: '/images/courses/ml.jpg',
-        instructor: instructor._id,
-        category: 'AI/ML',
-        level: 'Advanced',
-        language: 'Hindi',
-        price: 7499,
-        originalPrice: 15999,
-        totalHours: 150,
-        totalLessons: 95,
-        totalStudents: 1800,
-        totalRatings: 290,
-        rating: 4.7,
-        isPublished: true,
-        isFeatured: true, // ← POPULAR
-        publishedAt: new Date('2025-08-20'),
-        prerequisites: ['Python basics', 'Basic mathematics (Linear Algebra)'],
-        learningOutcomes: [
-          'Build ML models from scratch',
-          'Neural networks & deep learning',
-          'Natural Language Processing (NLP)',
-          'Computer Vision with OpenCV',
-          'TensorFlow & PyTorch mastery',
-          'Real-world AI project deployment',
-        ],
-        tags: ['Machine Learning', 'AI', 'Python', 'TensorFlow', 'Deep Learning'],
-        faqs: [
-          { question: 'Do I need GPU for this course?', answer: 'We use Google Colab with free GPU access.' },
-          { question: 'Is math knowledge required?', answer: 'Basic linear algebra helps, but we explain math as we go.' },
-        ],
-        chapters: [
-          {
-            title: 'Python for ML',
-            description: 'Python essentials for machine learning',
-            order: 1,
-            lessons: [
-              { title: 'NumPy & Pandas', slug: 'numpy-pandas', duration: 35, order: 1, isFree: true },
-              { title: 'Data Visualization', slug: 'data-viz', duration: 30, order: 2 },
-              { title: 'Feature Engineering', slug: 'feature-eng', duration: 40, order: 3 },
-            ],
-          },
-          {
-            title: 'Supervised Learning',
-            description: 'Regression and Classification',
-            order: 2,
-            lessons: [
-              { title: 'Linear Regression', slug: 'linear-reg', duration: 40, order: 1 },
-              { title: 'Decision Trees & Random Forests', slug: 'trees-forests', duration: 45, order: 2 },
-              { title: 'SVM & KNN', slug: 'svm-knn', duration: 35, order: 3 },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'GATE CSE Preparation',
-        slug: 'gate-cse-prep',
-        description:
-          'Complete GATE CSE preparation with mock tests, subject-wise video lectures, previous year solutions, and rank prediction. Designed by GATE toppers.',
-        shortDescription: 'Complete GATE CSE preparation',
-        thumbnail: '/images/courses/gate.jpg',
-        instructor: instructor2._id,
-        category: 'GATE',
-        level: 'All Levels',
-        language: 'Hindi',
-        price: 9999,
-        originalPrice: 19999,
-        totalHours: 300,
-        totalLessons: 200,
-        totalStudents: 4500,
-        totalRatings: 780,
-        rating: 4.9,
-        isPublished: true,
-        isFeatured: true, // ← POPULAR
-        publishedAt: new Date('2025-01-05'),
-        prerequisites: ['B.Tech CSE 2nd year or above'],
-        learningOutcomes: [
-          'Cover entire GATE CSE syllabus',
-          'Solve 2000+ previous year questions',
-          'Mock test series with analysis',
-          'Subject-wise strategy planning',
-          'Rank prediction & preparation tips',
-          'Interview preparation for PSUs & IITs',
-        ],
-        tags: ['GATE', 'CSE', 'Competitive Exams', 'IIT', 'PSU'],
-        faqs: [
-          { question: 'When should I start preparing?', answer: 'Ideally from 3rd year, but this course works for final year too.' },
-          { question: 'Are mock tests included?', answer: 'Yes, 30+ full-length mock tests with detailed solutions.' },
-        ],
-        chapters: [
-          {
-            title: 'Data Structures',
-            description: 'GATE level DS',
-            order: 1,
-            lessons: [
-              { title: 'Arrays & Linked Lists (GATE Level)', slug: 'gate-arrays-ll', duration: 50, order: 1, isFree: true },
-              { title: 'Stacks, Queues & Hashing', slug: 'gate-stacks-queues', duration: 45, order: 2 },
-              { title: 'Trees & Graphs (GATE)', slug: 'gate-trees-graphs', duration: 55, order: 3 },
-            ],
-          },
-          {
-            title: 'Operating Systems',
-            description: 'Process management, Memory, Scheduling',
-            order: 2,
-            lessons: [
-              { title: 'Process & Threads', slug: 'os-process', duration: 40, order: 1 },
-              { title: 'CPU Scheduling', slug: 'os-scheduling', duration: 45, order: 2 },
-              { title: 'Memory Management', slug: 'os-memory', duration: 50, order: 3 },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Digital Electronics & Logic Design',
-        slug: 'digital-electronics',
-        description:
-          'Learn digital circuits, combinational and sequential logic, flip-flops, counters, and microprocessor basics. Essential for ECE and CSE students.',
-        shortDescription: 'Master digital circuits and logic design',
-        thumbnail: '/images/courses/digital.jpg',
-        instructor: instructor2._id,
-        category: 'ECE',
-        level: 'Beginner',
-        language: 'Hindi',
-        price: 3499,
-        originalPrice: 7999,
-        totalHours: 80,
-        totalLessons: 55,
-        totalStudents: 950,
-        totalRatings: 140,
-        rating: 4.5,
-        isPublished: true,
-        isFeatured: false, // ← NOT on homepage
-        publishedAt: new Date('2025-09-01'),
-        prerequisites: ['Basic physics knowledge'],
-        learningOutcomes: [
-          'Understand number systems & boolean algebra',
-          'Design combinational circuits',
-          'Sequential circuit design',
-          'Microprocessor architecture basics',
-        ],
-        tags: ['ECE', 'Digital Electronics', 'Logic Design', 'Microprocessor'],
-        chapters: [
-          {
-            title: 'Number Systems',
-            description: 'Binary, Octal, Hexadecimal',
-            order: 1,
-            lessons: [
-              { title: 'Binary Number System', slug: 'binary-system', duration: 25, order: 1, isFree: true },
-              { title: 'Base Conversions', slug: 'base-conversions', duration: 30, order: 2 },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Engineering Mathematics',
-        slug: 'engineering-maths',
-        description:
-          'Complete engineering mathematics covering Calculus, Linear Algebra, Probability, Differential Equations. Essential for GATE and semester exams.',
-        shortDescription: 'Complete B.Tech mathematics course',
-        thumbnail: '/images/courses/maths.jpg',
+          'Complete Karnataka Board SSLC Class 10 Mathematics course. Covers step-by-step video lectures, textbook solutions, important theorems, model question paper analysis, and practice worksheets. Clear your doubts and score 100/100 in your boards.',
+        shortDescription: 'Complete Mathematics syllabus for Class 10 (SSLC) Karnataka Board.',
+        thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&auto=format&fit=crop',
         instructor: instructor2._id,
         category: 'MATHS',
         level: 'All Levels',
-        language: 'Hindi',
-        price: 2999,
-        originalPrice: 6999,
-        totalHours: 100,
-        totalLessons: 70,
-        totalStudents: 1200,
-        totalRatings: 200,
-        rating: 4.6,
+        language: 'English / Kannada',
+        price: 1499,
+        originalPrice: 2999,
+        totalHours: 80,
+        totalLessons: 45,
+        totalStudents: 1540,
+        totalRatings: 180,
+        rating: 4.8,
         isPublished: true,
-        isFeatured: false, // ← NOT on homepage
-        publishedAt: new Date('2025-11-15'),
-        prerequisites: ['12th class mathematics'],
+        isFeatured: true,
+        publishedAt: new Date('2025-06-15'),
+        prerequisites: ['Basic 9th class mathematics understanding'],
         learningOutcomes: [
-          'Calculus: Limits, derivatives, integrals',
-          'Linear Algebra: Matrices, eigenvalues',
-          'Probability & Statistics',
-          'Differential Equations',
+          'Solve Arithmetic Progressions and Linear Equations quickly',
+          'Understand similarity theorems for Triangles',
+          'Master Trigonometric identities and applications',
+          'Solve Coordinate Geometry and Area related problems easily',
+          'Excel in grouped statistics and probability questions',
+          'Solve previous years SSLC board question papers',
         ],
-        tags: ['Mathematics', 'GATE', 'Calculus', 'Linear Algebra'],
+        tags: ['Class 10', 'SSLC', 'Karnataka Board', 'Mathematics', 'Coaching'],
+        faqs: [
+          { question: 'Is the course based on the Karnataka Board syllabus?', answer: 'Yes, it strictly follows the Karnataka State Board (KSEAB) SSLC textbook and pattern.' },
+          { question: 'Will doubt sessions be conducted?', answer: 'Yes, weekly interactive live doubt resolution classes are included.' },
+        ],
         chapters: [
           {
-            title: 'Calculus',
-            description: 'Limits and Continuity',
+            title: 'Arithmetic Progressions',
+            description: 'Understanding terms, common differences, and summation formulas.',
             order: 1,
             lessons: [
-              { title: 'Limits & Continuity', slug: 'limits', duration: 35, order: 1, isFree: true },
-              { title: 'Differentiation', slug: 'differentiation', duration: 40, order: 2 },
+              { title: 'Introduction to AP & General Form', slug: 'ap-intro', duration: 25, order: 1, isFree: true },
+              { title: 'Finding the nth Term of an AP', slug: 'ap-nth-term', duration: 35, order: 2 },
+              { title: 'Sum of First n Terms of an AP', slug: 'ap-sum-n-terms', duration: 40, order: 3 },
+            ],
+          },
+          {
+            title: 'Triangles & Trigonometry',
+            description: 'Basic Proportionality Theorem, similarity criteria, and trigonometric identities.',
+            order: 2,
+            lessons: [
+              { title: 'BPT (Thales Theorem) and Similarity', slug: 'triangles-bpt', duration: 30, order: 1 },
+              { title: 'Introduction to Trigonometric Ratios', slug: 'trigo-intro', duration: 25, order: 2 },
+              { title: 'Trigonometric Identities & Applications', slug: 'trigo-identities', duration: 35, order: 3, isFree: true },
+            ],
+          },
+          {
+            title: 'Quadratic Equations & Statistics',
+            description: 'Nature of roots, quadratic formulas, and grouped statistical measures.',
+            order: 3,
+            lessons: [
+              { title: 'Solving Quadratic Equations by Factorization', slug: 'quad-factor', duration: 30, order: 1 },
+              { title: 'Quadratic Formula & Nature of Roots', slug: 'quad-formula', duration: 35, order: 2 },
+              { title: 'Mean, Median, and Mode of Grouped Data', slug: 'stats-grouped', duration: 40, order: 3 },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Class 10 Science (Physics, Chemistry & Biology)',
+        slug: 'class-10-science-sslc',
+        description:
+          'Master Karnataka SSLC Class 10 Science with high-quality explanations, neat diagrams, and practical examples. Features comprehensive modules in Physics (Electricity, Light), Chemistry (Carbon Compounds, Acids & Bases), and Biology (Life Processes, Control).',
+        shortDescription: 'Complete SSLC Science course with notes and board exam practice.',
+        thumbnail: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor._id,
+        category: 'SCIENCE',
+        level: 'All Levels',
+        language: 'English / Kannada',
+        price: 1499,
+        originalPrice: 2999,
+        totalHours: 90,
+        totalLessons: 60,
+        totalStudents: 1850,
+        totalRatings: 240,
+        rating: 4.9,
+        isPublished: true,
+        isFeatured: true,
+        publishedAt: new Date('2025-05-10'),
+        prerequisites: ['Basic middle school science concepts'],
+        learningOutcomes: [
+          'Draw neat, labeled science diagrams for exams',
+          'Understand chemical equation balancing and properties of acids/bases',
+          'Master Ray Diagrams for reflection and refraction',
+          'Understand electricity, Ohm\'s law, and Joule\'s heating effect',
+          'Understand human digestion, circulation, and nervous system functions',
+          'Write high-scoring answers to board-exam questions',
+        ],
+        tags: ['Class 10', 'SSLC', 'Karnataka Board', 'Science', 'Physics', 'Chemistry', 'Biology'],
+        faqs: [
+          { question: 'Are PDF notes provided?', answer: 'Yes, detailed chapter-wise notes and solved questions are attached to each chapter.' },
+        ],
+        chapters: [
+          {
+            title: 'Chemical Substances & Reactions',
+            description: 'Chemical equation balancing, acids, bases, and properties of metals.',
+            order: 1,
+            lessons: [
+              { title: 'Chemical Reactions and Equations', slug: 'chem-reactions', duration: 30, order: 1, isFree: true },
+              { title: 'Acids, Bases, and Salts - Core Concepts', slug: 'acids-bases', duration: 40, order: 2 },
+              { title: 'Metals and Non-Metals Properties', slug: 'metals-properties', duration: 35, order: 3 },
+            ],
+          },
+          {
+            title: 'World of Living (Biology)',
+            description: 'Life processes, nutrition, respiration, and human control systems.',
+            order: 2,
+            lessons: [
+              { title: 'Life Processes: Nutrition & Respiration', slug: 'bio-nutrition', duration: 45, order: 1 },
+              { title: 'Control and Coordination in Humans', slug: 'bio-coordination', duration: 40, order: 2 },
+            ],
+          },
+          {
+            title: 'Light & Electricity (Physics)',
+            description: 'Reflection, refraction, lens formulas, and electric current circuits.',
+            order: 3,
+            lessons: [
+              { title: 'Light - Reflection and Ray Diagrams', slug: 'phys-reflection', duration: 40, order: 1, isFree: true },
+              { title: 'Ohm\'s Law and Circuit Calculations', slug: 'phys-ohms-law', duration: 45, order: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        title: '2nd PUC Physics (Class 12 Board & KCET)',
+        slug: '2nd-puc-physics-kcet',
+        description:
+          'Comprehensive preparation course for 2nd PUC Physics Karnataka Board exams and KCET. Features detailed lectures on Electrostatics, Current Electricity, Magnetism, Electromagnetic Induction, Wave Optics, Dual Nature of Matter, Atoms, Nuclei, and Semiconductor Electronics. Includes past 10 years board papers and KCET MCQ solving strategies.',
+        shortDescription: 'Physics for 2nd PUC Karnataka Board and KCET preparation.',
+        thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor._id,
+        category: 'SCIENCE',
+        level: 'Intermediate',
+        language: 'English',
+        price: 2499,
+        originalPrice: 4999,
+        totalHours: 120,
+        totalLessons: 75,
+        totalStudents: 920,
+        totalRatings: 110,
+        rating: 4.7,
+        isPublished: true,
+        isFeatured: true,
+        publishedAt: new Date('2025-08-20'),
+        prerequisites: ['1st PUC Physics concepts'],
+        learningOutcomes: [
+          'Derive key board exam equations (Gauss law, Lens maker formula, etc.)',
+          'Solve numerical problems in Electrostatics and Current Electricity',
+          'Understand electromagnetic induction and alternating current behavior',
+          'Solve KCET Physics MCQs accurately in less than 60 seconds',
+          'Master Semiconductor device principles and logic gates',
+        ],
+        tags: ['2nd PUC', 'Class 12', 'Physics', 'KCET', 'Science'],
+        faqs: [
+          { question: 'Does this cover KCET as well?', answer: 'Yes! Every chapter has special lectures dedicated to solving KCET MCQs and previous years question papers.' },
+        ],
+        chapters: [
+          {
+            title: 'Electrostatics & Current Electricity',
+            description: 'Charges, potential difference, capacitors, and current circuits.',
+            order: 1,
+            lessons: [
+              { title: 'Electric Charges and Fields', slug: 'elec-charges', duration: 35, order: 1, isFree: true },
+              { title: 'Electrostatic Potential and Capacitance', slug: 'elec-potential', duration: 40, order: 2 },
+              { title: 'Kirchhoff\'s Rules & Wheatstone Bridge', slug: 'kirchhoff-rules', duration: 45, order: 3 },
+            ],
+          },
+          {
+            title: 'Magnetism & Induction',
+            description: 'Moving charges, electromagnetic induction, and AC circuits.',
+            order: 2,
+            lessons: [
+              { title: 'Moving Charges and Force in Magnetic Field', slug: 'moving-charges', duration: 40, order: 1 },
+              { title: 'Electromagnetic Induction & Faraday\'s Laws', slug: 'emi-faraday', duration: 35, order: 2 },
+            ],
+          },
+          {
+            title: 'Optics & Semiconductors',
+            description: 'Wave optics and p-n junction diode electronics.',
+            order: 3,
+            lessons: [
+              { title: 'Wave Optics: Huygens Principle & Interference', slug: 'wave-optics', duration: 45, order: 1, isFree: true },
+              { title: 'Semiconductor Electronics & Logic Gates', slug: 'semiconductors', duration: 50, order: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        title: '2nd PUC Mathematics (Class 12 Board & KCET)',
+        slug: '2nd-puc-math-kcet',
+        description:
+          'Master 2nd PUC Mathematics with expert guidance. Covers Relations and Functions, Inverse Trigonometric Functions, Matrices, Determinants, Continuity and Differentiability, Application of Derivatives, Integrals, Application of Integrals, Differential Equations, Vector Algebra, Three Dimensional Geometry, Linear Programming, and Probability. Ideal for Karnataka Board and KCET preparation.',
+        shortDescription: 'Mathematics masterclass for 2nd PUC and KCET preparation.',
+        thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor2._id,
+        category: 'MATHS',
+        level: 'All Levels',
+        language: 'English',
+        price: 2499,
+        originalPrice: 4999,
+        totalHours: 140,
+        totalLessons: 90,
+        totalStudents: 1200,
+        totalRatings: 170,
+        rating: 4.8,
+        isPublished: true,
+        isFeatured: true,
+        publishedAt: new Date('2025-07-05'),
+        prerequisites: ['Strong algebra and basic trigonometry concepts'],
+        learningOutcomes: [
+          'Evaluate integrals using substitution, parts, and partial fractions',
+          'Solve systems of linear equations using matrix inversion method',
+          'Master continuity, differentiability, and rate of change calculations',
+          'Understand vector properties, dot product, and cross product',
+          'Apply Bayes Theorem to solve complex probability problems',
+          'Solve KCET math sections with high accuracy',
+        ],
+        tags: ['2nd PUC', 'Class 12', 'Mathematics', 'KCET', 'Maths'],
+        chapters: [
+          {
+            title: 'Calculus (Integration & Differentiation)',
+            description: 'Derivative rules, applications, and indefinite/definite integration.',
+            order: 1,
+            lessons: [
+              { title: 'Continuity and Differentiability Basics', slug: 'math-continuity', duration: 35, order: 1, isFree: true },
+              { title: 'Methods of Differentiation', slug: 'math-differentiation', duration: 40, order: 2 },
+              { title: 'Indefinite Integrals: Substitution Method', slug: 'math-integrals', duration: 45, order: 3 },
+            ],
+          },
+          {
+            title: 'Algebra & Vectors',
+            description: 'Matrices operations, determinants, and vector geometry.',
+            order: 2,
+            lessons: [
+              { title: 'Matrices and Determinants Properties', slug: 'math-matrices', duration: 35, order: 1 },
+              { title: 'Vector Algebra: Dot & Cross Product', slug: 'math-vectors', duration: 40, order: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        title: '1st PUC Biology (Class 11 Science)',
+        slug: '1st-puc-biology',
+        description:
+          'Detailed biology course for Karnataka 1st PUC science students. Covers Diversity in the Living World, Structural Organisation in Plants and Animals, Cell Structure and Functions, Plant Physiology, and Human Physiology. Perfect for scoring high in college exams and building a strong foundation for NEET.',
+        shortDescription: 'Detailed Biology syllabus for 1st PUC and NEET foundation.',
+        thumbnail: 'https://images.unsplash.com/photo-1530026405186-ed1ea0ac7a63?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor2._id,
+        category: 'SCIENCE',
+        level: 'Beginner',
+        language: 'English',
+        price: 1999,
+        originalPrice: 3999,
+        totalHours: 100,
+        totalLessons: 70,
+        totalStudents: 680,
+        totalRatings: 90,
+        rating: 4.6,
+        isPublished: true,
+        isFeatured: false,
+        publishedAt: new Date('2025-11-15'),
+        prerequisites: ['10th class science basics'],
+        learningOutcomes: [
+          'Understand taxonomy and classifications of animal and plant kingdoms',
+          'Learn the cell cycle and mitotic/meiotic division processes',
+          'Master photosynthesis and respiration in plants',
+          'Understand human respiration, blood circulation, and neural coordination',
+          'Excel in drawing labeled biological diagrams',
+        ],
+        tags: ['1st PUC', 'Class 11', 'Biology', 'NEET', 'Science'],
+        chapters: [
+          {
+            title: 'Cell Structure & Division',
+            description: 'Components of cells, organelles, cell cycle, and division.',
+            order: 1,
+            lessons: [
+              { title: 'Cell: The Unit of Life', slug: 'cell-unit', duration: 35, order: 1, isFree: true },
+              { title: 'Cell Cycle and Cell Division', slug: 'cell-cycle', duration: 40, order: 2 },
+            ],
+          },
+          {
+            title: 'Plant & Human Physiology',
+            description: 'Photosynthesis, plant growth, breathing, and neural systems.',
+            order: 2,
+            lessons: [
+              { title: 'Photosynthesis in Higher Plants', slug: 'photosynthesis', duration: 45, order: 1 },
+              { title: 'Breathing and Exchange of Gases', slug: 'breathing', duration: 40, order: 2, isFree: true },
+            ],
+          },
+        ],
+      },
+      {
+        title: '2nd PUC Accountancy (Commerce)',
+        slug: '2nd-puc-accountancy',
+        description:
+          'Learn 2nd PUC Accountancy from basics to advanced. Covers Partnership Accounts, Reconstitution of Partnership Firm, Admission/Retirement/Death of a Partner, Dissolution of Partnership Firm, Share Capital Transaction, Issue and Redemption of Debentures, and Financial Statement Analysis. Perfect for scoring 100% in Commerce boards.',
+        shortDescription: 'Complete Accountancy syllabus for 2nd PUC Commerce Board.',
+        thumbnail: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor._id,
+        category: 'COMMERCE',
+        level: 'All Levels',
+        language: 'English',
+        price: 1999,
+        originalPrice: 3999,
+        totalHours: 110,
+        totalLessons: 65,
+        totalStudents: 780,
+        totalRatings: 95,
+        rating: 4.8,
+        isPublished: true,
+        isFeatured: true,
+        publishedAt: new Date('2025-06-01'),
+        prerequisites: ['1st PUC Accountancy basics'],
+        learningOutcomes: [
+          'Understand Partnership Deed, Capital Accounts, and profit distribution',
+          'Calculate new profit-sharing ratios and sacrifice ratios on partner admission',
+          'Prepare Revaluation Accounts and Balance Sheet after Partner retirement',
+          'Account for company share issues at par and premium',
+          'Analyse company financial statement using ratio analysis',
+        ],
+        tags: ['2nd PUC', 'Class 12', 'Accountancy', 'Commerce', 'Board Exam'],
+        chapters: [
+          {
+            title: 'Accounting for Partnership Firms',
+            description: 'Fundamentals, partner admission, retirement, and dissolution.',
+            order: 1,
+            lessons: [
+              { title: 'Partnership Deed & Interest on Capital', slug: 'acc-partnership-deed', duration: 35, order: 1, isFree: true },
+              { title: 'Admission: New Profit Sharing Ratio', slug: 'acc-admission-ratio', duration: 40, order: 2 },
+            ],
+          },
+          {
+            title: 'Company Accounts',
+            description: 'Issue of shares, forfeiture, and reissue accounting.',
+            order: 2,
+            lessons: [
+              { title: 'Issue of Shares at Par and Premium', slug: 'acc-shares-issue', duration: 40, order: 1, isFree: true },
+              { title: 'Forfeiture and Reissue of Shares', slug: 'acc-shares-forfeiture', duration: 45, order: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Class 9 Mathematics & Science Foundation',
+        slug: 'class-9-math-science-foundation',
+        description:
+          'Build a rock-solid foundation in Class 9 Math and Science for NTSE, Olympiads, and future Class 10 board exams. Covers Number Systems, Polynomials, Coordinate Geometry, matter in our surroundings, force, motion, work and energy.',
+        shortDescription: 'Foundation course in Mathematics and Science for Class 9 students.',
+        thumbnail: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor2._id,
+        category: 'GENERAL',
+        level: 'Beginner',
+        language: 'English / Hindi',
+        price: 1299,
+        originalPrice: 2499,
+        totalHours: 90,
+        totalLessons: 50,
+        totalStudents: 1100,
+        totalRatings: 130,
+        rating: 4.7,
+        isPublished: true,
+        isFeatured: false,
+        publishedAt: new Date('2025-09-01'),
+        prerequisites: ['Class 8 maths & science concepts'],
+        learningOutcomes: [
+          'Understand rational, irrational numbers and polynomial factorization',
+          'Apply equations of motion and Newton\'s laws of motion to numericals',
+          'Understand plant and animal tissues structures',
+          'Solve coordinate geometry and linear equations in two variables',
+          'Master foundations needed to crack future board and competitive exams',
+        ],
+        tags: ['Class 9', 'Science', 'Mathematics', 'Foundation', 'Olympiad'],
+        chapters: [
+          {
+            title: 'Number Systems & Algebra',
+            description: 'Rational numbers, irrational numbers, polynomials and factorization.',
+            order: 1,
+            lessons: [
+              { title: 'Rational & Irrational Numbers', slug: 'fnd-rational-numbers', duration: 35, order: 1, isFree: true },
+              { title: 'Polynomials & Remainder Theorem', slug: 'fnd-polynomials', duration: 40, order: 2 },
+            ],
+          },
+          {
+            title: 'Motion, Force & Gravitation',
+            description: 'Kinematics, dynamics, and universal gravitation laws.',
+            order: 2,
+            lessons: [
+              { title: 'Equations of Motion Graphical Derivation', slug: 'fnd-motion-eq', duration: 40, order: 1, isFree: true },
+              { title: 'Newton\'s Laws of Motion Explained', slug: 'fnd-newtons-laws', duration: 45, order: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Class 8 Comprehensive Syllabus (Math, Science & English)',
+        slug: 'class-8-comprehensive',
+        description:
+          'Complete Class 8 online course covering Mathematics, Science, and English. Designed to keep students ahead of their school curriculum from home. Focuses on conceptual clarity, interactive worksheets, and regular quizzes.',
+        shortDescription: 'Full syllabus coverage of Mathematics, Science, and English for Class 8.',
+        thumbnail: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop',
+        instructor: instructor._id,
+        category: 'GENERAL',
+        level: 'Beginner',
+        language: 'English / Hindi',
+        price: 999,
+        originalPrice: 1999,
+        totalHours: 75,
+        totalLessons: 40,
+        totalStudents: 850,
+        totalRatings: 90,
+        rating: 4.5,
+        isPublished: true,
+        isFeatured: false,
+        publishedAt: new Date('2025-10-01'),
+        prerequisites: ['Basic reading and math skills'],
+        learningOutcomes: [
+          'Solve linear equations in one variable',
+          'Understand crop production techniques and soil preparation',
+          'Identify friendly and harmful microorganisms',
+          'Improve English grammar, tense usage, and comprehension writing',
+          'Build study habits and self-learning discipline from home',
+        ],
+        tags: ['Class 8', 'Mathematics', 'Science', 'English', 'School Syllabus'],
+        chapters: [
+          {
+            title: 'Rational Numbers & Algebra',
+            description: 'Properties of numbers and linear equations solving.',
+            order: 1,
+            lessons: [
+              { title: 'Properties of Rational Numbers', slug: 'class8-rational', duration: 30, order: 1, isFree: true },
+              { title: 'Solving Linear Equations in One Variable', slug: 'class8-linear', duration: 35, order: 2 },
+            ],
+          },
+          {
+            title: 'Science - Agricultural & Biological Basics',
+            description: 'Crop production, irrigation, and friendly/harmful bacteria.',
+            order: 2,
+            lessons: [
+              { title: 'Agricultural Practices & Soil Prep', slug: 'class8-agri', duration: 30, order: 1, isFree: true },
+              { title: 'Microorganisms: Friend and Foe', slug: 'class8-microbes', duration: 35, order: 2 },
             ],
           },
         ],

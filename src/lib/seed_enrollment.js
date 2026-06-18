@@ -44,6 +44,10 @@ async function seed() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB Atlas\n');
 
+    // Clear old enrollments
+    await Enrollment.deleteMany({});
+    console.log('🗑️  Cleared old enrollments from database\n');
+
     // Find the student user (created by seed_users.js)
     const student = await User.findOne({ email: 'student@meetme.center' });
     if (!student) {

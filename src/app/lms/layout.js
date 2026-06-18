@@ -60,10 +60,12 @@ export default function LMSLayout({ children }) {
           </div>
           <div className={styles.topBarActions}>
             <select className={styles.filterSelect}>
-              <option>All Course</option>
-              <option>CSE</option>
-              <option>ECE</option>
-              <option>Mechanical</option>
+              <option>All Courses</option>
+              <option>Mathematics</option>
+              <option>Science</option>
+              <option>Commerce</option>
+              <option>Arts</option>
+              <option>General</option>
             </select>
             <div className={styles.searchBox}>
               <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
