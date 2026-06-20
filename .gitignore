@@ -55,3 +55,6 @@ next-env.d.ts
 .gemini/
 .gsd/
 .agent/
+
+# Local Scalability Suggestions Report
+suggestions_report.md

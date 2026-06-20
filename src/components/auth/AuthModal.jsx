@@ -186,14 +186,22 @@ function RoleSelectStep({ onClose }) {
       const data = await res.json();
 
       if (data.success) {
-        await update({ role, needsRoleSelection: false, name: trimmedName });
+        await update({ 
+          role, 
+          needsRoleSelection: false, 
+          needsOtpVerification: false, 
+          name: trimmedName 
+        });
         if (onClose) onClose();
-        if (role === 'instructor') {
-          router.push('/lms/instructor');
-        } else {
-          router.push('/lms');
-        }
+        
         router.refresh();
+        setTimeout(() => {
+          if (role === 'instructor') {
+            router.push('/lms/instructor');
+          } else {
+            router.push('/lms');
+          }
+        }, 100);
       } else {
         setError(data.error || 'Something went wrong. Please try again.');
         setSaving(false);
