@@ -50,6 +50,24 @@ export default function LMSLayout({ children }) {
   const [theme, setTheme] = useState('light');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [enrolledCount, setEnrolledCount] = useState(null);
+  const [isUnderMaintenance, setIsUnderMaintenance] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (session && session.user?.role !== 'admin') {
+      fetch('/api/settings')
+        .then(res => res.json())
+        .then(data => {
+          if (active && data.success && data.settings?.maintenanceMode) {
+            setIsUnderMaintenance(true);
+          }
+        })
+        .catch(err => console.error('[Maintenance check error]', err));
+    } else if (session && session.user?.role === 'admin') {
+      if (active) setIsUnderMaintenance(false);
+    }
+    return () => { active = false; };
+  }, [session]);
 
   useEffect(() => {
     // Check saved theme or system preference
@@ -174,6 +192,30 @@ export default function LMSLayout({ children }) {
       subtitle: "Gradify Academy — India's Premier Online Coaching."
     };
   };
+
+  if (isUnderMaintenance) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', width: '100vw', background: '#f8f9fb', padding: '2rem', textAlign: 'center',
+        fontFamily: 'var(--font-body)'
+      }}>
+        <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🛠️</div>
+        <h1 style={{ fontSize: '2.2rem', color: '#1B2B6B', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+          System Under Maintenance
+        </h1>
+        <p style={{ color: '#4A4A6A', fontSize: '1.1rem', maxWidth: '520px', lineHeight: 1.6, marginBottom: '2rem' }}>
+          Gradify Academy is currently undergoing scheduled maintenance to improve our systems and services. We will be back online shortly. Thank you for your patience!
+        </p>
+        <Link href="/" style={{
+          background: '#1B2B6B', color: 'white', padding: '0.8rem 2rem', borderRadius: '8px',
+          fontWeight: 600, fontSize: '0.95rem', transition: 'background 0.2s', display: 'inline-block'
+        }}>
+          Go back to Home Page
+        </Link>
+      </div>
+    );
+  }
 
   const header = getHeaderContent();
 
