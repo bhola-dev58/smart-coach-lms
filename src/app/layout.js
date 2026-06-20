@@ -2,7 +2,6 @@ import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/components/providers/AuthProvider';
 import AuthModal from '@/components/auth/AuthModal';
-import RoleSelectModal from '@/components/auth/RoleSelectModal';
 import LayoutShell from '@/components/layout/LayoutShell';
 
 const inter = Inter({
@@ -37,7 +36,6 @@ export default function RootLayout({ children }) {
       <body>
         <AuthProvider>
           <AuthModal />
-          <RoleSelectModal />
           <LayoutShell>{children}</LayoutShell>
         </AuthProvider>
       </body>

@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import styles from '@/app/auth/login/login.module.css';
 
 // ── Google-user OTP step (shown inside modal after Google OAuth) ──
@@ -36,9 +36,22 @@ function GoogleOtpModal({ onClose }) {
       });
       const data = await res.json();
       if (!data.success) { setError(data.error || 'Verification failed.'); setLoading(false); return; }
-      setSuccessMsg('Verified! Redirecting…');
+      
+      const needsRole = session?.user?.needsRoleSelection;
+      setSuccessMsg('Verified successfully!');
+      
       await update({ needsOtpVerification: false });
-      setTimeout(() => { router.replace('/lms'); router.refresh(); }, 800);
+      
+      if (needsRole) {
+        // Clear URL search params but keep modal open for role selection
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.delete('auth');
+        const q = newParams.toString();
+        router.replace(q ? `${window.location.pathname}?${q}` : window.location.pathname, { scroll: false });
+      } else {
+        setSuccessMsg('Verified! Redirecting…');
+        setTimeout(() => { router.replace('/lms'); router.refresh(); }, 800);
+      }
     } catch {
       setError('Something went wrong. Please try again.');
       setLoading(false);
@@ -106,6 +119,239 @@ function GoogleOtpModal({ onClose }) {
             ? <span style={{ color: 'var(--color-text-muted)' }}>Resend in {resendCooldown}s</span>
             : <button type="button" onClick={handleResend} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer', fontSize: 'inherit' }}>Resend OTP</button>}
         </p>
+        <p style={{ marginTop: 8 }}>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: '/' })}
+            style={{
+              background: 'none', border: 'none', padding: 0,
+              color: 'var(--color-text-muted)', fontWeight: 500,
+              cursor: 'pointer', fontSize: '0.85rem', textDecoration: 'underline'
+            }}
+          >
+            Wrong account? Sign out
+          </button>
+        </p>
+      </div>
+    </>
+  );
+}
+
+// ── Complete Profile / Role Selection Step ──
+function RoleSelectStep({ onClose }) {
+  const { data: session, update } = useSession();
+  const router = useRouter();
+
+  const [fullName, setFullName] = useState(session?.user?.name || '');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState(''); // 'student' or 'instructor'
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const defaultName = session?.user?.name || '';
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    const trimmedName = fullName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      setError('Please enter your full name (at least 2 characters).');
+      return;
+    }
+
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      setError('Phone number is required.');
+      return;
+    }
+    const phoneDigits = trimmedPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      setError('Please enter a valid phone number (at least 10 digits).');
+      return;
+    }
+
+    if (!role) {
+      setError('Please select your role (Student or Instructor).');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch('/api/auth/set-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, name: trimmedName, phone: trimmedPhone }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        await update({ role, needsRoleSelection: false, name: trimmedName });
+        if (onClose) onClose();
+        if (role === 'instructor') {
+          router.push('/lms/instructor');
+        } else {
+          router.push('/lms');
+        }
+        router.refresh();
+      } else {
+        setError(data.error || 'Something went wrong. Please try again.');
+        setSaving(false);
+      }
+    } catch {
+      setError('Network error. Please try again.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.authHeader} style={{ marginBottom: 'var(--space-6)' }}>
+        <div style={{
+          width: 56, height: 56,
+          background: 'rgba(200,16,46,0.1)', borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 1rem', color: 'var(--color-primary)',
+        }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.4rem', color: '#1A1A1A' }}>
+          Complete Your Profile
+        </h2>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+          Hi <strong>{defaultName.split(' ')[0]}</strong>! Please fill in the details below to get started.
+        </p>
+      </div>
+
+      {error && <div className={styles.errorBox}>⚠ {error}</div>}
+
+      <form onSubmit={handleSubmit} className={styles.authForm}>
+        {/* Full Name */}
+        <div className="form-group">
+          <label className="form-label" htmlFor="profile-fullname" style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.35rem' }}>
+            Full Name <span style={{ color: 'var(--color-primary)' }}>*</span>
+          </label>
+          <input
+            id="profile-fullname"
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Enter your full name"
+            className="form-input"
+            required
+          />
+        </div>
+
+        {/* Phone Number */}
+        <div className="form-group">
+          <label className="form-label" htmlFor="profile-phone" style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.35rem' }}>
+            Phone Number <span style={{ color: 'var(--color-primary)' }}>*</span>
+          </label>
+          <input
+            id="profile-phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+            maxLength={10}
+            placeholder="+91 xxxxxxxxxx"
+            className="form-input"
+            required
+          />
+        </div>
+
+        {/* Role Selection */}
+        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+          <label className="form-label" style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
+            Register As <span style={{ color: 'var(--color-primary)' }}>*</span>
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            {/* Student Card */}
+            <button
+              type="button"
+              onClick={() => setRole('student')}
+              style={{
+                border: `2px solid ${role === 'student' ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                borderRadius: '12px', padding: '1.1rem 0.75rem',
+                background: role === 'student' ? 'rgba(200,16,46,0.05)' : 'white',
+                cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center',
+              }}
+            >
+              <div style={{
+                width: 42, height: 42, borderRadius: '50%',
+                background: role === 'student' ? 'rgba(200,16,46,0.15)' : 'rgba(200,16,46,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 0.5rem', color: 'var(--color-primary)',
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1A1A1A', marginBottom: 2 }}>
+                Student
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                Enroll &amp; learn courses
+              </div>
+            </button>
+
+            {/* Instructor Card */}
+            <button
+              type="button"
+              onClick={() => setRole('instructor')}
+              style={{
+                border: `2px solid ${role === 'instructor' ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                borderRadius: '12px', padding: '1.1rem 0.75rem',
+                background: role === 'instructor' ? 'rgba(200,16,46,0.05)' : 'white',
+                cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center',
+              }}
+            >
+              <div style={{
+                width: 42, height: 42, borderRadius: '50%',
+                background: role === 'instructor' ? 'rgba(200,16,46,0.15)' : 'rgba(200,16,46,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 0.5rem', color: 'var(--color-primary)',
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <path d="M8 21h8M12 17v4" />
+                  <path d="M7 8h10M7 12h5" />
+                </svg>
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1A1A1A', marginBottom: 2 }}>
+                Instructor
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                Create &amp; teach courses
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary btn-block"
+          disabled={saving || !role}
+        >
+          {saving ? '⏳ Setting up your account...' : '🚀 Complete Registration'}
+        </button>
+      </form>
+
+      <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center', marginTop: '0.75rem' }}>
+        You can&apos;t change your role later. Please choose carefully.
+      </p>
+
+      <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: '/' })}
+          style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '0.82rem', cursor: 'pointer', textDecoration: 'underline' }}
+        >
+          Cancel &amp; Sign out
+        </button>
       </div>
     </>
   );
@@ -299,6 +545,10 @@ function AuthModalInner() {
   const { data: session, status } = useSession();
 
   const authMode = searchParams.get('auth'); // 'login', 'register', or 'verify-otp'
+  const needsOtpVerification = session?.user?.needsOtpVerification;
+  const needsRoleSelection = session?.user?.needsRoleSelection;
+
+  const showModal = !!authMode || !!needsOtpVerification || !!needsRoleSelection;
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', password: '', confirmPassword: '',
@@ -319,17 +569,17 @@ function AuthModalInner() {
     router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false });
   };
 
-  // Auto-close when authenticated — but NOT for verify-otp mode (user must verify first)
+  // Auto-close when authenticated — but NOT for verify-otp or role selection mode
   useEffect(() => {
-    if (status === 'authenticated' && authMode && authMode !== 'verify-otp') {
-      // Only close if user is fully verified
-      if (!session?.user?.needsOtpVerification) {
+    if (status === 'authenticated' && showModal) {
+      // Only close if user is fully verified and role is selected
+      if (!needsOtpVerification && !needsRoleSelection && authMode !== 'verify-otp') {
         closeModal();
       }
     }
-  }, [status, authMode, session]);
+  }, [status, showModal, needsOtpVerification, needsRoleSelection, authMode]);
 
-  if (!authMode) return null;
+  if (!showModal) return null;
 
   // ── OTP verified — auto-login and close ──
   const handleOtpSuccess = async () => {
@@ -414,8 +664,8 @@ function AuthModalInner() {
   };
 
   const isRegister = authMode === 'register';
-
-  const isVerifyOtp = authMode === 'verify-otp';
+  const isOtpRequired = status === 'authenticated' ? !!needsOtpVerification : (authMode === 'verify-otp');
+  const isLocked = isOtpRequired || !!needsRoleSelection;
 
   return (
     <div
@@ -423,39 +673,44 @@ function AuthModalInner() {
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(0,0,0,0.65)',
         display: 'flex', justifyContent: 'center',
-        alignItems: isRegister ? 'flex-start' : 'center',
-        overflowY: isRegister ? 'auto' : 'unset',
-        zIndex: 9999, padding: isRegister ? '2rem 1rem' : '1rem',
+        alignItems: (isRegister && !needsRoleSelection) ? 'flex-start' : 'center',
+        overflowY: (isRegister && !needsRoleSelection) ? 'auto' : 'unset',
+        zIndex: 9999, padding: (isRegister && !needsRoleSelection) ? '2rem 1rem' : '1rem',
         backdropFilter: 'blur(5px)',
       }}
-      // Don't allow closing by backdrop click when OTP verification is required
-      onClick={isVerifyOtp ? undefined : closeModal}
+      // Don't allow closing by backdrop click when onboarding is incomplete
+      onClick={isLocked ? undefined : closeModal}
     >
       <div
         className={styles.authCard}
         style={{
           position: 'relative', margin: 'auto', width: '100%',
-          padding: isRegister ? '1.5rem 2rem' : undefined,
+          padding: (isRegister && !needsRoleSelection) ? '1.5rem 2rem' : undefined,
+          maxWidth: needsRoleSelection ? '520px' : undefined,
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
-        <button
-          style={{
-            position: 'absolute', top: '1rem', right: '1rem',
-            background: 'none', border: 'none', fontSize: '1.5rem',
-            cursor: 'pointer', color: 'var(--color-text-muted)', lineHeight: 1,
-            zIndex: 1,
-          }}
-          onClick={closeModal}
-          aria-label="Close"
-        >
-          &times;
-        </button>
+        {!isLocked && (
+          <button
+            style={{
+              position: 'absolute', top: '1rem', right: '1rem',
+              background: 'none', border: 'none', fontSize: '1.5rem',
+              cursor: 'pointer', color: 'var(--color-text-muted)', lineHeight: 1,
+              zIndex: 1,
+            }}
+            onClick={closeModal}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        )}
 
-        {/* Google OAuth OTP step */}
-        {authMode === 'verify-otp' ? (
+        {/* Unified State Machine */}
+        {isOtpRequired ? (
           <GoogleOtpModal onClose={closeModal} />
+        ) : needsRoleSelection ? (
+          <RoleSelectStep onClose={closeModal} />
         ) : otpStep ? (
           <OtpStep
             email={pendingEmail}
