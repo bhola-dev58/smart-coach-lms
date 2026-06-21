@@ -8,21 +8,49 @@ import styles from '@/app/lms/lms.module.css';
 export default function BrowseCoursesClient({ courses = [] }) {
   const searchParams = useSearchParams();
   const filter = searchParams.get('category') || 'All';
+  const query = (searchParams.get('q') || '').trim().toLowerCase();
 
-  const filtered = (filter === 'All' || !filter) 
-    ? courses 
+  // First apply category filter, then search query filter
+  const afterCategory = (filter === 'All' || !filter)
+    ? courses
     : courses.filter(c => c.category.toUpperCase() === filter.toUpperCase());
+
+  const filtered = query
+    ? afterCategory.filter(c =>
+        (c.title || '').toLowerCase().includes(query) ||
+        (c.shortDescription || '').toLowerCase().includes(query) ||
+        (c.description || '').toLowerCase().includes(query) ||
+        (c.category || '').toLowerCase().includes(query) ||
+        (c.tags || []).some(t => t.toLowerCase().includes(query))
+      )
+    : afterCategory;
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
 
+      {/* Search result heading */}
+      {query && (
+        <div style={{ marginBottom: '1.25rem' }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '0.25rem' }}>
+            Results for &ldquo;<span style={{ color: 'var(--dash-accent)' }}>{query}</span>&rdquo;
+          </h2>
+          <p style={{ fontSize: '0.82rem', color: 'var(--dash-text-muted)' }}>
+            {filtered.length} course{filtered.length !== 1 ? 's' : ''} found
+          </p>
+        </div>
+      )}
+
       {/* Courses Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--dash-text-secondary)' }}>
-          <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</p>
-          <p>No courses found in this category.</p>
+          <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</p>
+          <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>
+            {query ? `No courses found for "${query}"` : 'No courses found in this category.'}
+          </p>
+          {query && <p style={{ fontSize: '0.85rem', color: 'var(--dash-text-muted)' }}>Try a different keyword or browse all courses.</p>}
         </div>
       ) : (
+
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',

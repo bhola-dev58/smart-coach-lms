@@ -40,6 +40,7 @@ function CategorySelect() {
 
 export default function LMSLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const userName = session?.user?.name || 'Student';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -51,6 +52,8 @@ export default function LMSLayout({ children }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [enrolledCount, setEnrolledCount] = useState(null);
   const [isUnderMaintenance, setIsUnderMaintenance] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   useEffect(() => {
     let active = true;
@@ -240,11 +243,35 @@ export default function LMSLayout({ children }) {
               <CategorySelect />
             </Suspense>
             <div className={styles.searchBox}>
-              <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input type="text" placeholder="Search" />
-            </div>
+                <button
+                  type="button"
+                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  onClick={() => {
+                    const q = searchQuery.trim();
+                    if (q) router.push(`/lms/browse?q=${encodeURIComponent(q)}`);
+                    else router.push('/lms/browse');
+                  }}
+                  aria-label="Search courses"
+                >
+                  <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+                <input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const q = searchQuery.trim();
+                      if (q) router.push(`/lms/browse?q=${encodeURIComponent(q)}`);
+                      else router.push('/lms/browse');
+                    }
+                  }}
+                  style={{ width: 150 }}
+                />
+              </div>
 
             <button className={styles.notifBtn} onClick={toggleTheme} aria-label="Toggle Theme" title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}>
               {theme === 'dark' ? (

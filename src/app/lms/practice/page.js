@@ -1,7 +1,7 @@
-import ComingSoon from '@/components/lms/ComingSoon';
+import PracticePageClient from '@/components/lms/PracticePageClient';
 
-export const metadata = { title: 'Practice — MeetMe Center' };
+export const metadata = { title: 'Practice Arena — Gradify Academy' };
 
 export default function PracticePage() {
-  return <ComingSoon title="Practice" icon="🎯" />;
+  return <PracticePageClient />;
 }

@@ -1,7 +1,7 @@
-import ComingSoon from '@/components/lms/ComingSoon';
+import CertificatesPageClient from '@/components/lms/CertificatesPageClient';
 
 export const metadata = { title: 'My Certificates — Gradify Academy' };
 
 export default function CertificatesPage() {
-  return <ComingSoon title="My Certificates" icon="🎓" />;
+  return <CertificatesPageClient />;
 }
