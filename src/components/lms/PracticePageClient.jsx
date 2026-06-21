@@ -1,70 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-
-// ── Static Practice Questions ──
-const QUESTION_BANK = {
-  MATHS: [
-    { id: 'm1', q: 'What is the value of √169?', options: ['11', '12', '13', '14'], ans: 2 },
-    { id: 'm2', q: 'If x² – 5x + 6 = 0, what are the values of x?', options: ['2 and 3', '1 and 6', '–2 and –3', '3 and 4'], ans: 0 },
-    { id: 'm3', q: 'The HCF of 36 and 48 is:', options: ['6', '8', '12', '16'], ans: 2 },
-    { id: 'm4', q: 'A train travels 360 km in 4 hours. What is its speed in m/s?', options: ['20 m/s', '25 m/s', '30 m/s', '35 m/s'], ans: 1 },
-    { id: 'm5', q: 'What is 15% of 840?', options: ['116', '126', '136', '146'], ans: 1 },
-    { id: 'm6', q: 'The sum of angles of a triangle is:', options: ['90°', '180°', '270°', '360°'], ans: 1 },
-    { id: 'm7', q: 'log₁₀(1000) = ?', options: ['2', '3', '4', '10'], ans: 1 },
-    { id: 'm8', q: 'The area of a circle with radius 7 cm is (π = 22/7):', options: ['144 cm²', '154 cm²', '164 cm²', '176 cm²'], ans: 1 },
-    { id: 'm9', q: 'What is the value of sin 90°?', options: ['0', '0.5', '1', '√2'], ans: 2 },
-    { id: 'm10', q: 'A number when divided by 56 gives remainder 29. What will be the remainder when divided by 8?', options: ['3', '5', '6', '7'], ans: 1 },
-  ],
-  SCIENCE: [
-    { id: 's1', q: 'What is the chemical formula of water?', options: ['H₂O₂', 'HO₂', 'H₂O', 'H₃O'], ans: 2 },
-    { id: 's2', q: 'Which gas is used in photosynthesis?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], ans: 2 },
-    { id: 's3', q: 'The SI unit of force is:', options: ['Joule', 'Watt', 'Newton', 'Pascal'], ans: 2 },
-    { id: 's4', q: 'Who proposed the theory of evolution?', options: ['Newton', 'Einstein', 'Darwin', 'Faraday'], ans: 2 },
-    { id: 's5', q: 'The atomic number of Carbon is:', options: ['4', '6', '8', '12'], ans: 1 },
-    { id: 's6', q: 'Which planet is closest to the Sun?', options: ['Venus', 'Mercury', 'Mars', 'Earth'], ans: 1 },
-    { id: 's7', q: 'Which acid is present in vinegar?', options: ['Lactic acid', 'Acetic acid', 'Citric acid', 'Tartaric acid'], ans: 1 },
-    { id: 's8', q: 'The speed of light is approximately:', options: ['3 × 10⁶ m/s', '3 × 10⁸ m/s', '3 × 10¹⁰ m/s', '3 × 10⁴ m/s'], ans: 1 },
-    { id: 's9', q: 'DNA stands for:', options: ['Deoxyribose Nucleic Acid', 'Di-nitrogen Acid', 'Double Nitro Acid', 'Deoxy Nitro Acid'], ans: 0 },
-    { id: 's10', q: 'Which is the largest organ of the human body?', options: ['Heart', 'Liver', 'Skin', 'Brain'], ans: 2 },
-  ],
-  COMMERCE: [
-    { id: 'c1', q: 'GST stands for:', options: ['General Sales Tax', 'Goods and Services Tax', 'Government Service Tax', 'Gross Sales Tax'], ans: 1 },
-    { id: 'c2', q: 'Which financial statement shows profitability?', options: ['Balance Sheet', 'Cash Flow Statement', 'Profit & Loss Account', 'Trial Balance'], ans: 2 },
-    { id: 'c3', q: 'SEBI regulates:', options: ['Banking sector', 'Insurance sector', 'Capital market', 'Mutual funds only'], ans: 2 },
-    { id: 'c4', q: 'Double entry bookkeeping means:', options: ['Two entries for every transaction', 'Debit and Credit for each transaction', 'Two books are maintained', 'Two accountants verify'], ans: 1 },
-    { id: 'c5', q: 'What is the full form of GDP?', options: ['Gross Domestic Product', 'General Domestic Product', 'Gross Development Product', 'Gross Debt Product'], ans: 0 },
-    { id: 'c6', q: 'Which tax is levied on personal income?', options: ['Excise Duty', 'Income Tax', 'Customs Duty', 'Sales Tax'], ans: 1 },
-    { id: 'c7', q: 'Current ratio measures:', options: ['Profitability', 'Liquidity', 'Solvency', 'Efficiency'], ans: 1 },
-    { id: 'c8', q: 'Depreciation is charged on:', options: ['Current Assets', 'Fixed Assets', 'Intangible Assets', 'Both B and C'], ans: 3 },
-    { id: 'c9', q: 'RBI was established in:', options: ['1930', '1935', '1947', '1950'], ans: 1 },
-    { id: 'c10', q: 'Which account always has a credit balance?', options: ['Debtors account', 'Expense account', 'Capital account', 'Purchases account'], ans: 2 },
-  ],
-  ARTS: [
-    { id: 'a1', q: 'Who wrote "Wings of Fire"?', options: ['Jawaharlal Nehru', 'A.P.J. Abdul Kalam', 'Mahatma Gandhi', 'Subhash Chandra Bose'], ans: 1 },
-    { id: 'a2', q: 'The Harappan Civilization belongs to which age?', options: ['Iron Age', 'Stone Age', 'Bronze Age', 'Copper Age'], ans: 2 },
-    { id: 'a3', q: 'Which is the national language of India?', options: ['English', 'Hindi', 'Sanskrit', 'No official national language'], ans: 3 },
-    { id: 'a4', q: 'Who is the author of "Arthashastra"?', options: ['Chanakya', 'Ashoka', 'Chandra Gupta', 'Akbar'], ans: 0 },
-    { id: 'a5', q: 'The Mughal Empire was founded by:', options: ['Akbar', 'Humayun', 'Babur', 'Aurangzeb'], ans: 2 },
-    { id: 'a6', q: 'Which fundamental right guarantees freedom of speech?', options: ['Article 14', 'Article 19', 'Article 21', 'Article 25'], ans: 1 },
-    { id: 'a7', q: 'The 73rd Constitutional Amendment is related to:', options: ['Panchayati Raj', 'Urban local bodies', 'Fundamental Rights', 'DPSP'], ans: 0 },
-    { id: 'a8', q: 'Which river is known as the "Sorrow of Bihar"?', options: ['Ganga', 'Son', 'Gandak', 'Kosi'], ans: 3 },
-    { id: 'a9', q: 'Who is the "Father of Indian Constitution"?', options: ['Mahatma Gandhi', 'Jawaharlal Nehru', 'B.R. Ambedkar', 'Rajendra Prasad'], ans: 2 },
-    { id: 'a10', q: 'Sitar is which type of instrument?', options: ['Percussion', 'String', 'Wind', 'Brass'], ans: 1 },
-  ],
-  GENERAL: [
-    { id: 'g1', q: 'Who is the current Chief Justice of India (2025)?', options: ['D.Y. Chandrachud', 'Sanjiv Khanna', 'N.V. Ramana', 'S.A. Bobde'], ans: 1 },
-    { id: 'g2', q: 'Which country won the FIFA World Cup 2022?', options: ['France', 'Brazil', 'Germany', 'Argentina'], ans: 3 },
-    { id: 'g3', q: 'What is the capital of Australia?', options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], ans: 2 },
-    { id: 'g4', q: 'Which is the smallest planet in our Solar System?', options: ['Mercury', 'Mars', 'Venus', 'Pluto'], ans: 0 },
-    { id: 'g5', q: 'When is "World Environment Day" observed?', options: ['April 22', 'June 5', 'March 22', 'September 16'], ans: 1 },
-    { id: 'g6', q: 'Which is the longest river in the world?', options: ['Amazon', 'Nile', 'Yangtze', 'Mississippi'], ans: 1 },
-    { id: 'g7', q: '"Operation Sindoor" was carried out by India in:', options: ['2023', '2024', '2025', '2026'], ans: 2 },
-    { id: 'g8', q: 'Which organisation publishes Human Development Index?', options: ['World Bank', 'IMF', 'UNDP', 'WHO'], ans: 2 },
-    { id: 'g9', q: 'Who invented the World Wide Web?', options: ['Bill Gates', 'Steve Jobs', 'Tim Berners-Lee', 'Mark Zuckerberg'], ans: 2 },
-    { id: 'g10', q: 'Which is the national flower of India?', options: ['Rose', 'Jasmine', 'Sunflower', 'Lotus'], ans: 3 },
-  ],
-};
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const SUBJECTS = [
   { key: 'MATHS', label: 'Mathematics', icon: '📐', color: '#1B2B6B' },
@@ -74,202 +10,507 @@ const SUBJECTS = [
   { key: 'GENERAL', label: 'General Knowledge', icon: '🌐', color: '#8E44AD' },
 ];
 
+const CLASSES = ['6', '7', '8', '9', '10', '11', '12', 'All'];
+const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const QUESTION_TIME = 30; // seconds per question
 
-// ── Results Screen ──
-function ResultScreen({ score, total, timeTaken, subject, onRestart, onChangeSubject }) {
-  const percentage = Math.round((score / total) * 100);
-  const sub = SUBJECTS.find(s => s.key === subject);
-  let grade = 'D';
-  let gradeColor = '#E74C3C';
-  let msg = 'Keep practising! Review the concepts and try again.';
-  if (percentage >= 90) { grade = 'A+'; gradeColor = '#27AE60'; msg = 'Outstanding! You have mastered this topic! 🌟'; }
-  else if (percentage >= 75) { grade = 'A'; gradeColor = '#27AE60'; msg = 'Excellent work! You have a strong grasp of the subject. 🎉'; }
-  else if (percentage >= 60) { grade = 'B'; gradeColor = '#F5A623'; msg = 'Good job! A little more revision and you\'ll ace it.'; }
-  else if (percentage >= 40) { grade = 'C'; gradeColor = '#E67E22'; msg = 'Fair attempt. Focus on the topics you found difficult.'; }
-
-  const mins = Math.floor(timeTaken / 60);
-  const secs = timeTaken % 60;
-
-  return (
-    <div style={{ maxWidth: 560, margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
-      {/* Score circle */}
-      <div style={{
-        width: 140, height: 140, borderRadius: '50%', margin: '0 auto 1.5rem',
-        background: `conic-gradient(${sub.color} ${percentage * 3.6}deg, var(--dash-border, #e2e6ef) 0deg)`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
-      }}>
-        <div style={{
-          width: 110, height: 110, borderRadius: '50%', background: 'var(--dash-surface)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <span style={{ fontSize: '1.8rem', fontWeight: 800, color: sub.color }}>{grade}</span>
-          <span style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)' }}>{percentage}%</span>
-        </div>
-      </div>
-
-      <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '0.5rem' }}>
-        {sub.icon} {sub.label} Practice
-      </h2>
-      <p style={{ color: sub.color, fontWeight: 600, marginBottom: '1.5rem' }}>{msg}</p>
-
-      {/* Stats */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem',
-        background: 'var(--dash-surface)', border: '1px solid var(--dash-border)',
-        borderRadius: 12, padding: '1.25rem',
-      }}>
-        <div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#27AE60' }}>{score}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Correct</div>
-        </div>
-        <div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#E74C3C' }}>{total - score}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Wrong / Skipped</div>
-        </div>
-        <div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--dash-text)' }}>
-            {mins > 0 ? `${mins}m ${secs}s` : `${secs}s`}
-          </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Time Taken</div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button
-          onClick={onRestart}
-          style={{
-            padding: '0.7rem 1.5rem', background: sub.color, color: 'white',
-            border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
-          }}
-        >
-          🔄 Practice Again
-        </button>
-        <button
-          onClick={onChangeSubject}
-          style={{
-            padding: '0.7rem 1.5rem', background: 'transparent', color: sub.color,
-            border: `1px solid ${sub.color}`, borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
-          }}
-        >
-          Change Subject
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Main Practice Page ──
 export default function PracticePageClient() {
-  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState('GENERAL');
+  const [selectedClass, setSelectedClass] = useState('All');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('Medium');
+
   const [questions, setQuestions] = useState([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [answers, setAnswers] = useState([]); // 0-based index of chosen option, or -1 for skipped
+  const [answers, setAnswers] = useState([]); // chosen options or -1 for skipped
   const [timer, setTimer] = useState(QUESTION_TIME);
-  const [gameState, setGameState] = useState('subject-select'); // 'subject-select' | 'playing' | 'results'
+  const [gameState, setGameState] = useState('filters-select'); // 'filters-select' | 'playing' | 'results'
   const [sessionTime, setSessionTime] = useState(0); // total seconds elapsed
 
-  // Start a practice session
-  const startPractice = useCallback((subjectKey) => {
-    const qs = [...QUESTION_BANK[subjectKey]].sort(() => Math.random() - 0.5).slice(0, 10);
-    setSelectedSubject(subjectKey);
-    setQuestions(qs);
-    setCurrentIdx(0);
-    setSelectedOption(null);
-    setAnswers([]);
-    setTimer(QUESTION_TIME);
-    setSessionTime(0);
-    setGameState('playing');
+  // Security & Violations
+  const [violations, setViolations] = useState(0);
+  const [isFullscreenViolated, setIsFullscreenViolated] = useState(false);
+  const [isTabViolated, setIsTabViolated] = useState(false);
+  const [movements, setMovements] = useState([]);
+
+  const isTabViolatedRef = useRef(isTabViolated);
+  const isFullscreenViolatedRef = useRef(isFullscreenViolated);
+  const gameStateRef = useRef(gameState);
+
+  useEffect(() => {
+    isTabViolatedRef.current = isTabViolated;
+  }, [isTabViolated]);
+
+  useEffect(() => {
+    isFullscreenViolatedRef.current = isFullscreenViolated;
+  }, [isFullscreenViolated]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  // Append telemetry movement log
+  const logMovement = useCallback((eventText) => {
+    setMovements(prev => [...prev, { event: eventText, timestamp: new Date() }]);
   }, []);
 
-  // Timer countdown
+  // Submit test to database
+  const submitSession = useCallback(async (finalScore, finalAnswers) => {
+    try {
+      const payload = {
+        subject: selectedSubject,
+        class: selectedClass,
+        difficulty: selectedDifficulty,
+        score: finalScore,
+        totalQuestions: questions.length,
+        timeTakenSeconds: sessionTime,
+        violationsCount: violations,
+        movements: [...movements, { event: 'Practice Session Ended', timestamp: new Date() }]
+      };
+
+      await fetch('/api/lms/practice/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error('Failed to submit practice telemetry:', err);
+    }
+  }, [selectedSubject, selectedClass, selectedDifficulty, questions.length, sessionTime, violations, movements]);
+
+  // Request Fullscreen
+  const enterFullscreen = async () => {
+    try {
+      const docEl = document.documentElement;
+      if (docEl.requestFullscreen) await docEl.requestFullscreen();
+      else if (docEl.mozRequestFullScreen) await docEl.mozRequestFullScreen();
+      else if (docEl.webkitRequestFullscreen) await docEl.webkitRequestFullscreen();
+      else if (docEl.msRequestFullscreen) await docEl.msRequestFullscreen();
+      return true;
+    } catch (err) {
+      console.error('Fullscreen request failed:', err);
+      return false;
+    }
+  };
+
+  // Exit Fullscreen
+  const exitFullscreen = async () => {
+    try {
+      if (document.exitFullscreen) await document.exitFullscreen();
+    } catch (err) {
+      console.error('Failed to exit fullscreen:', err);
+    }
+  };
+
+  // Start Practice
+  const handleStartPractice = async () => {
+    setLoadingQuestions(true);
+    try {
+      const res = await fetch(`/api/lms/practice/questions?subject=${selectedSubject}&class=${selectedClass}&difficulty=${selectedDifficulty}`);
+      const data = await res.json();
+      if (data.success && data.questions?.length > 0) {
+        setQuestions(data.questions);
+
+        // Attempt Fullscreen
+        const success = await enterFullscreen();
+        if (!success) {
+          alert('Fullscreen permission is required to start practice mode!');
+          setLoadingQuestions(false);
+          return;
+        }
+
+        // Initialize state
+        setCurrentIdx(0);
+        setSelectedOption(null);
+        setAnswers([]);
+        setTimer(QUESTION_TIME);
+        setSessionTime(0);
+        setViolations(0);
+        setIsFullscreenViolated(false);
+        setIsTabViolated(false);
+        
+        const initialLogs = [
+          { event: `Practice Session Started (Subject: ${selectedSubject}, Class: ${selectedClass}, Difficulty: ${selectedDifficulty})`, timestamp: new Date() }
+        ];
+        setMovements(initialLogs);
+        setGameState('playing');
+      } else {
+        alert('Could not load practice questions. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error fetching questions');
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
+  // Right-click blocking
   useEffect(() => {
     if (gameState !== 'playing') return;
+
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      logMovement('Right-click attempt blocked');
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, [gameState, logMovement]);
+
+  // Fullscreen change listener
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    const handleFullscreenChange = () => {
+      const isFs = !!(
+        document.fullscreenElement ||
+        document.mozFullScreenElement ||
+        document.webkitFullscreenElement ||
+        document.msFullscreenElement
+      );
+
+      if (!isFs && gameStateRef.current === 'playing') {
+        setIsFullscreenViolated(true);
+        setViolations(prev => {
+          const nextVal = prev + 1;
+          logMovement(`Fullscreen exited (Violation Count: ${nextVal})`);
+          return nextVal;
+        });
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [gameState, logMovement]);
+
+  // Tab switch / Visibility listener
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && gameStateRef.current === 'playing') {
+        triggerTabViolation();
+      }
+    };
+
+    const handleBlur = () => {
+      if (gameStateRef.current === 'playing') {
+        triggerTabViolation();
+      }
+    };
+
+    const triggerTabViolation = () => {
+      if (isTabViolatedRef.current) return; // avoid duplicate dialog triggers
+      setIsTabViolated(true);
+      setViolations(prev => {
+        const nextVal = prev + 1;
+        logMovement(`Tab switched or window lost focus (Violation Count: ${nextVal})`);
+        return nextVal;
+      });
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [gameState, logMovement]);
+
+  // Timer Tick
+  useEffect(() => {
+    if (gameState !== 'playing' || isFullscreenViolated || isTabViolated) return;
+
     if (timer === 0) {
-      // Auto-skip on timeout
+      logMovement(`Question ${currentIdx + 1} timed out`);
       handleNext(true);
       return;
     }
+
     const t = setTimeout(() => {
       setTimer(prev => prev - 1);
       setSessionTime(prev => prev + 1);
     }, 1000);
-    return () => clearTimeout(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer, gameState]);
 
+    return () => clearTimeout(t);
+  }, [timer, gameState, isFullscreenViolated, isTabViolated, currentIdx, logMovement]);
+
+  // Next Question
   const handleNext = useCallback((timedOut = false) => {
     const chosen = timedOut ? -1 : selectedOption;
     const newAnswers = [...answers, chosen];
     setAnswers(newAnswers);
     setSelectedOption(null);
 
+    if (chosen === -1) {
+      logMovement(`Skipped question ${currentIdx + 1}`);
+    } else {
+      logMovement(`Selected option ${String.fromCharCode(65 + chosen)} for question ${currentIdx + 1}`);
+    }
+
     if (currentIdx + 1 >= questions.length) {
+      // Calculate final score
+      const finalScore = newAnswers.reduce((acc, ansVal, i) => {
+        if (ansVal === -1) return acc;
+        return ansVal === questions[i]?.ans ? acc + 1 : acc;
+      }, 0);
+
+      submitSession(finalScore, newAnswers);
+      logMovement(`Completed test successfully. Score: ${finalScore}/${questions.length}`);
+      exitFullscreen();
       setGameState('results');
     } else {
       setCurrentIdx(prev => prev + 1);
       setTimer(QUESTION_TIME);
     }
-  }, [answers, currentIdx, questions.length, selectedOption]);
+  }, [answers, currentIdx, questions, selectedOption, logMovement, submitSession]);
 
-  // Calculate score
+  // Re-enter Fullscreen and Resume
+  const resumeFullscreen = async () => {
+    const success = await enterFullscreen();
+    if (success) {
+      setIsFullscreenViolated(false);
+      logMovement('Returned to fullscreen, resumed test');
+    } else {
+      alert('Could not return to fullscreen. Please grant permission.');
+    }
+  };
+
+  // Resume after tab violation warning
+  const resumeTab = () => {
+    if (violations >= 3) {
+      autoSubmit();
+    } else {
+      setIsTabViolated(false);
+      logMovement('Acknowledged tab switch warning, resumed test');
+    }
+  };
+
+  // Submit and exit prematurely
+  const handleCancelAndExit = () => {
+    const finalScore = answers.reduce((acc, ansVal, i) => {
+      if (ansVal === -1) return acc;
+      return ansVal === questions[i]?.ans ? acc + 1 : acc;
+    }, 0);
+    submitSession(finalScore, answers);
+    logMovement('Practice session cancelled prematurely by user');
+    exitFullscreen();
+    setGameState('filters-select');
+  };
+
+  // Automatic submission due to security breach
+  const autoSubmit = () => {
+    const finalAnswers = [...answers];
+    while (finalAnswers.length < questions.length) {
+      finalAnswers.push(-1);
+    }
+    const finalScore = finalAnswers.reduce((acc, ansVal, i) => {
+      if (ansVal === -1) return acc;
+      return ansVal === questions[i]?.ans ? acc + 1 : acc;
+    }, 0);
+
+    submitSession(finalScore, finalAnswers);
+    logMovement('Test automatically submitted due to multiple security violations');
+    setAnswers(finalAnswers);
+    setIsTabViolated(false);
+    setIsFullscreenViolated(false);
+    exitFullscreen();
+    setGameState('results');
+  };
+
+  // Score Calculation helper
   const score = answers.reduce((acc, chosen, i) => {
     if (chosen === -1) return acc;
     return chosen === questions[i]?.ans ? acc + 1 : acc;
   }, 0);
 
-  const sub = selectedSubject ? SUBJECTS.find(s => s.key === selectedSubject) : null;
-  const q = questions[currentIdx];
+  const sub = SUBJECTS.find(s => s.key === selectedSubject);
 
-  // ── Subject Select Screen ──
-  if (gameState === 'subject-select') {
+  // ── Filters Selector Screen ──
+  if (gameState === 'filters-select') {
     return (
-      <div style={{ padding: '1.5rem 2rem' }}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '0.5rem' }}>
-            🎯 Choose a Subject to Practice
-          </h2>
-          <p style={{ color: 'var(--dash-text-secondary)', fontSize: '0.88rem' }}>
-            10 questions per session · 30 seconds per question · Instant results
-          </p>
+      <div style={{ padding: '1rem 1.5rem', width: '100%' }}>
+        {/* Filters Grid - Flat layout without boxed card background */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '2.5rem',
+          padding: '0.5rem 0',
+        }}>
+          {/* 1. Subject Select */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--dash-text-muted)', marginBottom: '0.75rem' }}>
+              Step 1: Choose Subject
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              {SUBJECTS.map(s => {
+                const isSelected = selectedSubject === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    onClick={() => setSelectedSubject(s.key)}
+                    style={{
+                      background: isSelected ? `${s.color}12` : 'var(--dash-surface, #ffffff)',
+                      border: isSelected ? `3px solid ${s.color}` : '2px solid var(--dash-border)',
+                      borderRadius: 12,
+                      padding: '1.25rem 1rem',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = s.color;
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = 'var(--dash-border)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }
+                    }}
+                  >
+                    <span style={{ fontSize: '2.2rem' }}>{s.icon}</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? s.color : 'var(--dash-text)' }}>
+                      {s.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', borderTop: '1px solid var(--dash-border)', paddingTop: '1.5rem' }}>
+            {/* 2. Class Select */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--dash-text-muted)', marginBottom: '0.75rem' }}>
+                Step 2: Grade Level / Class
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {CLASSES.map(cls => {
+                  const isSelected = selectedClass === cls;
+                  return (
+                    <button
+                      key={cls}
+                      onClick={() => setSelectedClass(cls)}
+                      style={{
+                        padding: '0.55rem 1rem',
+                        borderRadius: 8,
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        background: isSelected ? 'var(--color-primary, #1B2B6B)' : 'var(--dash-surface, #ffffff)',
+                        color: isSelected ? 'white' : 'var(--dash-text)',
+                        border: isSelected ? '2px solid var(--color-primary, #1B2B6B)' : '2px solid var(--dash-border)',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {cls === 'All' ? 'All Classes' : `Class ${cls}`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. Difficulty Select */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--dash-text-muted)', marginBottom: '0.75rem' }}>
+                Step 3: Difficulty
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {DIFFICULTIES.map(diff => {
+                  const isSelected = selectedDifficulty === diff;
+                  let color = '#27AE60';
+                  if (diff === 'Medium') color = '#F5A623';
+                  if (diff === 'Hard') color = '#E74C3C';
+
+                  return (
+                    <button
+                      key={diff}
+                      onClick={() => setSelectedDifficulty(diff)}
+                      style={{
+                        flex: 1,
+                        padding: '0.55rem 1rem',
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        background: isSelected ? color : 'var(--dash-surface, #ffffff)',
+                        color: isSelected ? 'white' : 'var(--dash-text)',
+                        border: isSelected ? `2.5px solid ${color}` : '2px solid var(--dash-border)',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {diff}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Row */}
+          <div style={{ borderTop: '1px solid var(--dash-border)', paddingTop: '1.5rem', textAlign: 'center' }}>
+            <button
+              onClick={handleStartPractice}
+              disabled={loadingQuestions}
+              style={{
+                padding: '0.85rem 3rem',
+                background: sub.color,
+                color: 'white',
+                border: 'none',
+                borderRadius: 10,
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: `0 8px 20px ${sub.color}22`,
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              {loadingQuestions ? 'Fetching Questions...' : 'Start Secure Practice Session'}
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
-          {SUBJECTS.map(s => (
-            <button
-              key={s.key}
-              onClick={() => startPractice(s.key)}
-              style={{
-                background: 'var(--dash-surface)', border: '2px solid var(--dash-border)',
-                borderRadius: 12, padding: '1.5rem', cursor: 'pointer', textAlign: 'left',
-                transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column', gap: '0.75rem',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = s.color;
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = `0 8px 24px ${s.color}22`;
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--dash-border)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <span style={{ fontSize: '2rem' }}>{s.icon}</span>
-              <div>
-                <div style={{ fontWeight: 700, color: 'var(--dash-text)', fontSize: '0.95rem', marginBottom: '0.25rem' }}>{s.label}</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--dash-text-muted)' }}>{QUESTION_BANK[s.key].length} questions available</div>
-              </div>
-              <div style={{
-                alignSelf: 'flex-start', padding: '0.25rem 0.75rem',
-                background: `${s.color}15`, color: s.color,
-                borderRadius: 50, fontSize: '0.72rem', fontWeight: 600,
-              }}>
-                Start →
-              </div>
-            </button>
-          ))}
+        {/* Security Warning Panel (Moved to Bottom) */}
+        <div style={{
+          background: 'rgba(231,76,60,0.06)',
+          border: '1px solid rgba(231,76,60,0.2)',
+          borderRadius: 14,
+          padding: '1.25rem 1.5rem',
+          marginTop: '2.5rem',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+        }}>
+          <div style={{ fontSize: '2rem' }}>🔒</div>
+          <div>
+            <h4 style={{ margin: 0, color: '#E74C3C', fontWeight: 700, fontSize: '0.92rem' }}>Practice Security Notice</h4>
+            <p style={{ margin: '4px 0 0', color: 'var(--dash-text-secondary)', fontSize: '0.82rem', lineHeight: 1.5 }}>
+              To prevent cheating, starting a practice run forces **Fullscreen Mode**, blocks **Right-Clicks**, and locks screen focus. Tab switching or exiting fullscreen will count as a security violation. **3 violations will automatically submit your exam.**
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -277,16 +518,97 @@ export default function PracticePageClient() {
 
   // ── Results Screen ──
   if (gameState === 'results') {
+    const percentage = Math.round((score / questions.length) * 100);
+    let grade = 'D';
+    let msg = 'Keep practising! Review the concepts and try again.';
+    if (percentage >= 90) { grade = 'A+'; msg = 'Outstanding! You have mastered this topic! 🌟'; }
+    else if (percentage >= 75) { grade = 'A'; msg = 'Excellent work! You have a strong grasp of the subject. 🎉'; }
+    else if (percentage >= 60) { grade = 'B'; msg = 'Good job! A little more revision and you\'ll ace it.'; }
+    else if (percentage >= 40) { grade = 'C'; msg = 'Fair attempt. Focus on the topics you found difficult.'; }
+
+    const mins = Math.floor(sessionTime / 60);
+    const secs = sessionTime % 60;
+
     return (
-      <div style={{ padding: '1.5rem 2rem' }}>
-        <ResultScreen
-          score={score}
-          total={questions.length}
-          timeTaken={sessionTime}
-          subject={selectedSubject}
-          onRestart={() => startPractice(selectedSubject)}
-          onChangeSubject={() => setGameState('subject-select')}
-        />
+      <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+        {/* Conic conic score */}
+        <div style={{
+          width: 140, height: 140, borderRadius: '50%', margin: '0 auto 1.5rem',
+          background: `conic-gradient(${sub.color} ${percentage * 3.6}deg, var(--dash-border, #e2e6ef) 0deg)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: 110, height: 110, borderRadius: '50%', background: 'var(--dash-surface)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: '1.8rem', fontWeight: 800, color: sub.color }}>{grade}</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)' }}>{percentage}%</span>
+          </div>
+        </div>
+
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--dash-text)', marginBottom: '0.5rem' }}>
+          Practice Complete!
+        </h2>
+        <p style={{ color: sub.color, fontWeight: 600, marginBottom: '1.5rem', fontSize: '0.95rem' }}>{msg}</p>
+
+        {/* Stats card */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem',
+          background: 'var(--dash-surface)', border: '1px solid var(--dash-border)',
+          borderRadius: 12, padding: '1.25rem',
+        }}>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#27AE60' }}>{score}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Correct</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#E74C3C' }}>{questions.length - score}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Incorrect</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--dash-text)' }}>
+              {mins > 0 ? `${mins}m ${secs}s` : `${secs}s`}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>Time Taken</div>
+          </div>
+        </div>
+
+        {/* Violations notice */}
+        {violations > 0 && (
+          <div style={{
+            background: 'rgba(231,76,60,0.06)',
+            border: '1px solid rgba(231,76,60,0.18)',
+            borderRadius: 8,
+            padding: '0.75rem',
+            marginBottom: '2rem',
+            fontSize: '0.82rem',
+            color: '#E74C3C',
+            fontWeight: 600,
+          }}>
+            ⚠️ {violations} security violations logged. Admin has been notified.
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+          <button
+            onClick={handleStartPractice}
+            style={{
+              padding: '0.7rem 1.5rem', background: sub.color, color: 'white',
+              border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem',
+            }}
+          >
+            🔄 Practice Again
+          </button>
+          <button
+            onClick={() => setGameState('filters-select')}
+            style={{
+              padding: '0.7rem 1.5rem', background: 'transparent', color: sub.color,
+              border: `1px solid ${sub.color}`, borderRadius: 8, fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem',
+            }}
+          >
+            Adjust Filters
+          </button>
+        </div>
       </div>
     );
   }
@@ -294,17 +616,82 @@ export default function PracticePageClient() {
   // ── Playing Screen ──
   const timerPercent = (timer / QUESTION_TIME) * 100;
   const timerColor = timer > 15 ? '#27AE60' : timer > 7 ? '#F5A623' : '#E74C3C';
+  const q = questions[currentIdx];
 
   return (
-    <div style={{ padding: '1.5rem 2rem' }}>
-      {/* Top bar: subject, progress, score */}
+    <div style={{ padding: '1.5rem 2rem', position: 'relative', minHeight: '80vh' }}>
+      
+      {/* ── SECURITY OVERLAYS ── */}
+      
+      {/* Exited Fullscreen Warning */}
+      {isFullscreenViolated && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(10, 10, 15, 0.96)', color: 'white', zIndex: 99999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '2rem', textAlign: 'center', backdropFilter: 'blur(10px)',
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚠️</div>
+          <h2 style={{ fontSize: '2rem', color: '#E74C3C', fontWeight: 800, marginBottom: '0.5rem' }}>Security Violation</h2>
+          <h4 style={{ color: '#F5A623', marginBottom: '1.5rem' }}>Fullscreen Exited!</h4>
+          <p style={{ fontSize: '1rem', marginBottom: '2.5rem', maxWidth: '580px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
+            The practice environment requires your browser to remain in fullscreen mode. Any attempt to exit fullscreen or resize is flagged.
+            <br />
+            <strong>Total Violations Logged: {violations}</strong> (Limit before auto-submit: 3)
+          </p>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button onClick={resumeFullscreen} style={{ padding: '0.75rem 2rem', background: '#27AE60', color: 'white', border: 'none', borderRadius: 8, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer' }}>
+              Re-enter Fullscreen
+            </button>
+            <button onClick={handleCancelAndExit} style={{ padding: '0.75rem 2rem', background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer' }}>
+              Cancel & Exit
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Tab Switch Warning */}
+      {isTabViolated && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(10, 10, 15, 0.96)', color: 'white', zIndex: 99999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '2rem', textAlign: 'center', backdropFilter: 'blur(10px)',
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚫</div>
+          <h2 style={{ fontSize: '2rem', color: '#E74C3C', fontWeight: 800, marginBottom: '0.5rem' }}>Unfocused Window Detected</h2>
+          <h4 style={{ color: '#F5A623', marginBottom: '1.5rem' }}>Focus Lost / Tab Switch</h4>
+          <p style={{ fontSize: '1rem', marginBottom: '2.5rem', maxWidth: '580px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
+            You left the test window or switched browser tabs. This action is recorded as a security breach.
+            <br />
+            <strong>Total Violations Logged: {violations} / 3</strong>
+          </p>
+          {violations >= 3 ? (
+            <div>
+              <p style={{ color: '#E74C3C', fontWeight: 700, marginBottom: '1rem' }}>Maximum violation limit reached!</p>
+              <button onClick={autoSubmit} style={{ padding: '0.75rem 2.5rem', background: '#E74C3C', color: 'white', border: 'none', borderRadius: 8, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer' }}>
+                Submit & Close Test
+              </button>
+            </div>
+          ) : (
+            <button onClick={resumeTab} style={{ padding: '0.75rem 2rem', background: '#27AE60', color: 'white', border: 'none', borderRadius: 8, fontSize: '0.95rem', fontWeight: 'bold', cursor: 'pointer' }}>
+              I Understand, Resume
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Top Header bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.2rem' }}>{sub.icon}</span>
-          <span style={{ fontWeight: 700, color: 'var(--dash-text)', fontSize: '0.95rem' }}>{sub.label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span style={{ fontSize: '1.4rem' }}>{sub.icon}</span>
+          <span style={{ fontWeight: 800, color: 'var(--dash-text)', fontSize: '1rem' }}>{sub.label} Practice</span>
+          <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--dash-border)', padding: '0.2rem 0.5rem', borderRadius: 6, fontSize: '0.7rem', color: 'var(--dash-text-muted)' }}>
+            Class {selectedClass} · {selectedDifficulty}
+          </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.82rem', color: 'var(--dash-text-secondary)' }}>
-          <span>Q {currentIdx + 1} / {questions.length}</span>
+          <span>Question <strong>{currentIdx + 1}</strong> of {questions.length}</span>
           <span style={{ color: '#27AE60', fontWeight: 700 }}>✓ {score}</span>
           <span style={{ color: '#E74C3C', fontWeight: 700 }}>✗ {answers.filter((a, i) => a !== -1 && a !== questions[i]?.ans).length}</span>
         </div>
@@ -314,37 +701,41 @@ export default function PracticePageClient() {
       <div style={{ height: 4, background: 'var(--dash-border)', borderRadius: 4, marginBottom: '1.5rem', overflow: 'hidden' }}>
         <div style={{
           height: '100%', borderRadius: 4,
-          width: `${((currentIdx) / questions.length) * 100}%`,
+          width: `${(currentIdx / questions.length) * 100}%`,
           background: sub.color, transition: 'width 0.3s ease',
         }} />
       </div>
 
-      {/* Question card */}
+      {/* Question Card */}
       <div style={{
-        background: 'var(--dash-surface)', border: '1px solid var(--dash-border)',
-        borderRadius: 'var(--dash-radius)', padding: '2rem',
-        boxShadow: 'var(--dash-shadow)', maxWidth: 720, marginBottom: '1rem',
+        background: 'var(--dash-surface)',
+        border: '1px solid var(--dash-border)',
+        borderRadius: 'var(--dash-radius)',
+        padding: '2rem',
+        boxShadow: 'var(--dash-shadow)',
+        maxWidth: 720,
+        marginBottom: '1.5rem',
       }}>
-        {/* Timer */}
+        {/* Timer row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--dash-text-muted)', fontWeight: 600 }}>
-            QUESTION {currentIdx + 1}
+          <span style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>
+            MULTIPLE CHOICE QUESTION
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{ width: 80, height: 6, background: 'var(--dash-border)', borderRadius: 4, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${timerPercent}%`, background: timerColor, transition: 'width 1s linear, background 0.3s' }} />
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: timerColor, minWidth: 24 }}>{timer}s</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: timerColor, minWidth: 24 }}>{timer}s</span>
           </div>
         </div>
 
-        {/* Question text */}
-        <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--dash-text)', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+        {/* Question Text */}
+        <p style={{ fontSize: '1.08rem', fontWeight: 600, color: 'var(--dash-text)', lineHeight: 1.5, marginBottom: '1.5rem' }}>
           {q?.q}
         </p>
 
-        {/* Options */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+        {/* Options Stack */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {q?.options.map((opt, idx) => {
             const isSelected = selectedOption === idx;
             return (
@@ -352,12 +743,19 @@ export default function PracticePageClient() {
                 key={idx}
                 onClick={() => setSelectedOption(idx)}
                 style={{
-                  padding: '0.85rem 1.25rem',
-                  border: isSelected ? `2px solid ${sub.color}` : '1px solid var(--dash-border)',
-                  borderRadius: 10, background: isSelected ? `${sub.color}10` : 'var(--dash-bg, #F4F6F8)',
+                  padding: '0.9rem 1.25rem',
+                  border: isSelected ? `2.5px solid ${sub.color}` : '1.5px solid var(--dash-border)',
+                  borderRadius: 10,
+                  background: isSelected ? `${sub.color}08` : 'rgba(255,255,255,0.01)',
                   color: isSelected ? sub.color : 'var(--dash-text)',
-                  textAlign: 'left', cursor: 'pointer', fontWeight: isSelected ? 700 : 400,
-                  fontSize: '0.9rem', transition: 'all 0.15s ease', display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  fontWeight: isSelected ? 700 : 500,
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
                 }}
               >
                 <span style={{
@@ -377,29 +775,41 @@ export default function PracticePageClient() {
         </div>
       </div>
 
-      {/* Action buttons */}
+      {/* Buttons */}
       <div style={{ display: 'flex', gap: '0.75rem', maxWidth: 720 }}>
         <button
           onClick={() => handleNext(false)}
           disabled={selectedOption === null}
           style={{
-            flex: 1, padding: '0.75rem',
+            flex: 1,
+            padding: '0.75rem',
             background: selectedOption !== null ? sub.color : 'var(--dash-border)',
             color: selectedOption !== null ? 'white' : 'var(--dash-text-muted)',
-            border: 'none', borderRadius: 8, fontWeight: 700, cursor: selectedOption !== null ? 'pointer' : 'not-allowed',
-            fontSize: '0.9rem', transition: 'all 0.2s',
+            border: 'none',
+            borderRadius: 8,
+            fontWeight: 700,
+            cursor: selectedOption !== null ? 'pointer' : 'not-allowed',
+            fontSize: '0.9rem',
+            transition: 'all 0.2s',
           }}
         >
-          {currentIdx + 1 >= questions.length ? '✅ Submit' : 'Next Question →'}
+          {currentIdx + 1 >= questions.length ? '✅ Submit Answers' : 'Next Question →'}
         </button>
         <button
           onClick={() => handleNext(true)}
           style={{
-            padding: '0.75rem 1.25rem',
-            background: 'transparent', color: 'var(--dash-text-muted)',
-            border: '1px solid var(--dash-border)', borderRadius: 8, cursor: 'pointer',
-            fontSize: '0.85rem', fontWeight: 500,
+            padding: '0.75rem 1.5rem',
+            background: 'transparent',
+            color: 'var(--dash-text-muted)',
+            border: '1.5px solid var(--dash-border)',
+            borderRadius: 8,
+            cursor: 'pointer',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            transition: 'all 0.2s',
           }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--dash-text)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--dash-text-muted)'}
         >
           Skip
         </button>

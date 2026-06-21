@@ -61,13 +61,13 @@ function CertCard({ cert }) {
         {/* Status badge */}
         <span style={{
           position: 'absolute', top: '0.75rem', right: '0.75rem',
-          background: cert.status === 'generated' || cert.status === 'emailed'
+          background: cert.pdfUrl
             ? 'rgba(39,174,96,0.2)' : 'rgba(245,166,35,0.2)',
-          color: cert.status === 'generated' || cert.status === 'emailed' ? '#27AE60' : '#F5A623',
-          border: `1px solid ${cert.status === 'generated' || cert.status === 'emailed' ? 'rgba(39,174,96,0.4)' : 'rgba(245,166,35,0.4)'}`,
+          color: cert.pdfUrl ? '#27AE60' : '#F5A623',
+          border: `1px solid ${cert.pdfUrl ? 'rgba(39,174,96,0.4)' : 'rgba(245,166,35,0.4)'}`,
           padding: '0.15rem 0.6rem', borderRadius: 50, fontSize: '0.68rem', fontWeight: 700,
         }}>
-          {cert.status === 'generated' || cert.status === 'emailed' ? '✓ Verified' : '⏳ Processing'}
+          {cert.pdfUrl ? '✓ Verified' : '⏳ Processing'}
         </span>
       </div>
 
@@ -118,22 +118,36 @@ function CertCard({ cert }) {
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-          <Link
-            href={`/lms/certificates/verify/${cert.certId}`}
-            style={{
-              flex: 1, textAlign: 'center', padding: '0.6rem',
-              background: 'var(--color-primary, #1B2B6B)', color: 'white',
-              borderRadius: 8, textDecoration: 'none',
-              fontSize: '0.82rem', fontWeight: 600,
-              transition: 'opacity 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-          >
-            🔍 Verify
-          </Link>
-          {cert.pdfUrl && (
+        {!cert.pdfUrl ? (
+          <div style={{
+            marginTop: 'auto',
+            padding: '0.75rem',
+            background: 'rgba(245,166,35,0.08)',
+            border: '1px dashed rgba(245,166,35,0.3)',
+            borderRadius: 8,
+            textAlign: 'center',
+            color: '#D97706',
+            fontSize: '0.8rem',
+            fontWeight: 600
+          }}>
+            🔄 Certificate generation under process
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+            <Link
+              href={`/lms/certificates/verify/${cert.certId}`}
+              style={{
+                flex: 1, textAlign: 'center', padding: '0.6rem',
+                background: 'var(--color-primary, #1B2B6B)', color: 'white',
+                borderRadius: 8, textDecoration: 'none',
+                fontSize: '0.82rem', fontWeight: 600,
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              🔍 Verify
+            </Link>
             <a
               href={cert.pdfUrl}
               target="_blank"
@@ -144,12 +158,15 @@ function CertCard({ cert }) {
                 border: '1px solid var(--color-primary, #1B2B6B)',
                 borderRadius: 8, textDecoration: 'none',
                 fontSize: '0.82rem', fontWeight: 600,
+                transition: 'background-color 0.2s',
               }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(27,43,107,0.05)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              ⬇️ Download
+              👁️ Review Certificate
             </a>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

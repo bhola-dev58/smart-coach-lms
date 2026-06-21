@@ -30,6 +30,10 @@ const certificateSchema = new mongoose.Schema(
       ref: 'Enrollment',
       required: true,
     },
+    instructor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
 
     // ── Certificate Details ──
     studentName: { type: String, required: true },

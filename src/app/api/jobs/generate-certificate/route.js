@@ -201,6 +201,7 @@ export async function POST(request) {
       student: enrollment.student._id,
       course: enrollment.course._id,
       enrollment: enrollment._id,
+      instructor: enrollment.course.instructor?._id || enrollment.course.instructor,
       studentName: enrollment.student.name,
       courseName: enrollment.course.title,
       instructorName: enrollment.course.instructor?.name || 'MeetMe Center',

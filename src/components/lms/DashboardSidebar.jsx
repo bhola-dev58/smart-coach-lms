@@ -111,19 +111,29 @@ export default function DashboardSidebar({ isOpen, onClose, isCollapsed, onToggl
           <Link href="/" title="Back to Home" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             {!isCollapsed
               ? <img src="/images/logo-only.png" alt="Gradify Academy" style={{ height: '38px', width: 'auto' }} />
-              : <img src="/images/logo-only.png" alt="GA" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+              : <img src="/images/logo-during-collision.png" alt="GA" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
             }
           </Link>
-          {/* Desktop Collapse Toggle */}
-          <button className={styles.collapseBtn} onClick={onToggleCollapse} aria-label="Toggle Sidebar">
-
-            {isCollapsed ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
-            )}
-          </button>
         </div>
+
+        {/* Desktop Collapse Toggle / Mobile Close Toggle */}
+        <button
+          className={styles.collapseBtn}
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+              onClose();
+            } else {
+              onToggleCollapse();
+            }
+          }}
+          aria-label="Toggle Sidebar"
+        >
+          {isCollapsed ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          )}
+        </button>
 
         {/* Plan CTA */}
         {!isCollapsed && <button className={styles.planBtn}>📋 Plan Your Day</button>}

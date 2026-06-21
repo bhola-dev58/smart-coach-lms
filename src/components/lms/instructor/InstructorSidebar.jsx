@@ -12,6 +12,8 @@ const menuGroups = [
       { id: 'enrollments', label: 'Enrollments', icon: '📝' },
       { id: 'studymaterials', label: 'Study Materials', icon: '📄' },
       { id: 'reviews', label: 'Reviews', icon: '⭐' },
+      { id: 'practicequestions', label: 'Practice Questions', icon: '🎯' },
+      { id: 'certificates', label: 'Certificates', icon: '🏆' },
     ]
   },
   {

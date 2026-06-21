@@ -13,3 +13,5 @@ export { default as Coupon } from './Coupon';
 export { default as Notification } from './Notification';
 export { default as Contact } from './Contact';
 export { default as Announcement } from './Announcement';
+export { default as PracticeQuestion } from './PracticeQuestion';
+export { default as PracticeSession } from './PracticeSession';

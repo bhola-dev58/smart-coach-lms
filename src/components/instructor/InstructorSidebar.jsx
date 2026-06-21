@@ -52,15 +52,16 @@ export default function InstructorSidebar({ isOpen, onClose, isCollapsed, onTogg
             ? <img src="/images/logo-only.png" alt="Gradify Academy" style={{ height: '38px', width: 'auto' }} />
             : <img src="/images/logo-only.png" alt="GA" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
           }
-          {/* Desktop Collapse Toggle */}
-          <button className={styles.collapseBtn} onClick={onToggle} aria-label="Toggle Sidebar">
-            {isCollapsed ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
-            )}
-          </button>
         </div>
+
+        {/* Desktop Collapse Toggle */}
+        <button className={styles.collapseBtn} onClick={onToggle} aria-label="Toggle Sidebar">
+          {isCollapsed ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+          )}
+        </button>
 
         {/* Plan CTA (Optional, but let's match the student one) */}
         {!isCollapsed && <button className={styles.planBtn} style={{ background: 'var(--color-secondary-light)', color: 'var(--color-secondary)' }}>🎙️ Start Broadcast</button>}

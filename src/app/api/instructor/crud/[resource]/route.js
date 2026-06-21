@@ -19,6 +19,8 @@ const getModel = async (resource) => {
     case 'payments': return (await import('@/models/Payment')).default;
     case 'reviews': return (await import('@/models/Review')).default;
     case 'studymaterials': return (await import('@/models/StudyMaterial')).default;
+    case 'practicequestions': return (await import('@/models/PracticeQuestion')).default;
+    case 'certificates': return (await import('@/models/Certificate')).default;
     default: return null;
   }
 };

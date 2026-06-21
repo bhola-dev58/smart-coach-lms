@@ -11,6 +11,7 @@ const navItems = [
   { href: '/admin/users', label: 'Manage Users', icon: '👥', roles: ['admin'] },
   { href: '/admin/enrollments', label: 'Enrollments', icon: '📝', roles: ['admin', 'instructor'] },
   { href: '/admin/payments', label: 'Financials', icon: '💳', roles: ['admin'] },
+  { href: '/admin/practice', label: 'Practice Analytics', icon: '🎯', roles: ['admin'] },
   { href: '/admin/settings', label: 'Settings', icon: '⚙️', roles: ['admin'] },
 ];
 

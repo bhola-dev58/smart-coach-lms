@@ -65,20 +65,39 @@ export default function NotificationBell({ className = '' }) {
     }
   }, [session?.user?.id]);
 
-  // ── Initial fetch + polling every 30s ──
+  // ── Store callback in a stable Ref ──
+  const fetchRef = useRef(fetchNotifications);
+  useEffect(() => {
+    fetchRef.current = fetchNotifications;
+  }, [fetchNotifications]);
+
+  // ── Initial fetch + polling every 60s (only when visible) ──
   useEffect(() => {
     if (status !== 'authenticated') return;
-    fetchNotifications();
-    pollRef.current = setInterval(() => fetchNotifications(true), 30_000);
+    
+    // Initial fetch
+    fetchRef.current();
+    
+    const handleInterval = () => {
+      if (document.visibilityState === 'visible') {
+        fetchRef.current(true);
+      }
+    };
+
+    pollRef.current = setInterval(handleInterval, 60_000);
     return () => clearInterval(pollRef.current);
-  }, [status, fetchNotifications]);
+  }, [status]);
 
   // ── Refresh on window focus ──
   useEffect(() => {
-    const onFocus = () => { if (status === 'authenticated') fetchNotifications(true); };
+    const onFocus = () => { 
+      if (status === 'authenticated' && document.visibilityState === 'visible') { 
+        fetchRef.current(true); 
+      } 
+    };
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
-  }, [status, fetchNotifications]);
+  }, [status]);
 
   // ── Close dropdown on outside click ──
   useEffect(() => {

@@ -136,5 +136,31 @@ export const schemaConfig = {
       { key: 'fileUrl', label: 'PDF/Doc Upload', type: 'file', required: true },
       { key: 'type', label: 'Format', type: 'select', options: ['pdf', 'doc', 'link', 'other'] }
     ]
+  },
+  practicequestions: {
+    name: 'Practice Questions',
+    fields: [
+      { key: 'subject', label: 'Subject', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'ARTS', 'GENERAL'], required: true },
+      { key: 'class', label: 'Class', type: 'select', options: ['6', '7', '8', '9', '10', '11', '12', 'All'], required: true, default: 'All' },
+      { key: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Medium', 'Hard'], required: true, default: 'Medium' },
+      { key: 'question', label: 'Question Text', type: 'textarea', required: true },
+      { key: 'optionA', label: 'Option A', type: 'text', required: true },
+      { key: 'optionB', label: 'Option B', type: 'text', required: true },
+      { key: 'optionC', label: 'Option C', type: 'text', required: true },
+      { key: 'optionD', label: 'Option D', type: 'text', required: true },
+      { key: 'correctOptionIndex', label: 'Correct Option Index (0-3)', type: 'select', options: ['0', '1', '2', '3'], required: true, default: '0' },
+      { key: 'isActive', label: 'Active', type: 'boolean', default: true }
+    ]
+  },
+  certificates: {
+    name: 'Certificates',
+    fields: [
+      { key: 'studentName', label: 'Student Name', type: 'text', required: true },
+      { key: 'courseName', label: 'Course Name', type: 'text', required: true },
+      { key: 'certId', label: 'Certificate ID', type: 'text', required: true },
+      { key: 'pdfUrl', label: 'Certificate PDF URL', type: 'text' },
+      { key: 'imageUrl', label: 'Certificate Image URL', type: 'text' },
+      { key: 'status', label: 'Status', type: 'select', options: ['generating', 'generated', 'emailed', 'revoked'], default: 'generating' }
+    ]
   }
 };
