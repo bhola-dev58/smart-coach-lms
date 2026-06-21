@@ -43,14 +43,16 @@ export async function GET(request, { params }) {
     const Model = await getModel(unwrappedParams.resource);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
-    // Filter to instructor-specific data if applicable
+    // Filter to instructor-specific data if applicable (admin sees all data)
     const query = {};
-    if (Model.schema.paths.instructor) {
-      query.instructor = auth.session.user.id;
-    } else if (Model.schema.paths.user) {
-      query.user = auth.session.user.id;
-    } else if (Model.schema.paths.createdBy) {
-      query.createdBy = auth.session.user.id;
+    if (auth.session.user.role !== 'admin') {
+      if (Model.schema.paths.instructor) {
+        query.instructor = auth.session.user.id;
+      } else if (Model.schema.paths.user) {
+        query.user = auth.session.user.id;
+      } else if (Model.schema.paths.createdBy) {
+        query.createdBy = auth.session.user.id;
+      }
     }
 
     const data = await Model.find(query).sort({ createdAt: -1 }).limit(100).lean();

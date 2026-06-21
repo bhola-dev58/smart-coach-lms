@@ -106,7 +106,11 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                 
                 {field.key === 'course' ? (
                   <select 
-                    value={formData[field.key] || ''}
+                    value={
+                      typeof formData[field.key] === 'object' && formData[field.key] !== null
+                        ? (formData[field.key]._id || formData[field.key].id || '')
+                        : (formData[field.key] || '')
+                    }
                     onChange={e => handleChange(field.key, e.target.value)}
                     required={field.required}
                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--dash-border)', borderRadius: '6px', padding: '0.75rem', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}
@@ -160,7 +164,17 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                 ) : field.type === 'date' ? (
                    <input 
                     type="datetime-local" 
-                    value={formData[field.key] ? new Date(formData[field.key]).toISOString().slice(0, 16) : ''}
+                    value={
+                      formData[field.key]
+                        ? (() => {
+                            const date = new Date(formData[field.key]);
+                            if (isNaN(date.getTime())) return '';
+                            const offset = date.getTimezoneOffset();
+                            const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+                            return localDate.toISOString().slice(0, 16);
+                          })()
+                        : ''
+                    }
                     onChange={e => handleChange(field.key, e.target.value)}
                     required={field.required}
                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--dash-border)', borderRadius: '6px', padding: '0.75rem', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}

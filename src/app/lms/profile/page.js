@@ -390,77 +390,79 @@ export default function ProfilePage() {
       )}
 
       {/* ── KYC / Identity Verification ── */}
-      <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}>
-        {/* Status Banner */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '0.75rem',
-          padding: '0.85rem 1.25rem', borderRadius: '12px',
-          background: vc.bg, border: `1px solid ${vc.color}33`,
-          marginBottom: '1.5rem',
-        }}>
-          <span style={{ fontSize: '1.1rem', color: vc.color, fontWeight: 700 }}>{vc.icon}</span>
-          <div>
-            <p style={{ margin: 0, fontWeight: 600, color: vc.color, fontSize: '0.9rem' }}>
-              Status: {vc.label}
-            </p>
-            {vStatus === 'pending' && (
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--dash-text-muted)' }}>
-                Submitted: {formatDate(profile?.verification?.submittedAt)} · Document: {profile?.verification?.documentType?.replace('_', ' ')}
-              </p>
-            )}
-            {vStatus === 'rejected' && profile?.verification?.rejectionReason && (
-              <p style={{ margin: 0, fontSize: '0.78rem', color: '#ef4444' }}>
-                Reason: {profile.verification.rejectionReason}
-              </p>
-            )}
-            {vStatus === 'approved' && (
-              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--dash-text-muted)' }}>
-                Verified on {formatDate(profile?.verification?.reviewedAt)} · Your profile shows a verified badge ✓
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Upload Section — only if not approved */}
-        {vStatus !== 'approved' && (
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            <FieldGroup label="Document Type">
-              <select
-                value={kycDocType}
-                onChange={e => setKycDocType(e.target.value)}
-                style={{ width: '100%', maxWidth: '360px', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}
-              >
-                <option value="student_id">Student ID Card</option>
-                <option value="college_id">College ID</option>
-                <option value="aadhaar">Aadhaar Card</option>
-                <option value="pan">PAN Card</option>
-                <option value="passport">Passport</option>
-              </select>
-            </FieldGroup>
-
+      {!isInstructor && (
+        <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}>
+          {/* Status Banner */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '0.75rem',
+            padding: '0.85rem 1.25rem', borderRadius: '12px',
+            background: vc.bg, border: `1px solid ${vc.color}33`,
+            marginBottom: '1.5rem',
+          }}>
+            <span style={{ fontSize: '1.1rem', color: vc.color, fontWeight: 700 }}>{vc.icon}</span>
             <div>
-              <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.8rem', marginBottom: '0.75rem' }}>
-                Upload a clear photo of your document. Accepted: JPEG, PNG, WebP, PDF · Max 10MB
+              <p style={{ margin: 0, fontWeight: 600, color: vc.color, fontSize: '0.9rem' }}>
+                Status: {vc.label}
               </p>
-              <label
-                onClick={() => kycFileInputRef.current?.click()}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
-                  padding: '0.7rem 1.5rem', borderRadius: '10px', cursor: 'pointer',
-                  border: `1px dashed ${kycUploading ? 'var(--dash-text-muted)' : 'var(--dash-accent)'}`,
-                  background: kycUploading ? 'rgba(255,255,255,0.02)' : 'rgba(200,16,46,0.06)',
-                  color: kycUploading ? 'var(--dash-text-muted)' : 'var(--dash-accent)',
-                  fontWeight: 600, fontSize: '0.88rem', transition: 'all 0.2s',
-                }}>
-                {kycUploading
-                  ? <><div style={{ width: '16px', height: '16px', border: '2px solid currentColor', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Uploading...</>
-                  : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg> Upload Document</>}
-              </label>
-              <input ref={kycFileInputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleKycUpload} style={{ display: 'none' }} />
+              {vStatus === 'pending' && (
+                <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--dash-text-muted)' }}>
+                  Submitted: {formatDate(profile?.verification?.submittedAt)} · Document: {profile?.verification?.documentType?.replace('_', ' ')}
+                </p>
+              )}
+              {vStatus === 'rejected' && profile?.verification?.rejectionReason && (
+                <p style={{ margin: 0, fontSize: '0.78rem', color: '#ef4444' }}>
+                  Reason: {profile.verification.rejectionReason}
+                </p>
+              )}
+              {vStatus === 'approved' && (
+                <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--dash-text-muted)' }}>
+                  Verified on {formatDate(profile?.verification?.reviewedAt)} · Your profile shows a verified badge ✓
+                </p>
+              )}
             </div>
           </div>
-        )}
-      </SectionCard>
+
+          {/* Upload Section — only if not approved */}
+          {vStatus !== 'approved' && (
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <FieldGroup label="Document Type">
+                <select
+                  value={kycDocType}
+                  onChange={e => setKycDocType(e.target.value)}
+                  style={{ width: '100%', maxWidth: '360px', padding: '0.65rem 0.85rem', borderRadius: '10px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)', fontSize: '0.9rem', outline: 'none' }}
+                >
+                  <option value="student_id">Student ID Card</option>
+                  <option value="college_id">College ID</option>
+                  <option value="aadhaar">Aadhaar Card</option>
+                  <option value="pan">PAN Card</option>
+                  <option value="passport">Passport</option>
+                </select>
+              </FieldGroup>
+
+              <div>
+                <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.8rem', marginBottom: '0.75rem' }}>
+                  Upload a clear photo of your document. Accepted: JPEG, PNG, WebP, PDF · Max 10MB
+                </p>
+                <label
+                  onClick={() => kycFileInputRef.current?.click()}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.7rem 1.5rem', borderRadius: '10px', cursor: 'pointer',
+                    border: `1px dashed ${kycUploading ? 'var(--dash-text-muted)' : 'var(--dash-accent)'}`,
+                    background: kycUploading ? 'rgba(255,255,255,0.02)' : 'rgba(200,16,46,0.06)',
+                    color: kycUploading ? 'var(--dash-text-muted)' : 'var(--dash-accent)',
+                    fontWeight: 600, fontSize: '0.88rem', transition: 'all 0.2s',
+                  }}>
+                  {kycUploading
+                    ? <><div style={{ width: '16px', height: '16px', border: '2px solid currentColor', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Uploading...</>
+                    : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg> Upload Document</>}
+                </label>
+                <input ref={kycFileInputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleKycUpload} style={{ display: 'none' }} />
+              </div>
+            </div>
+          )}
+        </SectionCard>
+      )}
 
       {/* ── Save Button ── */}
       {editMode && (

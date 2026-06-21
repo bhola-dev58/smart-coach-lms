@@ -28,11 +28,14 @@ export default function LiveClassroom({ roomCode, onLeave }) {
   const chatEndRef = useRef(null);
   const pollIntervalRef = useRef(null);
 
-  // Join the room
+  // Join the room and start polling only on success
   useEffect(() => {
-    joinRoom();
-    // Poll for updates every 3 seconds
-    pollIntervalRef.current = setInterval(fetchRoomState, 3000);
+    joinRoom().then(ok => {
+      if (ok) {
+        // Poll for updates every 5 seconds (only if room joined successfully)
+        pollIntervalRef.current = setInterval(fetchRoomState, 5000);
+      }
+    });
 
     return () => {
       leaveRoom();
@@ -54,24 +57,42 @@ export default function LiveClassroom({ roomCode, onLeave }) {
         setMessages(data.room.messages || []);
         setParticipants(data.room.participants?.filter(p => !p.leftAt) || []);
         setLoading(false);
+        return true; // ← signal to start polling
       } else {
-        setError(data.error);
+        setError(data.error || 'Room not found');
         setLoading(false);
+        return false; // ← do NOT start polling for a missing room
       }
     } catch (err) {
       setError('Failed to join room');
       setLoading(false);
+      return false;
     }
   };
 
   const fetchRoomState = async () => {
     try {
       const res = await fetch(`/api/live/room?roomCode=${roomCode}`);
+      if (res.status === 404) {
+        // Room ended or doesn't exist — stop polling
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setRoom(data.room);
         setMessages(data.room.messages || []);
         setParticipants(data.room.participants?.filter(p => !p.leftAt) || []);
+        // If room has ended, stop polling
+        if (data.room.status === 'ended') {
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
+        }
       }
     } catch (err) { /* silent */ }
   };
@@ -210,11 +231,19 @@ export default function LiveClassroom({ roomCode, onLeave }) {
   }
 
   if (error) {
+    const isNotFound = error?.toLowerCase().includes('not found');
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh', flexDirection: 'column', gap: '1rem' }}>
-        <p style={{ color: '#e74c3c' }}>❌ {error}</p>
-        <button onClick={onLeave} style={{ padding: '0.5rem 1.5rem', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-          Go Back
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh', flexDirection: 'column', gap: '1rem', padding: '2rem', textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem' }}>❌</div>
+        <p style={{ color: '#e74c3c', fontWeight: 600, fontSize: '1.1rem', margin: 0 }}>{error}</p>
+        {isNotFound && (
+          <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem', maxWidth: 400, margin: 0 }}>
+            This code is not a valid in-app room code. If you have a <strong>Zoom or Google Meet link</strong>, please use
+            the session cards on the Live Classes page to join directly.
+          </p>
+        )}
+        <button onClick={onLeave} style={{ padding: '0.6rem 1.5rem', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+          ← Back to Live Classes
         </button>
       </div>
     );

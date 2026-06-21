@@ -23,7 +23,6 @@ const getNavItems = (role) => {
       { href: '/lms', label: 'Dashboard', icon: 'home' },
       { href: '/lms/live', label: 'Live Classes', icon: 'video' },
       { href: '/lms/courses', label: 'My Courses', icon: 'book' },
-      { href: '/lms/enrollments', label: 'My Enrollments', icon: 'check-square' },
       { href: '/lms/tests', label: 'My Test Series', icon: 'clipboard' },
       { href: '/lms/browse', label: 'Browse Courses', icon: 'layers' },
       { href: '/lms/materials', label: 'Study Materials', icon: 'file-text' },

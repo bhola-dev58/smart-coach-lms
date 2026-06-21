@@ -28,6 +28,7 @@ const menuGroups = [
     title: 'Communication',
     items: [
       { id: 'livesessions', label: 'Live Sessions', icon: '📡' },
+      { id: 'live', label: 'Live Classes Room', icon: '🎥', href: '/lms/live' },
       { id: 'announcements', label: 'Announcements', icon: '📢' },
       { id: 'notifications', label: 'Notifications', icon: '🔔' },
     ]
@@ -84,8 +85,8 @@ export default function InstructorSidebar() {
           </h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {group.items.map(item => {
-              const href = `/lms/instructor/${item.id}`;
-              const isActive = pathname === href;
+              const href = item.href || `/lms/instructor/${item.id}`;
+              const isActive = pathname === href || pathname.startsWith(href + '/');
               return (
                 <li key={item.id} style={{ marginBottom: '0.2rem' }}>
                   <Link href={href} style={{

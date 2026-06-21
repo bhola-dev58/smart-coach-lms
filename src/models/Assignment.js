@@ -16,6 +16,7 @@ const assignmentSchema = new mongoose.Schema(
     description: { type: String, default: '' },
     dueDate: { type: Date, required: true },
     totalMarks: { type: Number, default: 100 },
+    fileUrl: { type: String, default: '' },
     attachments: [
       {
         name: String,

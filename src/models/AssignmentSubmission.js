@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 
 const submissionSchema = new mongoose.Schema(
   {
+    assignment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Assignment',
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
@@ -9,7 +13,7 @@ const submissionSchema = new mongoose.Schema(
     },
     lessonSlug: {
       type: String,
-      required: true,
+      required: false, // Optional for standalone assignments
     },
     student: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +33,7 @@ const submissionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-submissionSchema.index({ course: 1, lessonSlug: 1, student: 1 }, { unique: true });
+submissionSchema.index({ assignment: 1, student: 1 }, { unique: true, partialFilterExpression: { assignment: { $exists: true } } });
+submissionSchema.index({ course: 1, lessonSlug: 1, student: 1 }, { unique: true, partialFilterExpression: { lessonSlug: { $exists: true } } });
 
 export default mongoose.models.AssignmentSubmission || mongoose.model('AssignmentSubmission', submissionSchema);

@@ -15,7 +15,7 @@ export const schemaConfig = {
       { key: 'title', label: 'Title', type: 'text', required: true },
       { key: 'description', label: 'Description', type: 'textarea' },
       { key: 'course', label: 'Course ID', type: 'text', required: true },
-      { key: 'dueDate', label: 'Due Date', type: 'date' },
+      { key: 'dueDate', label: 'Due Date', type: 'date', required: true },
       { key: 'fileUrl', label: 'Attachment URL', type: 'file' }
     ]
   },
@@ -95,9 +95,11 @@ export const schemaConfig = {
     fields: [
       { key: 'title', label: 'Session Title', type: 'text', required: true },
       { key: 'course', label: 'Course ID', type: 'text', required: true },
-      { key: 'date', label: 'Scheduled Date/Time', type: 'date', required: true },
-      { key: 'meetingLink', label: 'Zoom/Meet Link', type: 'text', required: true },
-      { key: 'status', label: 'Status', type: 'select', options: ['scheduled', 'live', 'ended'] }
+      { key: 'scheduledAt', label: 'Scheduled Date/Time', type: 'date', required: true },
+      { key: 'joinUrl', label: 'Zoom/Meet Link', type: 'text', required: true },
+      { key: 'duration', label: 'Duration (mins)', type: 'number', default: 60 },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'status', label: 'Status', type: 'select', options: ['scheduled', 'live', 'completed', 'cancelled'] }
     ]
   },
   notifications: {
@@ -132,9 +134,10 @@ export const schemaConfig = {
     name: 'Study Materials',
     fields: [
       { key: 'title', label: 'Document Title', type: 'text', required: true },
-      { key: 'course', label: 'Course ID', type: 'text' },
+      { key: 'course', label: 'Course ID', type: 'text', required: true },
       { key: 'fileUrl', label: 'PDF/Doc Upload', type: 'file', required: true },
-      { key: 'type', label: 'Format', type: 'select', options: ['pdf', 'doc', 'link', 'other'] }
+      { key: 'fileType', label: 'Format', type: 'select', options: ['PDF', 'ZIP', 'DOC', 'IMAGE'] },
+      { key: 'size', label: 'File Size (e.g. 1.2 MB)', type: 'text' }
     ]
   },
   practicequestions: {

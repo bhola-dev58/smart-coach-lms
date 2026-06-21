@@ -91,7 +91,7 @@ export default function LMSLayout({ children }) {
   }, []);
 
   useEffect(() => {
-    if (pathname === '/lms/courses' || pathname === '/lms/enrollments') {
+    if (pathname === '/lms/courses') {
       fetch('/api/lms/my-courses')
         .then(res => res.json())
         .then(data => {
@@ -125,17 +125,6 @@ export default function LMSLayout({ children }) {
           : "No enrolled courses yet";
       return {
         title: "My Courses",
-        subtitle: countText
-      };
-    }
-    if (pathname === '/lms/enrollments') {
-      const countText = enrolledCount === null 
-        ? "Loading your enrollments..." 
-        : enrolledCount > 0 
-          ? `You have ${enrolledCount} active enrollment${enrolledCount > 1 ? 's' : ''}`
-          : "No enrolled courses yet";
-      return {
-        title: "My Enrollments",
         subtitle: countText
       };
     }
