@@ -14,7 +14,7 @@ export default function Footer() {
                   style={{ height: '48px', width: 'auto', display: 'block', borderRadius: '10px' }}
                 />
               </Link>
-              <p>Empowering school students with expert coaching, conceptual academic courses, and personalized mentorship — From Concepts to Creation.</p>
+              <p>Empowering school students with expert coaching, conceptual academic courses, and personalized mentorship From Concepts to Creation.</p>
             </div>
 
             <div className="footer-col">
