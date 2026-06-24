@@ -469,7 +469,7 @@
 }
 
 .footer-links a:hover {
-  color: var(--color-accent);
+  color: #0ccf5c;
   transform: translateX(4px);
 }
 
@@ -640,7 +640,7 @@
 }
 
 .page-banner h1 {
-  color: var(--color-accent);
+  color: #0ccf5c;
   margin-bottom: var(--space-3);
 }
 
@@ -657,7 +657,7 @@
 }
 
 .page-banner .breadcrumb .current {
-  color: var(--color-primary-light);
+  color: #0ccf5c;
 }
 
 /* ═══════════════════════════════════════════

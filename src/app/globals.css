@@ -303,7 +303,7 @@ h6 {
 
 .page-banner h1 {
   font-size: var(--text-4xl);
-  color: white;
+  color: #0ccf5c;
   margin-bottom: var(--space-3);
 }
 
@@ -329,6 +329,10 @@ h6 {
 
 .breadcrumb .current {
   color: var(--color-primary);
+}
+
+.page-banner .breadcrumb .current {
+  color: #0ccf5c;
 }
 
 /* ---- Cards ---- */
@@ -653,7 +657,7 @@ h6 {
 }
 
 .footer-links a:hover {
-  color: var(--color-primary);
+  color: #0ccf5c;
 }
 
 .footer-contact {
