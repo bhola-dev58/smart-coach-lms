@@ -86,8 +86,8 @@ export default async function CoursesPage({ searchParams }) {
 
       <section className="section">
         <div className="container">
-          
-          <div 
+
+          <div
             className="courses-toolbar"
             style={{
               display: 'flex',
@@ -134,21 +134,17 @@ export default async function CoursesPage({ searchParams }) {
 
             {/* Search Bar Navbar Style */}
             <form method="GET" action="/courses" style={{ display: 'flex', gap: '0.5rem', minWidth: '300px', flex: '0 1 auto' }}>
-               <input 
-                 type="search" 
-                 name="q" 
-                 defaultValue={searchQuery}
-                 placeholder="Search courses..." 
-                 style={{
-                   flex: 1, padding: '0.6rem 1rem', borderRadius: '20px',
-                   border: '1px solid var(--color-border)', outline: 'none',
-                   fontSize: '0.9rem', color: 'var(--color-text)', background: 'var(--color-background)'
-                 }}
-               />
-               {category && <input type="hidden" name="category" value={category} />}
-               <button type="submit" className="btn btn-primary btn-sm" style={{ padding: '0 1.25rem', borderRadius: '20px' }}>
-                 Search
-               </button>
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search courses..."
+                className="search-input"
+              />
+              {category && <input type="hidden" name="category" value={category} />}
+              <button type="submit" className="btn btn-primary btn-sm" style={{ padding: '0 1.25rem', borderRadius: '20px' }}>
+                Search
+              </button>
             </form>
           </div>
 
@@ -306,7 +302,7 @@ export default async function CoursesPage({ searchParams }) {
                           amount={c.price}
                           courseTitle={c.title}
                           className="btn btn-primary btn-sm"
-                          style={{}} 
+                          style={{}}
                         >
                           Enroll Now
                         </EnrollButton>

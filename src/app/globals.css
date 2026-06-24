@@ -769,3 +769,25 @@ h6 {
 .gradify-premium-player::-webkit-media-controls-fullscreen-button:hover {
   transform: scale(1.15);
 }
+
+/* Course Search Input */
+.search-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #111111;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-input:hover {
+  border: 2px solid #111111;
+}
+
+.search-input:focus {
+  border: 2px solid #111111;
+  box-shadow: 0 0 0 2px rgba(12, 207, 92, 0.2);
+}
