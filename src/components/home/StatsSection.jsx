@@ -1,14 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-const stats = [
-  { number: 10000, suffix: '+', label: 'Students Enrolled' },
-  { number: 50, suffix: '+', label: 'Expert Courses' },
-  { number: 150, suffix: '+', label: 'Cities Covered' },
-  { number: 95, suffix: '%', label: 'Academic Success Rate' },
-];
-
 function AnimatedNumber({ target, suffix }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
@@ -42,12 +34,14 @@ function AnimatedNumber({ target, suffix }) {
   );
 }
 
-export default function StatsSection() {
+export default function StatsSection({ statsData = [] }) {
+  const statsList = statsData;
+
   return (
     <section className="stats-section">
       <div className="container">
-        <div className="stats-grid">
-          {stats.map((stat, i) => (
+        <div className="stats-grid" style={{ '--stats-count': statsList.length }}>
+          {statsList.map((stat, i) => (
             <div className="stat-item" key={i}>
               <AnimatedNumber target={stat.number} suffix={stat.suffix} />
               <div className="stat-label">{stat.label}</div>

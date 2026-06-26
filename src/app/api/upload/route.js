@@ -45,7 +45,7 @@ export async function POST(req) {
         const resourceType = file.type.startsWith('video/') ? 'video' : 'auto';
 
         const result = await cloudinary.uploader.upload(base64, {
-          folder: 'meetme-center/materials',
+          folder: 'gradify-academy/materials',
           resource_type: resourceType,
         });
 

@@ -1,5 +1,5 @@
 /* ============================================
-   MeetMe Center — Layout System
+   Gradify Academy — Layout System
    Grid, Container, Section Patterns
    ============================================ */
 
@@ -807,15 +807,21 @@
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
   gap: var(--space-8);
   text-align: center;
+  max-width: calc(var(--stats-count, 4) * 280px);
+  margin: 0 auto;
 }
 
 .stat-item {
   padding: var(--space-6);
   position: relative;
+  flex: 1 1 240px;
+  max-width: 280px;
 }
 
 .stat-item:not(:last-child)::after {
@@ -839,7 +845,7 @@
 }
 
 .stat-suffix {
-  color: var(--color-primary-light);
+  color: var(--color-success);
 }
 
 .stat-label {

@@ -3,13 +3,62 @@
 import Link from 'next/link';
 import EnrollButton from '@/components/courses/EnrollButton';
 
-export default function LmsCourseDetail({ course }) {
+export default function LmsCourseDetail({ course, backLink = '/lms/browse' }) {
   const c = course;
+
+  const hasSyllabus = c.chapters && c.chapters.length > 0 && c.chapters.some(ch => ch.lessons && ch.lessons.length > 0);
+
+  if (!hasSyllabus) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '60vh',
+        padding: '3rem 1.5rem',
+        textAlign: 'center',
+        width: '100%'
+      }}>
+        <div style={{ maxWidth: '600px' }}>
+          <h1 style={{ 
+            fontSize: '3rem', 
+            fontWeight: '800', 
+            marginBottom: '1.5rem', 
+            color: 'var(--dash-accent, #1B2B6B)',
+            fontFamily: 'var(--font-heading)'
+          }}>
+            Coming Soon!
+          </h1>
+          <p style={{ 
+            fontSize: '1.15rem', 
+            color: 'var(--dash-text-muted, #666)', 
+            marginBottom: '2.5rem',
+            lineHeight: '1.6'
+          }}>
+            The syllabus for this course is being prepared. Please check back later.
+          </p>
+          <Link href={backLink} style={{
+            background: 'var(--color-primary)',
+            color: 'white',
+            padding: '0.75rem 2rem',
+            borderRadius: '8px',
+            textDecoration: 'none',
+            fontWeight: 'bold',
+            display: 'inline-block',
+            transition: 'background var(--dash-transition)'
+          }}>
+            Back to Courses
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '1.5rem 2rem', maxWidth: '1000px' }}>
       {/* Back Button */}
-      <Link href="/lms/browse" style={{
+      <Link href={backLink} style={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.4rem',
@@ -82,8 +131,14 @@ export default function LmsCourseDetail({ course }) {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               {c.rating} ({c.totalRatings} reviews)
             </span>
-            <span>📊 {c.level}</span>
-            <span>🗣 {c.language}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              {c.level}
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              {c.language}
+            </span>
           </div>
 
           {c.instructor && (
@@ -135,11 +190,7 @@ export default function LmsCourseDetail({ course }) {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            {c.thumbnail ? (
-              <img src={c.thumbnail} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span style={{ fontSize: '3rem', opacity: 0.2 }}>📚</span>
-            )}
+            <img src={c.thumbnail || '/images/courses/default.jpg'} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
 
           {/* Price */}

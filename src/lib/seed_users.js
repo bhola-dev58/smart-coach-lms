@@ -38,19 +38,19 @@ async function seedUsers() {
     const usersToCreate = [
       {
         name: 'Super Admin',
-        email: 'admin@meetme.center',
+        email: 'admin@gradify.academy',
         password: hashedPassword,
         role: 'admin',
       },
       {
         name: 'Dr. Rajesh Kumar',
-        email: 'instructor@meetme.center', // Isko simple id k sath test k liye override karte h
+        email: 'instructor@gradify.academy', // Isko simple id k sath test k liye override karte h
         password: hashedPassword,
         role: 'instructor',
       },
       {
         name: 'Aman Student',
-        email: 'student@meetme.center',
+        email: 'student@gradify.academy',
         password: hashedPassword,
         role: 'student',
       }

@@ -60,7 +60,7 @@ export async function POST(req) {
     const resourceType = file.type === 'application/pdf' ? 'raw' : 'image';
 
     const result = await cloudinary.uploader.upload(base64, {
-      folder: 'meetme-center/kyc-documents',
+      folder: 'gradify-academy/kyc-documents',
       public_id: `kyc_${user._id}_${documentType}_${Date.now()}`,
       resource_type: resourceType,
     });

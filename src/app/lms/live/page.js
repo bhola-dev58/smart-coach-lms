@@ -108,7 +108,9 @@ export default function LiveClassesPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--dash-text)' }}>🎥 Live Classes</h1>
+          <h1 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--dash-text)' }}>
+            Live Classes
+          </h1>
           <p style={{ color: 'var(--dash-text-muted)', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
             Join Zoom sessions or real-time in-app classroom sessions
           </p>
@@ -143,7 +145,9 @@ export default function LiveClassesPage() {
                 Join Room
               </button>
             </div>
-            <span style={{ fontSize: '0.65rem', color: 'var(--dash-text-muted)' }}>⚠️ For in-app rooms only — not Zoom codes</span>
+            <span style={{ fontSize: '0.65rem', color: 'var(--dash-text-muted)' }}>
+              For in-app rooms only — not Zoom codes
+            </span>
           </div>
           {isInstructor && (
             <button
@@ -164,9 +168,8 @@ export default function LiveClassesPage() {
       <div style={{
         background: 'rgba(52,152,219,0.08)', border: '1px solid rgba(52,152,219,0.25)',
         borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.5rem',
-        fontSize: '0.85rem', color: 'var(--dash-text-secondary)', display: 'flex', gap: '0.5rem', alignItems: 'flex-start'
+        fontSize: '0.85rem', color: 'var(--dash-text-secondary)'
       }}>
-        <span>ℹ️</span>
         <span>
           <strong>Join by Code</strong> is for in-app WebRTC rooms only. For Zoom/Google Meet sessions,
           click <strong>"Join Zoom"</strong> on the session cards below — they open directly in your browser or Zoom app.
@@ -233,7 +236,7 @@ export default function LiveClassesPage() {
                   color: 'white', fontWeight: 600, cursor: createForm.title.trim() ? 'pointer' : 'not-allowed',
                 }}
               >
-                🚀 Go Live
+                Go Live
               </button>
             </div>
           </div>
@@ -246,9 +249,9 @@ export default function LiveClassesPage() {
         <>
           {/* ── SECTION 1: Zoom / External Sessions ── */}
           <div style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              📡 Zoom &amp; External Sessions
-              <span style={{ fontSize: '0.7rem', background: 'rgba(255,171,0,0.15)', color: '#ffab00', border: '1px solid rgba(255,171,0,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem' }}>
+              Zoom &amp; External Sessions
+              <span style={{ fontSize: '0.7rem', background: 'rgba(255,171,0,0.15)', color: '#ffab00', border: '1px solid rgba(255,171,0,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, marginLeft: '0.5rem' }}>
                 Scheduled
               </span>
             </h2>
@@ -283,13 +286,15 @@ export default function LiveClassesPage() {
                             border: isLive ? 'none' : '1px solid rgba(255,171,0,0.3)',
                             padding: '3px 10px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700,
                           }}>
-                            {isLive ? '🔴 LIVE' : '⏳ Upcoming'}
+                            {isLive ? 'LIVE' : 'Upcoming'}
                           </span>
                           <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 700 }}>{s.title}</h3>
                         </div>
                         <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--dash-text-muted)', flexWrap: 'wrap' }}>
-                          <span>🕐 {new Date(s.scheduledAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                          {s.duration && <span>⏱ {s.duration} mins</span>}
+                          <span>Time: {new Date(s.scheduledAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                          {s.duration && (
+                            <span>Duration: {s.duration} mins</span>
+                          )}
                           {s.description && <span>{s.description}</span>}
                         </div>
                       </div>
@@ -307,7 +312,7 @@ export default function LiveClassesPage() {
                           onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
                           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                         >
-                          {isLive ? '🔴 Join Zoom Now' : '📅 Join Zoom'}
+                          {isLive ? 'Join Zoom Now' : 'Join Zoom'}
                         </a>
                       ) : (
                         <span style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', fontStyle: 'italic' }}>No link yet</span>
@@ -321,9 +326,9 @@ export default function LiveClassesPage() {
 
           {/* ── SECTION 2: In-App WebRTC Rooms ── */}
           <div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              🖥️ In-App Live Rooms
-              <span style={{ fontSize: '0.7rem', background: 'rgba(46,213,115,0.12)', color: '#2ed573', border: '1px solid rgba(46,213,115,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem' }}>
+              In-App Live Rooms
+              <span style={{ fontSize: '0.7rem', background: 'rgba(46,213,115,0.12)', color: '#2ed573', border: '1px solid rgba(46,213,115,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, marginLeft: '0.5rem' }}>
                 WebRTC
               </span>
             </h2>
@@ -355,13 +360,13 @@ export default function LiveClassesPage() {
                           color: 'white', padding: '3px 10px', borderRadius: '12px',
                           fontSize: '0.7rem', fontWeight: 700,
                         }}>
-                          {room.status === 'live' ? '🔴 LIVE' : '⏳ Scheduled'}
+                          {room.status === 'live' ? 'LIVE' : 'Scheduled'}
                         </span>
                         <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--dash-text)' }}>{room.title}</h3>
                       </div>
-                      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--dash-text-muted)' }}>
-                        <span>👤 Host: {room.host?.name || 'Instructor'}</span>
-                        <span>👥 {room.participants?.filter(p => !p.leftAt).length || 0} / {room.maxParticipants}</span>
+                      <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--dash-text-muted)', flexWrap: 'wrap' }}>
+                        <span>Host: {room.host?.name || 'Instructor'}</span>
+                        <span>Participants: {room.participants?.filter(p => !p.leftAt).length || 0} / {room.maxParticipants}</span>
                         <span style={{ fontFamily: 'monospace', letterSpacing: '1px' }}>Code: <strong>{room.roomCode}</strong></span>
                       </div>
                     </div>
@@ -373,7 +378,7 @@ export default function LiveClassesPage() {
                         color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem',
                       }}
                     >
-                      {room.status === 'live' ? 'Join Live 🔴' : 'Join'}
+                      {room.status === 'live' ? 'Join Live' : 'Join'}
                     </button>
                   </div>
                 ))}

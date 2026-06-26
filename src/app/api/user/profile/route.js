@@ -36,6 +36,8 @@ export async function GET() {
         branch: user.branch || '',
         year: user.year || null,
         bio: user.bio || '',
+        qualification: user.qualification || '',
+        experience: user.experience || '',
         specialization: user.specialization || [],
         socialLinks: user.socialLinks || { linkedin: '', youtube: '', website: '' },
         enrolledCourses: user.enrolledCourses || [],
@@ -61,10 +63,18 @@ export async function PUT(req) {
     }
 
     await connectDB();
+    const dbUser = await User.findOne({ email: session.user.email });
+    if (!dbUser) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
     const body = await req.json();
 
     // Whitelist: Only these fields can be updated by the user themselves
-    const allowedFields = ['name', 'phone', 'avatar', 'college', 'branch', 'year', 'bio', 'socialLinks', 'payoutInfo', 'location'];
+    const allowedFields = [
+      'name', 'phone', 'avatar', 'college', 'branch', 'year', 'bio', 
+      'socialLinks', 'payoutInfo', 'location', 'qualification', 'experience'
+    ];
     const updateData = {};
 
     for (const key of allowedFields) {
@@ -114,6 +124,19 @@ export async function PUT(req) {
       return NextResponse.json({ success: false, error: 'Bio must be under 500 characters' }, { status: 400 });
     }
 
+    // If user is instructor, qualification and experience must be provided (mandatory)
+    if (dbUser.role === 'instructor') {
+      const qual = body.qualification !== undefined ? body.qualification.trim() : dbUser.qualification;
+      const exp = body.experience !== undefined ? body.experience.trim() : dbUser.experience;
+
+      if (!qual) {
+        return NextResponse.json({ success: false, error: 'Qualification is mandatory for instructors' }, { status: 400 });
+      }
+      if (!exp) {
+        return NextResponse.json({ success: false, error: 'Previous experience is mandatory for instructors' }, { status: 400 });
+      }
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
       { $set: updateData },
@@ -138,6 +161,8 @@ export async function PUT(req) {
         branch: updatedUser.branch || '',
         year: updatedUser.year || null,
         bio: updatedUser.bio || '',
+        qualification: updatedUser.qualification || '',
+        experience: updatedUser.experience || '',
         specialization: updatedUser.specialization || [],
         socialLinks: updatedUser.socialLinks || { linkedin: '', youtube: '', website: '' },
         location: updatedUser.location || { country: '', state: '', city: '' },

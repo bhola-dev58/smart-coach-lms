@@ -8,9 +8,9 @@ import mongoose from 'mongoose';
 const tenantSchema = new mongoose.Schema(
   {
     // ── Basic Info ──
-    name: { type: String, required: true, trim: true },         // e.g. "Physics Wallah Academy"
-    slug: { type: String, required: true, unique: true },       // e.g. "physics-wallah"
-    subdomain: { type: String, required: true, unique: true },  // e.g. "physicswallah" -> physicswallah.meetme.center
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true },
+    subdomain: { type: String, required: true, unique: true },
 
     // ── Owner (Admin of this tenant) ──
     owner: {

@@ -8,8 +8,8 @@ const practiceQuestionSchema = new mongoose.Schema(
   {
     subject: {
       type: String,
-      enum: ['MATHS', 'SCIENCE', 'COMMERCE', 'ARTS', 'GENERAL'],
       required: true,
+      trim: true,
     },
     class: {
       type: String,

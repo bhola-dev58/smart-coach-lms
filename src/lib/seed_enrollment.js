@@ -49,7 +49,7 @@ async function seed() {
     console.log('🗑️  Cleared old enrollments from database\n');
 
     // Find the student user (created by seed_users.js)
-    const student = await User.findOne({ email: 'student@meetme.center' });
+    const student = await User.findOne({ email: 'student@gradify.academy' });
     if (!student) {
       console.error('❌ Student user not found. Run seed_users.js first.');
       process.exit(1);
@@ -98,7 +98,7 @@ async function seed() {
 
     console.log(`\n─────────────────────────────────────`);
     console.log(`🎉 Enrollment seed complete! ${enrolled} new enrollment(s) created.`);
-    console.log(`📌 Login as student@meetme.center / password123 to test.`);
+    console.log(`📌 Login as student@gradify.academy / password123 to test.`);
 
   } catch (err) {
     console.error('❌ Seed failed:', err);

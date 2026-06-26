@@ -52,7 +52,6 @@ export const schemaConfig = {
     name: 'Courses',
     fields: [
       { key: 'title', label: 'Course Title', type: 'text', required: true },
-      { key: 'slug', label: 'URL Slug', type: 'text', required: true },
       { key: 'description', label: 'Description', type: 'textarea' },
       { key: 'shortDescription', label: 'Short Subtitle (200 chars)', type: 'text' },
       { key: 'price', label: 'Offer Price (INR)', type: 'number', default: 0 },
@@ -60,7 +59,7 @@ export const schemaConfig = {
       { key: 'isFree', label: 'Is Free Course?', type: 'boolean', default: false },
       { key: 'thumbnail', label: 'Cover Image URL', type: 'file' },
       { key: 'previewVideoUrl', label: 'Intro Video URL', type: 'file' },
-      { key: 'category', label: 'Category', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'GENERAL', 'ARTS'] },
+      { key: 'category', label: 'Category', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'GENERAL', 'ARTS', 'COMPUTER_SCIENCE'] },
       { key: 'level', label: 'Skill Level', type: 'select', options: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'] },
       { key: 'language', label: 'Language', type: 'text', default: 'Hindi' },
       { key: 'totalHours', label: 'Expected Total Hours', type: 'number' },
@@ -143,7 +142,7 @@ export const schemaConfig = {
   practicequestions: {
     name: 'Practice Questions',
     fields: [
-      { key: 'subject', label: 'Subject', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'ARTS', 'GENERAL'], required: true },
+      { key: 'subject', label: 'Subject', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'ARTS', 'GENERAL', 'COMPUTER_SCIENCE'], required: true },
       { key: 'class', label: 'Class', type: 'select', options: ['6', '7', '8', '9', '10', '11', '12', 'All'], required: true, default: 'All' },
       { key: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Medium', 'Hard'], required: true, default: 'Medium' },
       { key: 'question', label: 'Question Text', type: 'textarea', required: true },

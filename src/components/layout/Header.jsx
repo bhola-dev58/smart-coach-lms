@@ -125,10 +125,12 @@ export default function Header() {
                             Instructor Panel
                           </Link>
                         )}
-                        <Link href="/lms" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                          Student Portal
-                        </Link>
+                        {session.user?.role !== 'instructor' && session.user?.role !== 'admin' && (
+                          <Link href="/lms" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            Student Portal
+                          </Link>
+                        )}
                         <button onClick={() => signOut({ callbackUrl: '/' })} className={styles.dropdownItem}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                           Logout
@@ -167,13 +169,15 @@ export default function Header() {
         <div className={styles.mobileActions}>
           {status === 'loading' ? null : session ? (
             <>
-              {session.user?.role === 'admin' && (
+               {session.user?.role === 'admin' && (
                 <Link href="/admin" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Admin Panel</Link>
               )}
               {session.user?.role === 'instructor' && (
                 <Link href="/lms/instructor" className="btn btn-outline btn-block" onClick={() => setMobileOpen(false)}>Instructor Panel</Link>
               )}
-              <Link href="/lms" className="btn btn-primary btn-block" onClick={() => setMobileOpen(false)}>Student Portal</Link>
+              {session.user?.role !== 'instructor' && session.user?.role !== 'admin' && (
+                <Link href="/lms" className="btn btn-primary btn-block" onClick={() => setMobileOpen(false)}>Student Portal</Link>
+              )}
               <button onClick={() => signOut()} className="btn btn-outline btn-block">Logout</button>
             </>
           ) : (

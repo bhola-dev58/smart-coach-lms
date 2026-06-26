@@ -1,12 +1,12 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: meetme-center-hpa
+  name: gradify-academy-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: meetme-center
+    name: gradify-academy
   minReplicas: 3
   maxReplicas: 15
   metrics:

@@ -64,6 +64,18 @@ const STATIC_QUESTION_BANK = {
     { q: 'Who invented the World Wide Web?', options: ['Bill Gates', 'Steve Jobs', 'Tim Berners-Lee', 'Mark Zuckerberg'], ans: 2 },
     { q: 'Which is the national flower of India?', options: ['Rose', 'Jasmine', 'Sunflower', 'Lotus'], ans: 3 },
   ],
+  COMPUTER_SCIENCE: [
+    { q: 'Which of the following is NOT a programming language?', options: ['Python', 'HTML', 'Java', 'C++'], ans: 1 },
+    { q: 'What does CPU stand for?', options: ['Central Process Unit', 'Computer Processing Unit', 'Central Processing Unit', 'Control Processing Unit'], ans: 2 },
+    { q: 'Which data structure follows the Last In First Out (LIFO) principle?', options: ['Queue', 'Stack', 'Array', 'Linked List'], ans: 1 },
+    { q: 'What is the binary representation of decimal number 10?', options: ['1001', '1010', '1100', '1111'], ans: 1 },
+    { q: 'Which of the following is an example of non-volatile memory?', options: ['RAM', 'SRAM', 'DRAM', 'ROM'], ans: 3 },
+    { q: 'Who is known as the father of modern computers?', options: ['Alan Turing', 'Charles Babbage', 'Bill Gates', 'Steve Jobs'], ans: 0 },
+    { q: 'What does HTTP stand for?', options: ['Hypertext Transfer Protocol', 'Hypertext Transmission Protocol', 'High Transfer Text Protocol', 'Hyper Transfer Text Protocol'], ans: 0 },
+    { q: 'Which SQL statement is used to extract data from a database?', options: ['GET', 'OPEN', 'SELECT', 'EXTRACT'], ans: 2 },
+    { q: 'In computer networks, what does DNS stand for?', options: ['Domain Name System', 'Digital Network Service', 'Data Network System', 'Domain Network Server'], ans: 0 },
+    { q: 'What is the time complexity of binary search on a sorted array of size n?', options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'], ans: 1 },
+  ],
 };
 
 export async function POST() {

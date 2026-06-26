@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import styles from '@/app/lms/lms.module.css';
+import UiIcon from '@/components/common/UiIcon';
 
 // ── Course Progress Card ──
 function CourseProgressCard({ courseId, title, unit, progress, thumbnail }) {
@@ -12,7 +13,9 @@ function CourseProgressCard({ courseId, title, unit, progress, thumbnail }) {
         {thumbnail ? (
           <img src={thumbnail} alt={title} />
         ) : (
-          <span className={styles.courseThumbPlaceholder}>📚</span>
+          <span className={styles.courseThumbPlaceholder}>
+            <UiIcon name="book" size={24} color="var(--dash-text-muted)" />
+          </span>
         )}
       </div>
       <div className={styles.courseItemBody}>
@@ -113,8 +116,47 @@ function EmptyState({ icon, title, text, btnText, btnHref }) {
   );
 }
 
+// ── Helper to format Live Session Time ──
+function formatSessionTime(scheduledAt, durationMins = 60) {
+  const start = new Date(scheduledAt);
+  const end = new Date(start.getTime() + durationMins * 60 * 1000);
+
+  const startTimeStr = start.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const endTimeStr = end.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const dateStr = start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+  return `${dateStr}, ${startTimeStr} — ${endTimeStr}`;
+}
+
+// ── Helper to format Live Session Countdown ──
+function getLiveCountdown(scheduledAt, durationMins = 60) {
+  const now = new Date();
+  const start = new Date(scheduledAt);
+  const end = new Date(start.getTime() + durationMins * 60 * 1000);
+
+  if (now >= start && now <= end) {
+    return 'Live Now';
+  }
+  if (now > end) {
+    return 'Ended';
+  }
+
+  const diffMs = start.getTime() - now.getTime();
+  const diffMins = Math.floor(diffMs / (60 * 1000));
+  const diffHrs = Math.floor(diffMins / 60);
+
+  if (diffMins < 60) {
+    return `in ${diffMins} min${diffMins !== 1 ? 's' : ''}`;
+  } else if (diffHrs < 24) {
+    return `in ${diffHrs} hr${diffHrs !== 1 ? 's' : ''}`;
+  } else {
+    const diffDays = Math.floor(diffHrs / 24);
+    return `in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+  }
+}
+
 // ── Main Dashboard Content ──
-export default function DashboardContent({ enrolledCourses = [], leaderboard = [] }) {
+export default function DashboardContent({ enrolledCourses = [], leaderboard = [], liveSessions = [] }) {
   const { data: session } = useSession();
   const userName = session?.user?.name || 'Student';
   const userInitial = userName.charAt(0).toUpperCase();
@@ -148,7 +190,7 @@ export default function DashboardContent({ enrolledCourses = [], leaderboard = [
             </div>
           ) : (
             <EmptyState
-              icon="📚"
+              icon={<UiIcon name="book" size={40} color="var(--dash-text-muted)" />}
               title="No Courses Yet"
               text="Explore our catalog and start learning today!"
               btnText="Browse Courses"
@@ -175,9 +217,29 @@ export default function DashboardContent({ enrolledCourses = [], leaderboard = [
             <span className={styles.cardArrow}>›</span>
           </div>
           <div className={styles.liveList}>
-            <LiveClassItem title="Geography: Rivers of India" time="8:00pm — 12:00" countdown="in 10 mins" />
-            <LiveClassItem title="Data Structures: Trees" time="9:00pm — 10:30" countdown="in 1 hr" />
-            <LiveClassItem title="Physics: Optics Lab" time="10:00pm — 11:30" countdown="in 2 hrs" />
+            {liveSessions.length === 0 ? (
+              <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.85rem', padding: '1rem', margin: 0, textAlign: 'center' }}>
+                No live classes scheduled.
+              </p>
+            ) : (
+              liveSessions.slice(0, 5).map((session) => {
+                const countdown = getLiveCountdown(session.scheduledAt, session.duration);
+                const timeStr = formatSessionTime(session.scheduledAt, session.duration);
+                return (
+                  <Link
+                    key={session._id || session.id}
+                    href="/lms/live"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <LiveClassItem
+                      title={session.title}
+                      time={timeStr}
+                      countdown={countdown}
+                    />
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
 

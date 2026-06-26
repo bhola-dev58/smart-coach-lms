@@ -1,5 +1,5 @@
 /**
- * MeetMe Center — Navigation
+ * Gradify Academy — Navigation
  * Sticky header, hamburger menu, active states
  */
 

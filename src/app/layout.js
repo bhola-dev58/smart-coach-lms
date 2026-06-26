@@ -18,7 +18,7 @@ const outfit = Outfit({
 
 export const metadata = {
   title: {
-    default: 'Gradify Academy — From Concepts to Creation',
+    default: 'Gradify Academy',
     template: '%s — Gradify Academy',
   },
   description: 'Gradify Academy — India\'s premier coaching platform. Expert faculty from IITs & NITs, 50+ industry-relevant courses, GATE preparation, and placement assistance for engineering students.',

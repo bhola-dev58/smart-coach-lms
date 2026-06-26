@@ -4,8 +4,18 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import EnrollButton from '@/components/courses/EnrollButton';
 import styles from '@/app/lms/lms.module.css';
+import UiIcon from '@/components/common/UiIcon';
 
 export default function BrowseCoursesClient({ courses = [] }) {
+  const categoryLabels = {
+    MATHS: 'Mathematics',
+    SCIENCE: 'Science',
+    COMMERCE: 'Commerce',
+    ARTS: 'Arts',
+    GENERAL: 'General',
+    COMPUTER_SCIENCE: 'Computer Science'
+  };
+
   const searchParams = useSearchParams();
   const filter = searchParams.get('category') || 'All';
   const query = (searchParams.get('q') || '').trim().toLowerCase();
@@ -43,7 +53,9 @@ export default function BrowseCoursesClient({ courses = [] }) {
       {/* Courses Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--dash-text-secondary)' }}>
-          <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</p>
+          <p style={{ marginBottom: '0.5rem' }}>
+            <UiIcon name="search" size={40} color="var(--dash-text-muted)" />
+          </p>
           <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>
             {query ? `No courses found for "${query}"` : 'No courses found in this category.'}
           </p>
@@ -75,11 +87,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
                 position: 'relative',
                 overflow: 'hidden',
               }}>
-                {c.thumbnail ? (
-                  <img src={c.thumbnail} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span style={{ fontSize: '3rem', opacity: 0.2 }}>📚</span>
-                )}
+                <img src={c.thumbnail || '/images/courses/default.jpg'} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <span style={{
                   position: 'absolute',
                   top: '0.75rem',
@@ -91,7 +99,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
                   fontSize: '0.7rem',
                   fontWeight: 600,
                 }}>
-                  {c.category}
+                  {categoryLabels[c.category] || c.category}
                 </span>
               </div>
 

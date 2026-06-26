@@ -26,6 +26,8 @@ export default function ProfilePage() {
     branch: '',
     year: '',
     bio: '',
+    qualification: '',
+    experience: '',
     socialLinks: { linkedin: '', youtube: '', website: '' },
     payoutInfo: { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
     location: { country: '', state: '', city: '' },
@@ -46,6 +48,8 @@ export default function ProfilePage() {
           branch: data.user.branch || '',
           year: data.user.year || '',
           bio: data.user.bio || '',
+          qualification: data.user.qualification || '',
+          experience: data.user.experience || '',
           socialLinks: data.user.socialLinks || { linkedin: '', youtube: '', website: '' },
           payoutInfo: data.user.payoutInfo || { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
           location: data.user.location || { country: '', state: '', city: '' },
@@ -69,6 +73,16 @@ export default function ProfilePage() {
   const handleLocationChange = (field, value) => setForm(prev => ({ ...prev, location: { ...prev.location, [field]: value } }));
 
   const handleSave = async () => {
+    if (isInstructor) {
+      if (!form.qualification.trim()) {
+        showMsg('❌ Qualification is mandatory for instructors', 'error');
+        return;
+      }
+      if (!form.experience.trim()) {
+        showMsg('❌ Previous experience is mandatory for instructors', 'error');
+        return;
+      }
+    }
     setSaving(true);
     try {
       const res = await fetch('/api/user/profile', {
@@ -389,6 +403,36 @@ export default function ProfilePage() {
         </SectionCard>
       )}
 
+      {/* ── Instructor Professional Details (Mandatory) ── */}
+      {isInstructor && (
+        <SectionCard title="Professional Details" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1.25rem' }}>
+            <FieldGroup label="Qualification" required>
+              {editMode ? (
+                <StyledInput 
+                  value={form.qualification} 
+                  onChange={e => handleChange('qualification', e.target.value)} 
+                  placeholder="e.g. B.Tech in CSE (IIT Bombay)" 
+                />
+              ) : (
+                <FieldValue>{profile?.qualification || <span style={{ color: '#ef4444', fontWeight: 600 }}>⚠️ Missing Qualification</span>}</FieldValue>
+              )}
+            </FieldGroup>
+            <FieldGroup label="Previous Experience" required>
+              {editMode ? (
+                <StyledInput 
+                  value={form.experience} 
+                  onChange={e => handleChange('experience', e.target.value)} 
+                  placeholder="e.g. 5+ Years teaching JEE / Coding" 
+                />
+              ) : (
+                <FieldValue>{profile?.experience || <span style={{ color: '#ef4444', fontWeight: 600 }}>⚠️ Missing Experience</span>}</FieldValue>
+              )}
+            </FieldGroup>
+          </div>
+        </SectionCard>
+      )}
+
       {/* ── KYC / Identity Verification ── */}
       {!isInstructor && (
         <SectionCard title="Identity Verification (KYC)" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dash-accent)" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>}>
@@ -474,6 +518,8 @@ export default function ProfilePage() {
                 name: profile?.name || '', phone: profile?.phone || '',
                 college: profile?.college || '', branch: profile?.branch || '',
                 year: profile?.year || '', bio: profile?.bio || '',
+                qualification: profile?.qualification || '',
+                experience: profile?.experience || '',
                 socialLinks: profile?.socialLinks || { linkedin: '', youtube: '', website: '' },
                 payoutInfo: profile?.payoutInfo || { upiId: '', bankAccount: '', ifscCode: '', bankName: '' },
                 location: profile?.location || { country: '', state: '', city: '' },

@@ -74,6 +74,8 @@ const userSchema = new mongoose.Schema(
 
     // ── Instructor-specific fields ──
     bio: { type: String, default: '', maxlength: 500 },
+    qualification: { type: String, default: '', trim: true },
+    experience: { type: String, default: '', trim: true },
     specialization: [{ type: String }],
     socialLinks: {
       linkedin: { type: String, default: '' },

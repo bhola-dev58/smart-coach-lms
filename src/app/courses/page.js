@@ -3,6 +3,8 @@ import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import '@/models/User'; // Register User schema for populate('instructor')
 import EnrollButton from '@/components/courses/EnrollButton';
+import CategoryDropdown from '@/components/courses/CategoryDropdown';
+import Category from '@/models/Category';
 
 export const metadata = {
   title: 'All Courses | Gradify Academy',
@@ -68,8 +70,13 @@ export default async function CoursesPage({ searchParams }) {
     };
   });
 
-  // All unique categories for filter tabs
-  const allCategories = await Course.distinct('category', { isPublished: true });
+  // Fetch categories dynamically from database
+  const categoriesFromDb = await Category.find({ isActive: true }).sort({ label: 1 }).lean();
+  const allCategories = categoriesFromDb.map(c => c.name);
+  const categoryLabels = categoriesFromDb.reduce((acc, c) => {
+    acc[c.name] = c.label;
+    return acc;
+  }, {});
 
   return (
     <>
@@ -104,33 +111,13 @@ export default async function CoursesPage({ searchParams }) {
               flexWrap: 'wrap'
             }}
           >
-            {/* Category Filter Tabs */}
-            <div
-              style={{
-                display: 'flex',
-                gap: 'var(--space-2)',
-                flexWrap: 'wrap',
-                flex: 1
-              }}
-            >
-              <Link
-                href={`/courses${searchQuery ? `?q=${searchQuery}` : ''}`}
-                className={`btn btn-sm ${!category ? 'btn-primary' : 'btn-outline'}`}
-                style={{ borderRadius: '20px' }}
-              >
-                All
-              </Link>
-              {allCategories.map((cat) => (
-                <Link
-                  href={`/courses?category=${cat}${searchQuery ? `&q=${searchQuery}` : ''}`}
-                  className={`btn btn-sm ${category === cat ? 'btn-primary' : 'btn-outline'}`}
-                  key={cat}
-                  style={{ borderRadius: '20px' }}
-                >
-                  {cat}
-                </Link>
-              ))}
-            </div>
+            {/* Category Filter Dropdown */}
+            <CategoryDropdown
+              categories={allCategories}
+              categoryLabels={categoryLabels}
+              currentCategory={category}
+              searchQuery={searchQuery}
+            />
 
             {/* Search Bar Navbar Style */}
             <form method="GET" action="/courses" style={{ display: 'flex', gap: '0.5rem', minWidth: '300px', flex: '0 1 auto' }}>
@@ -167,7 +154,7 @@ export default async function CoursesPage({ searchParams }) {
                 {courses.length}
               </strong>{' '}
               courses
-              {category ? ` in ${category}` : ''}
+              {category ? ` in ${categoryLabels[category] || category}` : ''}
             </span>
           </div>
 
@@ -178,7 +165,7 @@ export default async function CoursesPage({ searchParams }) {
               </h3>
               <p style={{ color: 'var(--color-text-muted)' }}>
                 {category
-                  ? `No courses available in the "${category}" category yet.`
+                  ? `No courses available in the "${categoryLabels[category] || category}" category yet.`
                   : 'New courses are being added soon!'}
               </p>
               <Link
@@ -200,7 +187,7 @@ export default async function CoursesPage({ searchParams }) {
                       className="card-img"
                     />
                     <span className="course-category badge badge-primary">
-                      {c.category}
+                      {categoryLabels[c.category] || c.category}
                     </span>
                     {c.isFeatured && (
                       <span

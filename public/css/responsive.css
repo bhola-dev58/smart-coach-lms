@@ -1,5 +1,5 @@
 /* ============================================
-   MeetMe Center — Responsive Styles
+   Gradify Academy — Responsive Styles
    Mobile-First Breakpoints
    ============================================ */
 
@@ -45,7 +45,7 @@
   }
 
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    /* flexbox handles columns */
   }
 
   .stat-item:nth-child(2)::after {
@@ -205,7 +205,6 @@
 
   /* Stats */
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4);
   }
 
@@ -408,7 +407,6 @@
 
   /* Stats */
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
   }
 

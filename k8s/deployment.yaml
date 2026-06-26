@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: meetme-center
+  name: gradify-academy
   labels:
-    app: meetme-center
+    app: gradify-academy
 spec:
   replicas: 3 # Start with 3 instances for high availability
   selector:
     matchLabels:
-      app: meetme-center
+      app: gradify-academy
   template:
     metadata:
       labels:
-        app: meetme-center
+        app: gradify-academy
     spec:
       containers:
-        - name: meetme-center
-          image: your-docker-registry/meetme-center:latest # Replace with your actual image
+        - name: gradify-academy
+          image: your-docker-registry/gradify-academy:latest # Replace with your actual image
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
           envFrom:
             - secretRef:
-                name: meetme-center-secrets
+                name: gradify-academy-secrets
           resources:
             requests:
               cpu: "250m"

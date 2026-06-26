@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { schemaConfig } from '@/components/lms/instructor/schemaConfig';
 import DataTable from '@/components/lms/instructor/DataTable';
 import SchemaFormModal from '@/components/lms/instructor/SchemaFormModal';
+import UiIcon from '@/components/common/UiIcon';
 
 export default function GenericResourcePage({ params }) {
   const router = useRouter();
@@ -14,10 +15,35 @@ export default function GenericResourcePage({ params }) {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.categories) {
+          setCategories(json.categories);
+        }
+      })
+      .catch(err => console.error('Failed to load categories:', err));
+  }, []);
+
+  const dynamicConfig = config ? {
+    ...config,
+    fields: config.fields.map(f => {
+      if ((f.key === 'category' || f.key === 'subject') && f.type === 'select') {
+        return {
+          ...f,
+          options: categories.map(c => c.name)
+        };
+      }
+      return f;
+    })
+  } : null;
 
   useEffect(() => {
     if (!config) return; // Ignore if config not found
@@ -82,7 +108,7 @@ export default function GenericResourcePage({ params }) {
     }
   };
 
-  if (!config) {
+  if (!dynamicConfig) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
         <h2>Resource Not Found</h2>
@@ -92,7 +118,7 @@ export default function GenericResourcePage({ params }) {
   }
 
   // Build columns for DataTable from config fields
-  const columns = config.fields.map(f => ({
+  const columns = dynamicConfig.fields.map(f => ({
     key: f.key,
     label: f.label,
     render: (val) => {
@@ -139,10 +165,14 @@ export default function GenericResourcePage({ params }) {
             borderRadius: '6px',
             fontSize: '0.75rem',
             fontWeight: 600,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
           }}
         >
-          ⚙️ Builder
+          <UiIcon name="gear" size={12} color="white" />
+          <span>Builder</span>
         </button>
       )
     });
@@ -284,7 +314,7 @@ export default function GenericResourcePage({ params }) {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--dash-text-muted)' }}>
-          Loading {config.name}...
+          Loading {dynamicConfig.name}...
         </div>
 
       ) : resource === 'courses' ? (
@@ -307,7 +337,7 @@ export default function GenericResourcePage({ params }) {
           {/* Empty State */}
           {data.length === 0 && (
             <div style={{ textAlign: 'center', padding: '4rem', background: 'rgba(255,255,255,0.03)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+              <UiIcon name="book" size={48} color="var(--dash-text-muted)" style={{ marginBottom: '1rem' }} />
               <p style={{ color: 'var(--dash-text-muted)', marginBottom: '1rem' }}>No courses yet.</p>
               <button onClick={() => { setEditingRow(null); setIsModalOpen(true); }} className="btn-create-first">
                 + Create First Course
@@ -324,7 +354,9 @@ export default function GenericResourcePage({ params }) {
                   {course.thumbnail ? (
                     <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>📖</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <UiIcon name="book" size={40} color="var(--dash-text-muted)" />
+                    </div>
                   )}
                   {/* Published/Draft badge */}
                   <span style={{
@@ -335,11 +367,11 @@ export default function GenericResourcePage({ params }) {
                     border: `1px solid ${course.isPublished ? 'rgba(46,213,115,0.3)' : 'rgba(255,171,0,0.3)'}`,
                     backdropFilter: 'blur(4px)',
                   }}>
-                    {course.isPublished ? '✓ Published' : '⏸ Draft'}
+                    {course.isPublished ? 'Published' : 'Draft'}
                   </span>
                   {/* Category badge */}
                   {course.category && (
-                    <span style={{ position: 'absolute', top: 10, left: 10, padding: '0.2rem 0.6rem', borderRadius: 6, fontSize: '0.68rem', fontWeight: 700, background: 'var(--dash-accent)', color: 'white', letterSpacing: '0.04em' }}>
+                    <span style={{ position: 'absolute', top: 10, left: 10, padding: '0.2rem 0.6,px', borderRadius: 6, fontSize: '0.68rem', fontWeight: 700, background: 'var(--dash-accent)', color: 'white', letterSpacing: '0.04em' }}>
                       {course.category}
                     </span>
                   )}
@@ -354,9 +386,9 @@ export default function GenericResourcePage({ params }) {
 
                   {/* Meta */}
                   <div style={{ display: 'flex', gap: '0.75rem', marginTop: 4, fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>
-                    <span>⏱ {course.totalHours || 0}h</span>
-                    <span>👥 {(course.totalStudents || 0).toLocaleString()}</span>
-                    <span>⭐ {course.rating || 0}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><UiIcon name="time" size={13} color="currentColor" /> {course.totalHours || 0}h</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><UiIcon name="group" size={13} color="currentColor" /> {(course.totalStudents || 0).toLocaleString()}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><UiIcon name="award" size={13} color="currentColor" /> {course.rating || 0}</span>
                   </div>
 
                   {/* Price */}
@@ -377,20 +409,25 @@ export default function GenericResourcePage({ params }) {
                   <button
                     onClick={() => { setEditingRow(course); setIsModalOpen(true); }}
                     className="btn-edit"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                   >
-                    ✏️ Edit
+                    <UiIcon name="edit" size={12} color="currentColor" />
+                    <span>Edit</span>
                   </button>
                   <button
                     onClick={() => router.push(`/lms/instructor/courses/${course._id}/builder`)}
                     className="btn-builder"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                   >
-                    ⚙️ Builder
+                    <UiIcon name="gear" size={12} color="currentColor" />
+                    <span>Builder</span>
                   </button>
                   <button
                     onClick={() => handleDelete(course._id)}
                     className="btn-delete"
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    🗑
+                    <UiIcon name="trash" size={14} color="#ef4444" />
                   </button>
                 </div>
               </div>
@@ -401,7 +438,7 @@ export default function GenericResourcePage({ params }) {
       ) : (
         /* ── ALL OTHER RESOURCES: DataTable ── */
         <DataTable
-          resourceName={config.name}
+          resourceName={dynamicConfig.name}
           columns={columns}
           data={data}
           onAdd={() => { setEditingRow(null); setIsModalOpen(true); }}
@@ -412,7 +449,7 @@ export default function GenericResourcePage({ params }) {
 
       {isModalOpen && (
         <SchemaFormModal
-          config={config}
+          config={dynamicConfig}
           initialData={editingRow}
           onClose={() => setIsModalOpen(false)}
           onSave={handleSave}

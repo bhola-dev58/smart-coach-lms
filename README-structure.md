@@ -1,4 +1,4 @@
-# MeetMe Center - Project Architecture & Structure
+# Gradify Academy - Project Architecture & Structure
 
 To ensure maximum scalability and maintainability, this Next.js project is structured according to **Frontend**, **Backend**, and **Database (DB)** domains. Since Next.js is a full-stack framework (App Router), we conceptually and physically separate concerns within the `src/` directory.
 

@@ -1,5 +1,5 @@
 /**
- * MeetMe Center — Animations
+ * Gradify Academy — Animations
  * Scroll-triggered animations, counter, testimonial slider, course tabs
  */
 

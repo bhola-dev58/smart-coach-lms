@@ -42,7 +42,7 @@ export async function POST(req) {
 
     // Upload to Cloudinary with transformations for avatar
     const result = await cloudinary.uploader.upload(base64, {
-      folder: 'meetme-center/avatars',
+      folder: 'gradify-academy/avatars',
       public_id: `user_${session.user.email.replace(/[@.]/g, '_')}_${Date.now()}`,
       overwrite: true,
       transformation: [

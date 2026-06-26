@@ -68,7 +68,7 @@ export default function LearnCoursePage() {
 
     // Save Auto-Resume progress every ~2 seconds to local storage
     if (Math.floor(video.currentTime) % 2 === 0 && activeLesson) {
-      localStorage.setItem(`meetme_resumeTime_${activeLesson.slug}`, video.currentTime);
+      localStorage.setItem(`gradify_resumeTime_${activeLesson.slug}`, video.currentTime);
     }
 
     if (progress < 0.25) {
@@ -241,7 +241,7 @@ export default function LearnCoursePage() {
     // Download
     const a = document.createElement('a');
     a.href = dataURI;
-    a.download = `MeetMeCenter_${activeLesson?.slug}_Snapshot.png`;
+    a.download = `GradifyAcademy_${activeLesson?.slug}_Snapshot.png`;
     a.click();
   };
 
@@ -362,11 +362,15 @@ export default function LearnCoursePage() {
   // ── Picture-in-Picture Toggle ──
   const togglePiP = async () => {
     if (!videoRef.current) return;
+    if (videoRef.current.readyState < 1) {
+      console.warn('PiP skipped: Video metadata not loaded yet.');
+      return;
+    }
     try {
       if (document.pictureInPictureElement) {
         await document.exitPictureInPicture();
         setIsPiP(false);
-      } else if (document.pictureInPictureEnabled) {
+      } else if (document.pictureInPictureEnabled && typeof videoRef.current.requestPictureInPicture === 'function') {
         await videoRef.current.requestPictureInPicture();
         setIsPiP(true);
         videoRef.current.addEventListener('leavepictureinpicture', () => setIsPiP(false), { once: true });
@@ -580,7 +584,7 @@ export default function LearnCoursePage() {
                       })
                     }).catch(() => {});
 
-                    const savedTime = localStorage.getItem(`meetme_resumeTime_${activeLesson.slug}`);
+                    const savedTime = localStorage.getItem(`gradify_resumeTime_${activeLesson.slug}`);
                     // If progress was saved and the video isn't practically finished already, resume!
                     if (savedTime && parseFloat(savedTime) < video.duration - 10) {
                       video.currentTime = parseFloat(savedTime);
@@ -608,7 +612,7 @@ export default function LearnCoursePage() {
                     textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
                     zIndex: 10,
                   }}>
-                    support@meetmecenter.com
+                    support@gradify.academy
                   </div>
                 )}
               </>

@@ -1,5 +1,5 @@
 /**
- * MeetMe Center — Forms
+ * Gradify Academy — Forms
  * Client-side validation, submission handling
  */
 

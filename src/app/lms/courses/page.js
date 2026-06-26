@@ -8,6 +8,15 @@ export default function MyCoursesPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const categoryLabels = {
+    MATHS: 'Mathematics',
+    SCIENCE: 'Science',
+    COMMERCE: 'Commerce',
+    ARTS: 'Arts',
+    GENERAL: 'General',
+    COMPUTER_SCIENCE: 'Computer Science'
+  };
+
   useEffect(() => {
     async function fetchMyCourses() {
       try {
@@ -68,7 +77,7 @@ export default function MyCoursesPage() {
                 ) : (
                   <span style={{ fontSize: '3rem', opacity: 0.2 }}>📚</span>
                 )}
-                <span className={styles.myCourseCategory}>{c.category}</span>
+                <span className={styles.myCourseCategory}>{categoryLabels[c.category] || c.category}</span>
                 <span className={`${styles.myCourseStatus} ${c.status === 'completed' ? styles.statusCompleted : styles.statusActive}`}>
                   {c.status === 'completed' ? '✅ Completed' : '▶ Active'}
                 </span>

@@ -1,5 +1,5 @@
 /**
- * MeetMe Center — Main JS
+ * Gradify Academy — Main JS
  * Core initialization, back-to-top, utilities
  */
 
@@ -140,8 +140,8 @@
     initScrollProgress();
 
     // Log theme version
-    if (typeof meetmeData !== 'undefined') {
-      console.log('%cMeetMe Center v1.0.0', 'color: #C8102E; font-weight: bold; font-size: 14px;');
+    if (typeof gradifyData !== 'undefined') {
+      console.log('%cGradify Academy v1.0.0', 'color: #C8102E; font-weight: bold; font-size: 14px;');
     }
   });
 

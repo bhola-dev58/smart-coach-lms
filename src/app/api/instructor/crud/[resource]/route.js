@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 
+import slugify from 'slugify';
+
 // Safely lazy load all models
 const getModel = async (resource) => {
   switch (resource.toLowerCase()) {
@@ -71,14 +73,29 @@ export async function POST(request, { params }) {
 
     const body = await request.json();
     const unwrappedParams = await params;
+    const resourceName = unwrappedParams.resource.toLowerCase();
     await connectDB();
-    const Model = await getModel(unwrappedParams.resource);
+    const Model = await getModel(resourceName);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
 
     // Auto-inject instructor ID if applicable
     if (Model.schema.paths.instructor) body.instructor = auth.session.user.id;
     if (Model.schema.paths.user) body.user = auth.session.user.id;
     if (Model.schema.paths.createdBy) body.createdBy = auth.session.user.id;
+
+    // Auto-generate slug for courses if not provided
+    if (resourceName === 'courses') {
+      if (!body.slug || body.slug.trim() === '') {
+        const baseSlug = slugify(body.title || 'course', { lower: true, strict: true }) || `course-${Date.now()}`;
+        let slug = baseSlug;
+        let count = 1;
+        while (await Model.exists({ slug })) {
+          slug = `${baseSlug}-${count}`;
+          count++;
+        }
+        body.slug = slug;
+      }
+    }
 
     const newItem = await Model.create(body);
     return NextResponse.json({ success: true, data: newItem });
@@ -98,9 +115,24 @@ export async function PUT(request, { params }) {
     if (!_id) return NextResponse.json({ success: false, error: 'Missing _id' }, { status: 400 });
 
     const unwrappedParams = await params;
+    const resourceName = unwrappedParams.resource.toLowerCase();
     await connectDB();
-    const Model = await getModel(unwrappedParams.resource);
+    const Model = await getModel(resourceName);
     if (!Model) return NextResponse.json({ success: false, error: 'Resource not found' }, { status: 404 });
+
+    // Auto-generate/update slug for courses if empty or not provided
+    if (resourceName === 'courses') {
+      if (!body.slug || body.slug.trim() === '') {
+        const baseSlug = slugify(body.title || 'course', { lower: true, strict: true }) || `course-${Date.now()}`;
+        let slug = baseSlug;
+        let count = 1;
+        while (await Model.exists({ slug, _id: { $ne: _id } })) {
+          slug = `${baseSlug}-${count}`;
+          count++;
+        }
+        updateData.slug = slug;
+      }
+    }
 
     const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { new: true, runValidators: true }).lean();
     return NextResponse.json({ success: true, data: updatedItem });

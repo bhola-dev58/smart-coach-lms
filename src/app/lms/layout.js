@@ -6,12 +6,29 @@ import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import DashboardSidebar from '@/components/lms/DashboardSidebar';
 import NotificationBell from '@/components/layout/NotificationBell';
+import UiIcon from '@/components/common/UiIcon';
 import styles from './lms.module.css';
 
 function CategorySelect() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get('category') || 'All';
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data.success) {
+          setCategories(data.categories || []);
+        }
+      })
+      .catch((err) => console.error('Failed to load categories:', err));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleCategoryChange = (e) => {
     const val = e.target.value;
@@ -29,11 +46,11 @@ function CategorySelect() {
       onChange={handleCategoryChange}
     >
       <option value="All">All Courses</option>
-      <option value="MATHS">Mathematics</option>
-      <option value="SCIENCE">Science</option>
-      <option value="COMMERCE">Commerce</option>
-      <option value="ARTS">Arts</option>
-      <option value="GENERAL">General</option>
+      {categories.map((cat) => (
+        <option key={cat._id} value={cat.name}>
+          {cat.label}
+        </option>
+      ))}
     </select>
   );
 }
@@ -173,7 +190,7 @@ export default function LMSLayout({ children }) {
     
     if (pathname === '/lms/notifications') {
       return {
-        title: '🔔 Notifications',
+        title: 'Notifications',
         subtitle: 'Stay updated on your enrollments, announcements, and course activity.',
       };
     }
@@ -192,7 +209,9 @@ export default function LMSLayout({ children }) {
         height: '100vh', width: '100vw', background: '#f8f9fb', padding: '2rem', textAlign: 'center',
         fontFamily: 'var(--font-body)'
       }}>
-        <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🛠️</div>
+        <div style={{ marginBottom: '1.5rem', color: '#1B2B6B' }}>
+          <UiIcon name="maintenance" size={64} />
+        </div>
         <h1 style={{ fontSize: '2.2rem', color: '#1B2B6B', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
           System Under Maintenance
         </h1>
@@ -329,8 +348,13 @@ export default function LMSLayout({ children }) {
         className={styles.mobileToggle}
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label="Toggle sidebar"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
-        ☰
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
       </button>
     </div>
   );

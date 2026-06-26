@@ -2,6 +2,14 @@ import Link from 'next/link';
 import EnrollButton from '@/components/courses/EnrollButton';
 
 export default function CoursesSection({ courses = [] }) {
+  const categoryLabels = {
+    MATHS: 'Mathematics',
+    SCIENCE: 'Science',
+    COMMERCE: 'Commerce',
+    ARTS: 'Arts',
+    GENERAL: 'General',
+    COMPUTER_SCIENCE: 'Computer Science'
+  };
 
   return (
     <section className="section section-light" id="popular-courses">
@@ -33,7 +41,7 @@ export default function CoursesSection({ courses = [] }) {
                     className="card-img"
                   />
                   <span className="course-category badge badge-primary">
-                    {c.category}
+                    {categoryLabels[c.category] || c.category}
                   </span>
                 </div>
                 <div className="card-body">

@@ -30,7 +30,7 @@ function generateCertId() {
   for (let i = 0; i < 8; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `MC-${year}-${code}`;
+  return `GA-${year}-${code}`;
 }
 
 /**
@@ -128,7 +128,7 @@ function generateCertificateHTML(data) {
         <div class="decorative-circle dc1"></div>
         <div class="decorative-circle dc2"></div>
 
-        <div class="cert-logo">🎓 MeetMe Center</div>
+        <div class="cert-logo">🎓 Gradify Academy</div>
         <div class="cert-date">${data.completionDate}</div>
 
         <div class="cert-badge">🏆</div>
@@ -145,7 +145,7 @@ function generateCertificateHTML(data) {
         </div>
 
         <div class="cert-id">Certificate ID: ${data.certId}</div>
-        <div class="cert-verify">Verify at: meetmecenter.com/verify/${data.certId}</div>
+        <div class="cert-verify">Verify at: gradify.academy/verify/${data.certId}</div>
       </div>
     </body>
     </html>
@@ -204,7 +204,7 @@ export async function POST(request) {
       instructor: enrollment.course.instructor?._id || enrollment.course.instructor,
       studentName: enrollment.student.name,
       courseName: enrollment.course.title,
-      instructorName: enrollment.course.instructor?.name || 'MeetMe Center',
+      instructorName: enrollment.course.instructor?.name || 'Gradify Academy',
       completionDate: new Date(),
       totalHours: enrollment.course.totalHours || 0,
       status: 'generating',
@@ -216,7 +216,7 @@ export async function POST(request) {
     const certHTML = generateCertificateHTML({
       studentName: enrollment.student.name,
       courseName: enrollment.course.title,
-      instructorName: enrollment.course.instructor?.name || 'MeetMe Center',
+      instructorName: enrollment.course.instructor?.name || 'Gradify Academy',
       totalHours: enrollment.course.totalHours || 0,
       completionDate,
       certId,
@@ -245,7 +245,7 @@ export async function POST(request) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #C8102E; text-align: center;">🎉 Congratulations, ${enrollment.student.name}!</h1>
           <p style="font-size: 16px; color: #333; text-align: center;">
-            You have successfully completed <strong>"${enrollment.course.title}"</strong> on MeetMe Center!
+            You have successfully completed <strong>"${enrollment.course.title}"</strong> on Gradify Academy!
           </p>
           <div style="text-align: center; margin: 30px 0;">
             <img src="${certImageUrl}" alt="Certificate" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
@@ -254,13 +254,13 @@ export async function POST(request) {
             Your Certificate ID: <strong>${certId}</strong>
           </p>
           <div style="text-align: center; margin: 20px 0;">
-            <a href="${process.env.NEXTAUTH_URL || 'https://meetmecenter.com'}/lms/certificates/verify/${certId}"
+            <a href="${process.env.NEXTAUTH_URL || 'https://gradify.academy'}/lms/certificates/verify/${certId}"
                style="background: #C8102E; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600;">
               Verify Certificate
             </a>
           </div>
           <p style="font-size: 12px; color: #999; text-align: center; margin-top: 30px;">
-            This certificate can be verified at: meetmecenter.com/lms/certificates/verify/${certId}
+            This certificate can be verified at: gradify.academy/lms/certificates/verify/${certId}
           </p>
         </div>
       `,

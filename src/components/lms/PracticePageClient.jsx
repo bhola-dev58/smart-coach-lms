@@ -1,20 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-
-const SUBJECTS = [
-  { key: 'MATHS', label: 'Mathematics', icon: '📐', color: '#1B2B6B' },
-  { key: 'SCIENCE', label: 'Science', icon: '🔬', color: '#27AE60' },
-  { key: 'COMMERCE', label: 'Commerce', icon: '📊', color: '#F5A623' },
-  { key: 'ARTS', label: 'Arts & Humanities', icon: '🎨', color: '#E74C3C' },
-  { key: 'GENERAL', label: 'General Knowledge', icon: '🌐', color: '#8E44AD' },
-];
+import { useState, useEffect, useRef, useCallback } from 'react';
+import CategoryIcon from '@/components/courses/CategoryIcon';
 
 const CLASSES = ['6', '7', '8', '9', '10', '11', '12', 'All'];
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const QUESTION_TIME = 30; // seconds per question
 
 export default function PracticePageClient() {
+  const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('GENERAL');
   const [selectedClass, setSelectedClass] = useState('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState('Medium');
@@ -22,6 +16,29 @@ export default function PracticePageClient() {
   const [questions, setQuestions] = useState([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (active && data.success) {
+          const mapped = data.categories.map(c => ({
+            key: c.name,
+            label: c.label,
+            icon: c.icon,
+            color: c.color
+          }));
+          setSubjects(mapped);
+          if (mapped.length > 0) {
+            const hasGeneral = mapped.some(m => m.key === 'GENERAL');
+            setSelectedSubject(hasGeneral ? 'GENERAL' : mapped[0].key);
+          }
+        }
+      })
+      .catch(err => console.error('Failed to load categories', err));
+    return () => { active = false; };
+  }, []);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answers, setAnswers] = useState([]); // chosen options or -1 for skipped
   const [timer, setTimer] = useState(QUESTION_TIME);
@@ -97,7 +114,9 @@ export default function PracticePageClient() {
   // Exit Fullscreen
   const exitFullscreen = async () => {
     try {
-      if (document.exitFullscreen) await document.exitFullscreen();
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
     } catch (err) {
       console.error('Failed to exit fullscreen:', err);
     }
@@ -338,7 +357,7 @@ export default function PracticePageClient() {
     return chosen === questions[i]?.ans ? acc + 1 : acc;
   }, 0);
 
-  const sub = SUBJECTS.find(s => s.key === selectedSubject);
+  const sub = subjects.find(s => s.key === selectedSubject) || { label: 'General Knowledge', color: '#8E44AD', icon: 'general' };
 
   // ── Filters Selector Screen ──
   if (gameState === 'filters-select') {
@@ -357,7 +376,7 @@ export default function PracticePageClient() {
               Step 1: Choose Subject
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-              {SUBJECTS.map(s => {
+              {subjects.map(s => {
                 const isSelected = selectedSubject === s.key;
                 return (
                   <button
@@ -373,7 +392,7 @@ export default function PracticePageClient() {
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
-                      gap: '0.5rem',
+                      gap: '0.75rem',
                       transition: 'all 0.2s',
                     }}
                     onMouseEnter={e => {
@@ -389,7 +408,7 @@ export default function PracticePageClient() {
                       }
                     }}
                   >
-                    <span style={{ fontSize: '2.2rem' }}>{s.icon}</span>
+                    <CategoryIcon name={s.icon || s.key} color={s.color} size={36} />
                     <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? s.color : 'var(--dash-text)' }}>
                       {s.label}
                     </span>

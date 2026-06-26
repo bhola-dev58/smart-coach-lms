@@ -1,13 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createCourseDraft, updateCourse } from '@/app/actions/courseActions';
 import Link from 'next/link';
+import UiIcon from '@/components/common/UiIcon';
 
 export default function CourseDashboardClient({ courses }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.categories) {
+          setCategories(json.categories);
+        }
+      })
+      .catch(err => console.error('Failed to load categories:', err));
+  }, []);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -76,11 +89,9 @@ export default function CourseDashboardClient({ courses }) {
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--dash-text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Category</label>
                   <select name="category" required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--dash-border)', background: 'var(--dash-bg)', color: 'var(--dash-text)' }}>
-                    <option value="CSE">Computer Science (CSE)</option>
-                    <option value="ECE">Electronics (ECE)</option>
-                    <option value="MECH">Mechanical Eng.</option>
-                    <option value="CIVIL">Civil Eng.</option>
-                    <option value="GATE">GATE Prep</option>
+                    {categories.map(cat => (
+                      <option key={cat._id} value={cat.name}>{cat.label}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -109,7 +120,9 @@ export default function CourseDashboardClient({ courses }) {
           background: 'var(--dash-surface)', border: '1px dashed var(--dash-border)', 
           borderRadius: '12px', padding: '4rem 2rem', textAlign: 'center' 
         }}>
-          <div style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>📂</div>
+          <div style={{ margin: '0 0 1.5rem 0', color: 'var(--dash-text-muted)' }}>
+            <UiIcon name="book" size={48} />
+          </div>
           <h3 style={{ color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '0.5rem' }}>No Courses Yet</h3>
           <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto 1.5rem auto' }}>
             You haven't created any courses. Start tracking your syllabus and upload videos.
@@ -129,7 +142,9 @@ export default function CourseDashboardClient({ courses }) {
                 {course.thumbnail ? (
                   <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--dash-text-muted)', fontSize: '2rem' }}>📺</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--dash-text-muted)' }}>
+                    <UiIcon name="video" size={40} />
+                  </div>
                 )}
                 
                 {/* Publish Toggle Button */}
@@ -142,7 +157,7 @@ export default function CourseDashboardClient({ courses }) {
                     borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
                   }}>
-                  {course.isPublished ? '🔴 REVOKE' : '🟢 PUBLISH NOW'}
+                  {course.isPublished ? 'REVOKE' : 'PUBLISH NOW'}
                 </button>
               </div>
               <div style={{ padding: '1.25rem' }}>

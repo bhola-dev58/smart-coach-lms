@@ -115,7 +115,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       tenant,
-      url: `${subdomain}.meetme.center`,
+      url: `${subdomain}.gradify.academy`,
     });
   } catch (error) {
     console.error('Tenant POST error:', error);

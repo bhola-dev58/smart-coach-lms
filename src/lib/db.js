@@ -41,6 +41,26 @@ export async function connectDB() {
 
   try {
     cached.conn = await cached.promise;
+    
+    // Seed default categories if none exist (dynamic category management system)
+    try {
+      const Category = mongoose.models.Category || (await import('@/models/Category')).default;
+      const count = await Category.countDocuments();
+      if (count === 0) {
+        console.log('🌱 Seeding default categories...');
+        await Category.insertMany([
+          { name: 'MATHS', label: 'Mathematics', icon: 'maths', color: '#1B2B6B' },
+          { name: 'SCIENCE', label: 'Science', icon: 'science', color: '#27AE60' },
+          { name: 'COMMERCE', label: 'Commerce', icon: 'commerce', color: '#F5A623' },
+          { name: 'ARTS', label: 'Arts & Humanities', icon: 'arts', color: '#E74C3C' },
+          { name: 'GENERAL', label: 'General Knowledge', icon: 'general', color: '#8E44AD' },
+          { name: 'COMPUTER_SCIENCE', label: 'Computer Science', icon: 'computerscience', color: '#2980B9' },
+        ]);
+        console.log('🌱 Default categories seeded successfully!');
+      }
+    } catch (err) {
+      console.error('⚠️ Failed to seed categories:', err.message);
+    }
   } catch (e) {
     cached.promise = null;
     console.error('❌ MongoDB connection error:', e.message);

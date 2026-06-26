@@ -3,47 +3,48 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import UiIcon from '@/components/common/UiIcon';
 
 const menuGroups = [
   {
     title: 'Academics',
     items: [
-      { id: 'courses', label: 'Courses', icon: '📚' },
-      { id: 'enrollments', label: 'Enrollments', icon: '📝' },
-      { id: 'studymaterials', label: 'Study Materials', icon: '📄' },
-      { id: 'reviews', label: 'Reviews', icon: '⭐' },
-      { id: 'practicequestions', label: 'Practice Questions', icon: '🎯' },
-      { id: 'certificates', label: 'Certificates', icon: '🏆' },
+      { id: 'courses', label: 'Courses', icon: 'book' },
+      { id: 'enrollments', label: 'Enrollments', icon: 'document' },
+      { id: 'studymaterials', label: 'Study Materials', icon: 'file' },
+      { id: 'reviews', label: 'Reviews', icon: 'award' },
+      { id: 'practicequestions', label: 'Practice Questions', icon: 'target' },
+      { id: 'certificates', label: 'Certificates', icon: 'trophy' },
     ]
   },
   {
     title: 'Engagement',
     items: [
-      { id: 'assignments', label: 'Assignments', icon: '✍️' },
-      { id: 'assignmentsubmissions', label: 'Submissions', icon: '📥' },
-      { id: 'discussions', label: 'Discussions', icon: '💬' },
+      { id: 'assignments', label: 'Assignments', icon: 'edit' },
+      { id: 'assignmentsubmissions', label: 'Submissions', icon: 'download' },
+      { id: 'discussions', label: 'Discussions', icon: 'chat' },
     ]
   },
   {
     title: 'Communication',
     items: [
-      { id: 'livesessions', label: 'Live Sessions', icon: '📡' },
-      { id: 'live', label: 'Live Classes Room', icon: '🎥', href: '/lms/live' },
-      { id: 'announcements', label: 'Announcements', icon: '📢' },
-      { id: 'notifications', label: 'Notifications', icon: '🔔' },
+      { id: 'livesessions', label: 'Live Sessions', icon: 'bell' },
+      { id: 'live', label: 'Live Classes Room', icon: 'video', href: '/lms/live' },
+      { id: 'announcements', label: 'Announcements', icon: 'speaker' },
+      { id: 'notifications', label: 'Notifications', icon: 'bell' },
     ]
   },
   {
     title: 'Finance & Ops',
     items: [
-      { id: 'payments', label: 'Payments', icon: '💰' },
-      { id: 'coupons', label: 'Coupons', icon: '🏷️' },
-      { id: 'contacts', label: 'Contacts', icon: '📞' },
+      { id: 'payments', label: 'Payments', icon: 'cash' },
+      { id: 'coupons', label: 'Coupons', icon: 'tag' },
+      { id: 'contacts', label: 'Contacts', icon: 'phone' },
     ]
   }
 ];
 
-export default function InstructorSidebar() {
+export default function InstructorSidebar({ onClose }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === 'admin';
@@ -57,16 +58,19 @@ export default function InstructorSidebar() {
       padding: '1.5rem 1rem',
       overflowY: 'auto'
     }}>
-      <Link href="/lms/instructor" style={{
+      <Link href="/lms/instructor" onClick={onClose} style={{
         textDecoration: 'none',
         color: 'var(--dash-text)',
         fontWeight: 'bold',
         fontSize: '1.1rem',
         marginBottom: '2rem',
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
         paddingLeft: '0.5rem'
       }}>
-        💼 Instructor Panel
+        <UiIcon name="briefcase" size={18} color="var(--color-primary)" />
+        <span>Instructor Panel</span>
       </Link>
 
       {menuGroups
@@ -89,7 +93,7 @@ export default function InstructorSidebar() {
               const isActive = pathname === href || pathname.startsWith(href + '/');
               return (
                 <li key={item.id} style={{ marginBottom: '0.2rem' }}>
-                  <Link href={href} style={{
+                  <Link href={href} onClick={onClose} style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
@@ -105,7 +109,9 @@ export default function InstructorSidebar() {
                   onMouseOver={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--dash-text)'; }}
                   onMouseOut={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--dash-text-secondary)'; }}
                   >
-                    <span>{item.icon}</span>
+                    <span style={{ display: 'flex', alignItems: 'center' }}>
+                      <UiIcon name={item.icon} size={16} color={isActive ? 'var(--color-primary)' : 'currentColor'} />
+                    </span>
                     {item.label}
                   </Link>
                 </li>
@@ -117,3 +123,4 @@ export default function InstructorSidebar() {
     </aside>
   );
 }
+

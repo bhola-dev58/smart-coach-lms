@@ -15,7 +15,7 @@ export async function GET() {
     if (!instructor) {
       instructor = await User.create({
         name: 'AI Instructor',
-        email: 'ai@meetmecenter.com',
+        email: 'ai@gradify.academy',
         password: 'dummy_password_hash',
         role: 'instructor'
       });

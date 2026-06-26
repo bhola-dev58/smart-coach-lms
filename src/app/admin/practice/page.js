@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import styles from '../admin.module.css';
+import UiIcon from '@/components/common/UiIcon';
 
 export default function AdminPracticeAnalyticsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,6 +18,17 @@ export default function AdminPracticeAnalyticsPage() {
 
   // Modal for audit logs
   const [selectedSession, setSelectedSession] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.categories) {
+          setCategories(json.categories);
+        }
+      })
+      .catch(err => console.error('Failed to load categories:', err));
+  }, []);
 
   useEffect(() => {
     fetch('/api/admin/practice/analytics')
@@ -34,7 +47,9 @@ export default function AdminPracticeAnalyticsPage() {
   if (loading) {
     return (
       <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--dash-text-secondary)' }}>
-        <p style={{ fontSize: '2rem' }}>⏳</p>
+        <div style={{ color: 'var(--dash-text-muted)', marginBottom: '1.5rem' }}>
+          <UiIcon name="time" size={48} />
+        </div>
         <p>Loading practice analytics and telemetry database...</p>
       </div>
     );
@@ -153,11 +168,9 @@ export default function AdminPracticeAnalyticsPage() {
               style={{ padding: '0.65rem 1rem', border: '1px solid #D1D5DB', borderRadius: '8px', outline: 'none', fontSize: '0.9rem' }}
             >
               <option value="All">All Subjects</option>
-              <option value="MATHS">Maths</option>
-              <option value="SCIENCE">Science</option>
-              <option value="COMMERCE">Commerce</option>
-              <option value="ARTS">Arts</option>
-              <option value="GENERAL">General Knowledge</option>
+              {categories.map(cat => (
+                <option key={cat._id} value={cat.name}>{cat.label}</option>
+              ))}
             </select>
           </div>
 
@@ -241,11 +254,15 @@ export default function AdminPracticeAnalyticsPage() {
                       </td>
                       <td style={{ padding: '1rem' }}>
                         {session.violationsCount > 0 ? (
-                          <span style={{ background: 'rgba(231,76,60,0.1)', color: '#E74C3C', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.78rem', fontWeight: 700 }}>
-                            ⚠️ {session.violationsCount} violations
+                          <span style={{ background: 'rgba(231,76,60,0.1)', color: '#E74C3C', padding: '0.2rem 0.65rem', borderRadius: '50px', fontSize: '0.78rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <UiIcon name="warning" size={13} color="#E74C3C" />
+                            <span>{session.violationsCount} violations</span>
                           </span>
                         ) : (
-                          <span style={{ color: '#27AE60', fontSize: '0.78rem', fontWeight: 700 }}>✓ Secure</span>
+                          <span style={{ color: '#27AE60', fontSize: '0.78rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <UiIcon name="check" size={13} color="#27AE60" />
+                            <span>Secure</span>
+                          </span>
                         )}
                       </td>
                       <td style={{ padding: '1rem', textAlign: 'right' }}>
@@ -260,9 +277,13 @@ export default function AdminPracticeAnalyticsPage() {
                             cursor: 'pointer',
                             fontWeight: 600,
                             fontSize: '0.8rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
                           }}
                         >
-                          👁️ Telemetry Logs
+                          <UiIcon name="layers" size={12} color="white" />
+                          <span>Telemetry Logs</span>
                         </button>
                       </td>
                     </tr>
@@ -351,10 +372,18 @@ export default function AdminPracticeAnalyticsPage() {
                           fontSize: '0.82rem',
                         }}>
                           <div style={{
-                            fontSize: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             flexShrink: 0
                           }}>
-                            {isViolation ? '⚠️' : isImportant ? '🎯' : '📝'}
+                            {isViolation ? (
+                              <UiIcon name="warning" size={16} color="#E74C3C" />
+                            ) : isImportant ? (
+                              <UiIcon name="target" size={16} color="var(--color-primary)" />
+                            ) : (
+                              <UiIcon name="document" size={16} color="#4B5563" />
+                            )}
                           </div>
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: (isViolation || isImportant) ? 700 : 500, color: isViolation ? '#E74C3C' : '#1F2937' }}>

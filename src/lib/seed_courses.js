@@ -90,11 +90,11 @@ async function seed() {
     console.log('🗑️  Cleared old courses from database\n');
 
     // ── Create/find instructor ──
-    let instructor = await User.findOne({ email: 'rajesh@meetme.center' });
+    let instructor = await User.findOne({ email: 'rajesh@gradify.academy' });
     if (!instructor) {
       instructor = await User.create({
         name: 'Dr. Rajesh Kumar',
-        email: 'rajesh@meetme.center',
+        email: 'rajesh@gradify.academy',
         role: 'instructor',
         bio: 'Senior Science Faculty with 15+ years of teaching board & foundation courses.',
         specialization: ['Physics', 'Chemistry', 'Mathematics Foundation'],
@@ -108,11 +108,11 @@ async function seed() {
     }
 
     // ── Create second instructor ──
-    let instructor2 = await User.findOne({ email: 'priya@meetme.center' });
+    let instructor2 = await User.findOne({ email: 'priya@gradify.academy' });
     if (!instructor2) {
       instructor2 = await User.create({
         name: 'Prof. Priya Sharma',
-        email: 'priya@meetme.center',
+        email: 'priya@gradify.academy',
         role: 'instructor',
         bio: 'Experienced Mathematics expert, specializing in Board Exams and KCET/NEET coaching.',
         specialization: ['Mathematics', 'Biology', 'Science Foundation'],

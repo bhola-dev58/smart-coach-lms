@@ -1,4 +1,4 @@
-#  MeetMe Center — Smart Coaching LMS
+# Gradify Academy — Smart Coaching LMS
 
 A modern, scalable Learning Management System (LMS) built for coaching centers. Students can browse courses, enroll via Razorpay payments, and access video content — all through a premium dark-themed UI.
 
@@ -76,7 +76,7 @@ cp .env.example .env.local
 
 # 4. Seed the database (Optional but recommended)
 node src/lib/seed_courses.js     # Seeds initial demo courses
-node src/lib/seed_enrollment.js  # Enrolls "student@meetme.center" in courses
+node src/lib/seed_enrollment.js  # Enrolls "student@gradify.academy" in courses
 
 # 5. Run the development server
 npm run dev
