@@ -1,4 +1,4 @@
-import { getRedis } from './redis';
+import { getRedis, reportRedisFailure } from './redis';
 
 // ============================================
 // 🗄️ CACHE HELPER
@@ -22,6 +22,7 @@ export async function cacheGet(key) {
     return data || null;
   } catch (err) {
     console.error('Cache GET error:', err.message);
+    reportRedisFailure();
     return null;
   }
 }
@@ -40,6 +41,7 @@ export async function cacheSet(key, value, ttl = DEFAULT_TTL) {
     await redis.set(key, JSON.stringify(value), { ex: ttl });
   } catch (err) {
     console.error('Cache SET error:', err.message);
+    reportRedisFailure();
   }
 }
 
@@ -55,6 +57,7 @@ export async function cacheDelete(key) {
     await redis.del(key);
   } catch (err) {
     console.error('Cache DELETE error:', err.message);
+    reportRedisFailure();
   }
 }
 
@@ -80,6 +83,7 @@ export async function cacheInvalidatePattern(pattern) {
     } while (cursor !== 0);
   } catch (err) {
     console.error('Cache INVALIDATE PATTERN error:', err.message);
+    reportRedisFailure();
   }
 }
 

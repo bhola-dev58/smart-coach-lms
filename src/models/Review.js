@@ -29,5 +29,45 @@ const reviewSchema = new mongoose.Schema(
 reviewSchema.index({ student: 1, course: 1 }, { unique: true });
 reviewSchema.index({ course: 1, isApproved: 1 });
 
+reviewSchema.post('save', async function(doc) {
+  try {
+    const Course = (await import('./Course')).default;
+    await Course.syncRatingsCount(doc.course);
+  } catch (err) {
+    console.error('Review post-save hook error:', err);
+  }
+});
+
+reviewSchema.post('remove', async function(doc) {
+  try {
+    const Course = (await import('./Course')).default;
+    await Course.syncRatingsCount(doc.course);
+  } catch (err) {
+    console.error('Review post-remove hook error:', err);
+  }
+});
+
+reviewSchema.post('findOneAndDelete', async function(doc) {
+  if (doc && doc.course) {
+    try {
+      const Course = (await import('./Course')).default;
+      await Course.syncRatingsCount(doc.course);
+    } catch (err) {
+      console.error('Review post-findOneAndDelete hook error:', err);
+    }
+  }
+});
+
+reviewSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc && doc.course) {
+    try {
+      const Course = (await import('./Course')).default;
+      await Course.syncRatingsCount(doc.course);
+    } catch (err) {
+      console.error('Review post-findOneAndUpdate hook error:', err);
+    }
+  }
+});
+
 export default mongoose.models.Review ||
   mongoose.model('Review', reviewSchema);

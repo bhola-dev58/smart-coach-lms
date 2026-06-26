@@ -57,18 +57,26 @@ export const schemaConfig = {
       { key: 'price', label: 'Offer Price (INR)', type: 'number', default: 0 },
       { key: 'originalPrice', label: 'Original MRP (INR)', type: 'number', default: 0 },
       { key: 'isFree', label: 'Is Free Course?', type: 'boolean', default: false },
-      { key: 'thumbnail', label: 'Cover Image URL', type: 'file' },
-      { key: 'previewVideoUrl', label: 'Intro Video URL', type: 'file' },
+      { key: 'thumbnail', label: 'Upload Thumbnail', type: 'file' },
       { key: 'category', label: 'Category', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'GENERAL', 'ARTS', 'COMPUTER_SCIENCE'] },
       { key: 'level', label: 'Skill Level', type: 'select', options: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'] },
       { key: 'language', label: 'Language', type: 'text', default: 'Hindi' },
       { key: 'totalHours', label: 'Expected Total Hours', type: 'number' },
-      { key: 'prerequisites', label: 'Prerequisites (Comma separated)', type: 'stringArray' },
-      { key: 'learningOutcomes', label: 'Learning Outcomes (Comma separated)', type: 'stringArray' },
-      { key: 'tags', label: 'Tags (Comma separated)', type: 'stringArray' },
+      { key: 'prerequisites', label: 'Prerequisites', type: 'stringArray' },
+      { key: 'learningOutcomes', label: 'Learning Outcomes', type: 'stringArray' },
+      { key: 'tags', label: 'Tags', type: 'stringArray' },
       { key: 'faqs', label: 'FAQs', type: 'faqArray' },
       { key: 'isPublished', label: 'Published / Live', type: 'boolean', default: false },
       { key: 'isFeatured', label: 'Featured on Homepage', type: 'boolean', default: false }
+    ]
+  },
+  batches: {
+    name: 'Batches',
+    fields: [
+      { key: 'name', label: 'Batch Name', type: 'text', required: true },
+      { key: 'course', label: 'Course', type: 'text', required: true },
+      { key: 'students', label: 'Student Emails', type: 'stringArray' },
+      { key: 'isActive', label: 'Active', type: 'boolean', default: true }
     ]
   },
   discussions: {
@@ -85,7 +93,8 @@ export const schemaConfig = {
     fields: [
       { key: 'student', label: 'Student ID', type: 'text', required: true },
       { key: 'course', label: 'Course ID', type: 'text', required: true },
-      { key: 'status', label: 'Status', type: 'select', options: ['active', 'completed', 'suspended'] },
+      { key: 'batch', label: 'Batch', type: 'text' },
+      { key: 'status', label: 'Status', type: 'select', options: ['active', 'completed', 'expired', 'refunded'] },
       { key: 'paymentId', label: 'Payment Receipt ID', type: 'text' }
     ]
   },
@@ -94,6 +103,7 @@ export const schemaConfig = {
     fields: [
       { key: 'title', label: 'Session Title', type: 'text', required: true },
       { key: 'course', label: 'Course ID', type: 'text', required: true },
+      { key: 'batch', label: 'Batch ID (Optional)', type: 'text' },
       { key: 'scheduledAt', label: 'Scheduled Date/Time', type: 'date', required: true },
       { key: 'joinUrl', label: 'Zoom/Meet Link', type: 'text', required: true },
       { key: 'duration', label: 'Duration (mins)', type: 'number', default: 60 },

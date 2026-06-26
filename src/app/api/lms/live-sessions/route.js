@@ -3,9 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 import LiveSession from '@/models/LiveSession';
+import Batch from '@/models/Batch';
 
 // GET: Fetch live sessions visible to the current user
-// ALL sessions are visible to ALL logged-in users (students, instructors, admins)
 // Sessions from the past 24 hours or any future sessions are shown.
 export async function GET() {
   try {
@@ -30,7 +30,18 @@ export async function GET() {
     if (role === 'instructor') {
       filter.instructor = session.user.id;
     }
-    // Admins and students see ALL sessions
+    // Students only see sessions matching their batches or unbatched ones
+    else if (role === 'student') {
+      const userBatches = await Batch.find({ students: session.user.email, isActive: true }).select('_id').lean();
+      const userBatchIds = userBatches.map(b => b._id);
+      
+      filter.$or = [
+        { batch: { $in: userBatchIds } },
+        { batch: { $exists: false } },
+        { batch: null }
+      ];
+    }
+    // Admins see all sessions
 
     const sessions = await LiveSession.find(filter)
       .sort({ scheduledAt: 1 })

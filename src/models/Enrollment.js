@@ -17,6 +17,10 @@ const enrollmentSchema = new mongoose.Schema(
       ref: 'Course',
       required: true,
     },
+    batch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Batch',
+    },
     payment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Payment',
@@ -74,5 +78,48 @@ enrollmentSchema.index({ student: 1, course: 1 }, { unique: true }); // one enro
 enrollmentSchema.index({ student: 1, status: 1 });
 enrollmentSchema.index({ course: 1 });
 
+enrollmentSchema.post('save', async function(doc) {
+  try {
+    const Course = (await import('./Course')).default;
+    await Course.syncEnrollmentsCount(doc.course);
+  } catch (err) {
+    console.error('Enrollment post-save hook error:', err);
+  }
+});
+
+enrollmentSchema.post('remove', async function(doc) {
+  try {
+    const Course = (await import('./Course')).default;
+    await Course.syncEnrollmentsCount(doc.course);
+  } catch (err) {
+    console.error('Enrollment post-remove hook error:', err);
+  }
+});
+
+enrollmentSchema.post('findOneAndDelete', async function(doc) {
+  if (doc && doc.course) {
+    try {
+      const Course = (await import('./Course')).default;
+      await Course.syncEnrollmentsCount(doc.course);
+    } catch (err) {
+      console.error('Enrollment post-findOneAndDelete hook error:', err);
+    }
+  }
+});
+
+enrollmentSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc && doc.course) {
+    try {
+      const Course = (await import('./Course')).default;
+      await Course.syncEnrollmentsCount(doc.course);
+    } catch (err) {
+      console.error('Enrollment post-findOneAndUpdate hook error:', err);
+    }
+  }
+});
+
+if (mongoose.models.Enrollment) {
+  delete mongoose.models.Enrollment;
+}
 export default mongoose.models.Enrollment ||
   mongoose.model('Enrollment', enrollmentSchema);

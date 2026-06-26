@@ -42,7 +42,7 @@ export async function POST(request) {
           status: 'captured',
           paidAt: new Date()
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
 
       // Create Enrollment if not exists (Webhook acts as a safety net if frontend validation fails)

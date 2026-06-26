@@ -108,4 +108,49 @@ courseSchema.index({ instructor: 1 });
 courseSchema.index({ isFeatured: 1, isPublished: 1 });
 courseSchema.index({ tags: 1 });
 
-export default mongoose.models.Course || mongoose.model('Course', courseSchema);
+// ── Static Methods to sync realtime stats ──
+courseSchema.statics.syncEnrollmentsCount = async function(courseId) {
+  try {
+    const totalStudents = await mongoose.model('Enrollment').countDocuments({
+      course: courseId,
+      status: { $in: ['active', 'completed'] }
+    });
+    await this.findByIdAndUpdate(courseId, { totalStudents });
+    try {
+      const { cacheInvalidatePattern } = await import('@/lib/cache');
+      cacheInvalidatePattern('courses:*').catch(err => {
+        console.error('Non-blocking cache error:', err.message);
+      });
+    } catch (cErr) {
+      // Ignore if cache key invalidation fails
+    }
+  } catch (err) {
+    console.error('Error syncing enrollments count:', err);
+  }
+};
+
+courseSchema.statics.syncRatingsCount = async function(courseId) {
+  try {
+    const reviews = await mongoose.model('Review').find({ course: courseId, isApproved: true });
+    const totalRatings = reviews.length;
+    const rating = totalRatings > 0
+      ? parseFloat((reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalRatings).toFixed(1))
+      : 0;
+    await this.findByIdAndUpdate(courseId, { rating, totalRatings });
+    try {
+      const { cacheInvalidatePattern } = await import('@/lib/cache');
+      cacheInvalidatePattern('courses:*').catch(err => {
+        console.error('Non-blocking cache error:', err.message);
+      });
+    } catch (cErr) {
+      // Ignore if cache key invalidation fails
+    }
+  } catch (err) {
+    console.error('Error syncing ratings count:', err);
+  }
+};
+
+const CourseModel = mongoose.models.Course || mongoose.model('Course', courseSchema);
+CourseModel.syncEnrollmentsCount = CourseModel.syncEnrollmentsCount || courseSchema.statics.syncEnrollmentsCount.bind(CourseModel);
+CourseModel.syncRatingsCount = CourseModel.syncRatingsCount || courseSchema.statics.syncRatingsCount.bind(CourseModel);
+export default CourseModel;

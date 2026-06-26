@@ -23,7 +23,7 @@ export async function PUT(request) {
        return NextResponse.json({ success: false, error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }, { status: 400 });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(_id, { role: role.toLowerCase() }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(_id, { role: role.toLowerCase() }, { returnDocument: 'after' });
     
     return NextResponse.json({ success: true, data: updatedUser, error: null });
   } catch (error) {

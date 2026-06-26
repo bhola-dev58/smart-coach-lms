@@ -11,6 +11,10 @@ const liveSessionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
     },
+    batch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Batch',
+    },
     title: { type: String, required: true },
     description: { type: String, default: '' },
     scheduledAt: { type: Date, required: true },

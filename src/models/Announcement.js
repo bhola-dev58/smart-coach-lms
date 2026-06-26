@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 // ============================================
-// 📊 ANNOUNCEMENT SCHEMA
 // Admin announcements shown on dashboard/banner
 // ============================================
 const announcementSchema = new mongoose.Schema(

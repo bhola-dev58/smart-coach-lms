@@ -140,7 +140,7 @@ export async function PUT(req) {
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
       { $set: updateData },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).select('-password -__v').lean();
 
     if (!updatedUser) {

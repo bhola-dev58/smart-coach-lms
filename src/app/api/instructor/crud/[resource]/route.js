@@ -14,6 +14,7 @@ const getModel = async (resource) => {
     case 'contacts': return (await import('@/models/Contact')).default;
     case 'coupons': return (await import('@/models/Coupon')).default;
     case 'courses': return (await import('@/models/Course')).default;
+    case 'batches': return (await import('@/models/Batch')).default;
     case 'discussions': return (await import('@/models/Discussion')).default;
     case 'enrollments': return (await import('@/models/Enrollment')).default;
     case 'livesessions': return (await import('@/models/LiveSession')).default;
@@ -57,7 +58,73 @@ export async function GET(request, { params }) {
       }
     }
 
-    const data = await Model.find(query).sort({ createdAt: -1 }).limit(100).lean();
+    let queryBuilder = Model.find(query);
+    const resourceName = unwrappedParams.resource.toLowerCase();
+
+    // Ensure related models are loaded and populated for human-readable DataTable view
+    if (resourceName === 'enrollments') {
+      await import('@/models/User');
+      await import('@/models/Course');
+      await import('@/models/Batch');
+      queryBuilder = queryBuilder
+        .populate('student', 'name email')
+        .populate('course', 'title')
+        .populate('batch', 'name');
+    } else if (resourceName === 'batches') {
+      await import('@/models/Course');
+      queryBuilder = queryBuilder.populate('course', 'title');
+    } else if (resourceName === 'livesessions') {
+      await import('@/models/Course');
+      await import('@/models/Batch');
+      queryBuilder = queryBuilder
+        .populate('course', 'title')
+        .populate('batch', 'name');
+    } else if (resourceName === 'announcements') {
+      await import('@/models/Course');
+      queryBuilder = queryBuilder.populate('course', 'title');
+    } else if (resourceName === 'assignments') {
+      await import('@/models/Course');
+      queryBuilder = queryBuilder.populate('course', 'title');
+    } else if (resourceName === 'studymaterials') {
+      await import('@/models/Course');
+      queryBuilder = queryBuilder.populate('course', 'title');
+    } else if (resourceName === 'reviews') {
+      await import('@/models/User');
+      await import('@/models/Course');
+      queryBuilder = queryBuilder
+        .populate('student', 'name email')
+        .populate('course', 'title');
+    }
+
+    const data = await queryBuilder.sort({ createdAt: -1 }).limit(100).lean();
+
+    if (unwrappedParams.resource.toLowerCase() === 'courses') {
+      const Enrollment = (await import('@/models/Enrollment')).default;
+      const Review = (await import('@/models/Review')).default;
+      const Course = (await import('@/models/Course')).default;
+      
+      for (const course of data) {
+        // Sync totalStudents count
+        const totalStudents = await Enrollment.countDocuments({
+          course: course._id,
+          status: { $in: ['active', 'completed'] }
+        });
+        
+        // Sync rating and totalRatings count
+        const reviews = await Review.find({ course: course._id, isApproved: true });
+        const totalRatings = reviews.length;
+        const rating = totalRatings > 0
+          ? parseFloat((reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalRatings).toFixed(1))
+          : 0;
+          
+        if (course.totalStudents !== totalStudents || course.rating !== rating || course.totalRatings !== totalRatings) {
+          await Course.findByIdAndUpdate(course._id, { totalStudents, rating, totalRatings });
+          course.totalStudents = totalStudents;
+          course.rating = rating;
+          course.totalRatings = totalRatings;
+        }
+      }
+    }
 
     return NextResponse.json({ success: true, data });
   } catch (err) {
@@ -134,7 +201,7 @@ export async function PUT(request, { params }) {
       }
     }
 
-    const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { new: true, runValidators: true }).lean();
+    const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { returnDocument: 'after', runValidators: true }).lean();
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (err) {
     console.error(`Error updating resource:`, err);

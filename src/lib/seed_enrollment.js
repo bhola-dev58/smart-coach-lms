@@ -24,6 +24,7 @@ const courseSchema = new mongoose.Schema({ title: String, slug: { type: String, 
 const enrollmentSchema = new mongoose.Schema({
   student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+  batch: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch' },
   progress: {
     completedLessons: [String],
     currentLesson: { type: String, default: '' },
@@ -35,8 +36,16 @@ const enrollmentSchema = new mongoose.Schema({
   enrolledAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 
+const batchSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+  students: [String],
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
+const Batch = mongoose.models.Batch || mongoose.model('Batch', batchSchema);
 const Enrollment = mongoose.models.Enrollment || mongoose.model('Enrollment', enrollmentSchema);
 
 async function seed() {
@@ -44,9 +53,10 @@ async function seed() {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB Atlas\n');
 
-    // Clear old enrollments
+    // Clear old enrollments and batches
     await Enrollment.deleteMany({});
-    console.log('🗑️  Cleared old enrollments from database\n');
+    await Batch.deleteMany({});
+    console.log('🗑️  Cleared old enrollments and batches from database\n');
 
     // Find the student user (created by seed_users.js)
     const student = await User.findOne({ email: 'student@gradify.academy' });
@@ -72,6 +82,21 @@ async function seed() {
         continue;
       }
 
+      // Generate default batch name (e.g. batch-26-jun)
+      const date = new Date();
+      const year = String(date.getFullYear()).slice(-2);
+      const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+      const monthName = months[date.getMonth()];
+      const batchName = `batch-${year}-${monthName}`;
+
+      // Create dynamic batch
+      const batch = await Batch.create({
+        name: batchName,
+        course: course._id,
+        students: [student.email],
+        isActive: true
+      });
+
       // Get first lesson slug for currentLesson
       let firstLessonSlug = '';
       if (course.chapters?.length > 0 && course.chapters[0].lessons?.length > 0) {
@@ -81,6 +106,7 @@ async function seed() {
       await Enrollment.create({
         student: student._id,
         course: course._id,
+        batch: batch._id,
         progress: {
           completedLessons: [],
           currentLesson: firstLessonSlug,
@@ -92,8 +118,17 @@ async function seed() {
         enrolledAt: new Date(),
       });
 
-      console.log(`✅ Enrolled in: ${course.title}`);
+      console.log(`✅ Enrolled in: ${course.title} (Batch: ${batchName})`);
       enrolled++;
+    }
+
+    // Recalculate totalStudents for all courses in DB
+    console.log('\n🔄 Syncing totalStudents counts on courses...');
+    const allCourses = await Course.find({});
+    for (const c of allCourses) {
+      const count = await Enrollment.countDocuments({ course: c._id, status: 'active' });
+      await Course.findByIdAndUpdate(c._id, { totalStudents: count });
+      console.log(`Synced ${c.title}: ${count} student(s)`);
     }
 
     console.log(`\n─────────────────────────────────────`);

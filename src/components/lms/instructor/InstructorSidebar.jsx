@@ -10,6 +10,7 @@ const menuGroups = [
     title: 'Academics',
     items: [
       { id: 'courses', label: 'Courses', icon: 'book' },
+      { id: 'batches', label: 'Batches', icon: 'users' },
       { id: 'enrollments', label: 'Enrollments', icon: 'document' },
       { id: 'studymaterials', label: 'Study Materials', icon: 'file' },
       { id: 'reviews', label: 'Reviews', icon: 'award' },

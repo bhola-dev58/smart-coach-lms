@@ -7,8 +7,52 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
   const [uploading, setUploading] = useState(false);
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [batches, setBatches] = useState([]);
+  const [loadingBatches, setLoadingBatches] = useState(false);
   const [newValues, setNewValues] = useState({});
   const [totalHoursText, setTotalHoursText] = useState('');
+  
+  const [courseStudents, setCourseStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
+  const [prevCourseId, setPrevCourseId] = useState(null);
+
+  // Fetch enrolled students when the selected course changes (for Batch creation)
+  useEffect(() => {
+    const courseVal = formData.course;
+    const courseId = typeof courseVal === 'object' && courseVal !== null
+      ? (courseVal._id || courseVal.id)
+      : courseVal;
+
+    if (courseId) {
+      setLoadingStudents(true);
+      fetch(`/api/instructor/courses/${courseId}/students`)
+        .then(res => res.json())
+        .then(json => {
+          if (json.success) {
+            setCourseStudents(json.students || []);
+          } else {
+            setCourseStudents([]);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load course students:', err);
+          setCourseStudents([]);
+        })
+        .finally(() => setLoadingStudents(false));
+    } else {
+      setCourseStudents([]);
+    }
+
+    // Only clear selected students if the course ID has changed from a previous value
+    if (config.name === 'Batches' && prevCourseId && prevCourseId !== courseId) {
+      handleChange('students', []);
+    }
+    
+    setPrevCourseId(courseId);
+  }, [formData.course]);
+
 
   useEffect(() => {
     if (initialData) {
@@ -59,6 +103,23 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
         })
         .catch(err => console.error('Failed to load courses for selection dropdown:', err))
         .finally(() => setLoadingCourses(false));
+    }
+  }, [config]);
+
+  // Load batches if 'batch' field exists in the form configuration
+  useEffect(() => {
+    const hasBatchField = config.fields.some(f => f.key === 'batch');
+    if (hasBatchField) {
+      setLoadingBatches(true);
+      fetch('/api/instructor/crud/batches')
+        .then(res => res.json())
+        .then(json => {
+          if (json.success) {
+            setBatches(json.data || []);
+          }
+        })
+        .catch(err => console.error('Failed to load batches for selection dropdown:', err))
+        .finally(() => setLoadingBatches(false));
     }
   }, [config]);
 
@@ -299,6 +360,24 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                         </option>
                       ))}
                     </select>
+                  ) : field.key === 'batch' ? (
+                    <select 
+                      value={
+                        typeof formData[field.key] === 'object' && formData[field.key] !== null
+                          ? (formData[field.key]._id || formData[field.key].id || '')
+                          : (formData[field.key] || '')
+                      }
+                      onChange={e => handleChange(field.key, e.target.value)}
+                      required={field.required}
+                      className="modal-select"
+                    >
+                      <option value="">{loadingBatches ? 'Loading batches...' : 'Select a batch'}</option>
+                      {batches.map(b => (
+                        <option key={b._id} value={b._id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
                   ) : field.type === 'textarea' ? (
                     <textarea 
                       value={formData[field.key] || ''}
@@ -431,18 +510,300 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                       className="modal-input"
                     />
                   ) : field.type === 'stringArray' ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {/* Existing items */}
-                      {(formData[field.key] || []).map((item, idx) => (
-                        <div key={idx} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    config.name === 'Batches' && field.key === 'students' ? (
+                      <div style={{ position: 'relative' }}>
+                        {/* Backdrop to close the dropdown when clicking outside */}
+                        {studentDropdownOpen && (
+                          <div 
+                            onClick={() => setStudentDropdownOpen(false)}
+                            style={{
+                              position: 'fixed',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              zIndex: 999,
+                              background: 'transparent',
+                            }}
+                          />
+                        )}
+                        
+                        {/* Selector Box */}
+                        <div 
+                          onClick={() => setStudentDropdownOpen(!studentDropdownOpen)}
+                          className="modal-input"
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            minHeight: '42px',
+                            background: '#ffffff',
+                          }}
+                        >
+                          <span style={{ color: (formData.students || []).length > 0 ? '#1f2937' : '#9ca3af' }}>
+                            {(formData.students || []).length > 0 
+                              ? `${(formData.students || []).length} student(s) selected` 
+                              : 'Select Student Emails'}
+                          </span>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: studentDropdownOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </div>
+                        
+                        {/* Dropdown Menu */}
+                        {studentDropdownOpen && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            marginTop: '4px',
+                            background: '#ffffff',
+                            border: '2px solid var(--dash-border)',
+                            borderRadius: '8px',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                            zIndex: 1000,
+                            padding: '0.75rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.5rem',
+                            maxHeight: '300px',
+                          }}>
+                            {!formData.course ? (
+                              <span style={{ fontSize: '0.85rem', color: '#ef4444', padding: '0.25rem' }}>
+                                ⚠️ Please select a course first to view enrolled students.
+                              </span>
+                            ) : loadingStudents ? (
+                              <span style={{ fontSize: '0.85rem', color: 'var(--dash-text-muted)', padding: '0.25rem' }}>
+                                Loading students...
+                              </span>
+                            ) : courseStudents.length === 0 ? (
+                              <span style={{ fontSize: '0.85rem', color: '#ef4444', padding: '0.25rem' }}>
+                                No students are enrolled in the selected course yet.
+                              </span>
+                            ) : (
+                              <>
+                                {/* Search & Action Buttons */}
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
+                                  <input
+                                    type="text"
+                                    placeholder="Search by name or email..."
+                                    value={studentSearch}
+                                    onChange={e => setStudentSearch(e.target.value)}
+                                    onClick={e => e.stopPropagation()}
+                                    style={{
+                                      flex: 1,
+                                      fontSize: '0.8rem',
+                                      padding: '0.4rem 0.6rem',
+                                      borderRadius: '4px',
+                                      border: '1px solid var(--dash-border)',
+                                      outline: 'none',
+                                      background: '#ffffff',
+                                      color: '#1f2937',
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const filtered = courseStudents
+                                        .filter(s => 
+                                          s.name?.toLowerCase().includes(studentSearch.toLowerCase()) || 
+                                          s.email?.toLowerCase().includes(studentSearch.toLowerCase())
+                                        )
+                                        .map(s => s.email);
+                                      const merged = Array.from(new Set([...(formData.students || []), ...filtered]));
+                                      handleChange('students', merged);
+                                    }}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      padding: '0.25rem 0.5rem',
+                                      background: 'var(--dash-accent, #1B2B6B)',
+                                      color: '#ffffff',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    All
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const filtered = courseStudents
+                                        .filter(s => 
+                                          s.name?.toLowerCase().includes(studentSearch.toLowerCase()) || 
+                                          s.email?.toLowerCase().includes(studentSearch.toLowerCase())
+                                        )
+                                        .map(s => s.email);
+                                      const filteredSet = new Set(filtered);
+                                      const updated = (formData.students || []).filter(email => !filteredSet.has(email));
+                                      handleChange('students', updated);
+                                    }}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      padding: '0.25rem 0.5rem',
+                                      background: 'transparent',
+                                      color: '#ef4444',
+                                      border: '1px solid #ef4444',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    Clear
+                                  </button>
+                                </div>
+                                
+                                {/* Student List */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto', flex: 1 }}>
+                                  {(() => {
+                                    const filtered = courseStudents.filter(s => 
+                                      s.name?.toLowerCase().includes(studentSearch.toLowerCase()) || 
+                                      s.email?.toLowerCase().includes(studentSearch.toLowerCase())
+                                    );
+                                    if (filtered.length === 0) {
+                                      return (
+                                        <div style={{ fontSize: '0.85rem', color: '#9ca3af', padding: '0.5rem', textAlign: 'center' }}>
+                                          No students found matching your search.
+                                        </div>
+                                      );
+                                    }
+                                    return filtered.map(s => {
+                                      const isChecked = (formData.students || []).includes(s.email);
+                                      return (
+                                        <label
+                                          key={s.email}
+                                          onClick={e => e.stopPropagation()}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer',
+                                            background: isChecked ? 'rgba(27, 43, 107, 0.05)' : 'transparent',
+                                          }}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => {
+                                              if (isChecked) {
+                                                handleChange('students', (formData.students || []).filter(email => email !== s.email));
+                                              } else {
+                                                handleChange('students', [...(formData.students || []), s.email]);
+                                              }
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                          />
+                                          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1f2937' }}>{s.name}</span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)' }}>{s.email}</span>
+                                          </div>
+                                        </label>
+                                      );
+                                    });
+                                  })()}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {/* Existing items */}
+                        {(formData[field.key] || []).map((item, idx) => (
+                          <div key={idx} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              placeholder={`${field.label.replace(/\(comma\s+separated\)/i, '').trim()} #${idx + 1}`}
+                              value={item}
+                              onChange={e => {
+                                const newArr = [...(formData[field.key] || [])];
+                                newArr[idx] = e.target.value;
+                                handleChange(field.key, newArr);
+                              }}
+                              className="modal-input"
+                              style={{ paddingRight: '2.5rem', flex: 1 }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newArr = [...(formData[field.key] || [])];
+                                newArr.splice(idx, 1);
+                                handleChange(field.key, newArr);
+                              }}
+                              style={{
+                                position: 'absolute',
+                                right: '12px',
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#ef4444',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '20px',
+                                height: '20px',
+                                fontSize: '1rem',
+                                transition: 'color 0.2s',
+                                padding: 0,
+                              }}
+                              title="Remove item"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                        
+                        {/* Blank toggle/add input box */}
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                           <input
                             type="text"
-                            placeholder={`${field.label.replace(/\(comma\s+separated\)/i, '').trim()} #${idx + 1}`}
-                            value={item}
+                            placeholder={`Add new ${getSingularName(field.label.replace(/\(comma\s+separated\)/i, '').trim()).toLowerCase()}...`}
+                            value={newValues[field.key] || ''}
                             onChange={e => {
-                              const newArr = [...(formData[field.key] || [])];
-                              newArr[idx] = e.target.value;
-                              handleChange(field.key, newArr);
+                              const text = e.target.value;
+                              if (text.includes(',')) {
+                                const parts = text.split(',');
+                                const newItems = parts.slice(0, -1).map(p => p.trim()).filter(Boolean);
+                                if (newItems.length > 0) {
+                                  const newArr = [...(formData[field.key] || []), ...newItems];
+                                  handleChange(field.key, newArr);
+                                }
+                                setNewValues(prev => ({ ...prev, [field.key]: parts[parts.length - 1] }));
+                              } else {
+                                setNewValues(prev => ({ ...prev, [field.key]: text }));
+                              }
+                            }}
+                            onPaste={e => {
+                              const pastedText = e.clipboardData.getData('text');
+                              if (pastedText.includes(',')) {
+                                e.preventDefault();
+                                const parts = pastedText.split(',').map(p => p.trim()).filter(Boolean);
+                                if (parts.length > 0) {
+                                  const newArr = [...(formData[field.key] || []), ...parts];
+                                  handleChange(field.key, newArr);
+                                  setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                                }
+                              }
+                            }}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const val = (newValues[field.key] || '').trim();
+                                if (val) {
+                                  const newArr = [...(formData[field.key] || []), val];
+                                  handleChange(field.key, newArr);
+                                  setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                                }
+                              }
                             }}
                             className="modal-input"
                             style={{ paddingRight: '2.5rem', flex: 1 }}
@@ -450,111 +811,36 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                           <button
                             type="button"
                             onClick={() => {
-                              const newArr = [...(formData[field.key] || [])];
-                              newArr.splice(idx, 1);
-                              handleChange(field.key, newArr);
-                            }}
-                            style={{
-                              position: 'absolute',
-                              right: '12px',
-                              background: 'transparent',
-                              border: 'none',
-                              color: '#ef4444',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '20px',
-                              height: '20px',
-                              fontSize: '1rem',
-                              transition: 'color 0.2s',
-                              padding: 0,
-                            }}
-                            title="Remove item"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                      
-                      {/* Blank toggle/add input box */}
-                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                        <input
-                          type="text"
-                          placeholder={`Add new ${getSingularName(field.label.replace(/\(comma\s+separated\)/i, '').trim()).toLowerCase()}...`}
-                          value={newValues[field.key] || ''}
-                          onChange={e => {
-                            const text = e.target.value;
-                            if (text.includes(',')) {
-                              const parts = text.split(',');
-                              const newItems = parts.slice(0, -1).map(p => p.trim()).filter(Boolean);
-                              if (newItems.length > 0) {
-                                const newArr = [...(formData[field.key] || []), ...newItems];
-                                handleChange(field.key, newArr);
-                              }
-                              setNewValues(prev => ({ ...prev, [field.key]: parts[parts.length - 1] }));
-                            } else {
-                              setNewValues(prev => ({ ...prev, [field.key]: text }));
-                            }
-                          }}
-                          onPaste={e => {
-                            const pastedText = e.clipboardData.getData('text');
-                            if (pastedText.includes(',')) {
-                              e.preventDefault();
-                              const parts = pastedText.split(',').map(p => p.trim()).filter(Boolean);
-                              if (parts.length > 0) {
-                                const newArr = [...(formData[field.key] || []), ...parts];
-                                handleChange(field.key, newArr);
-                                setNewValues(prev => ({ ...prev, [field.key]: '' }));
-                              }
-                            }
-                          }}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
                               const val = (newValues[field.key] || '').trim();
                               if (val) {
                                 const newArr = [...(formData[field.key] || []), val];
                                 handleChange(field.key, newArr);
                                 setNewValues(prev => ({ ...prev, [field.key]: '' }));
                               }
-                            }
-                          }}
-                          className="modal-input"
-                          style={{ paddingRight: '2.5rem', flex: 1 }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const val = (newValues[field.key] || '').trim();
-                            if (val) {
-                              const newArr = [...(formData[field.key] || []), val];
-                              handleChange(field.key, newArr);
-                              setNewValues(prev => ({ ...prev, [field.key]: '' }));
-                            }
-                          }}
-                          style={{
-                            position: 'absolute',
-                            right: '12px',
-                            background: 'transparent',
-                            border: 'none',
-                            color: 'var(--dash-accent, #3b82f6)',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '20px',
-                            height: '20px',
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                            padding: 0,
-                          }}
-                          title="Add item"
-                        >
-                          ＋
-                        </button>
+                            }}
+                            style={{
+                              position: 'absolute',
+                              right: '12px',
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--dash-accent, #3b82f6)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '20px',
+                              height: '20px',
+                              fontSize: '1.2rem',
+                              fontWeight: 'bold',
+                              padding: 0,
+                            }}
+                            title="Add item"
+                          >
+                            ＋
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )
                   ) : field.type === 'faqArray' ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {(formData[field.key] || []).map((faq, idx) => (

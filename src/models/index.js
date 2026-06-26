@@ -15,3 +15,5 @@ export { default as Contact } from './Contact';
 export { default as Announcement } from './Announcement';
 export { default as PracticeQuestion } from './PracticeQuestion';
 export { default as PracticeSession } from './PracticeSession';
+export { default as Batch } from './Batch';
+export { default as Attendance } from './Attendance';

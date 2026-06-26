@@ -142,6 +142,13 @@ export default function LearnCoursePage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, action: 'watch' }),
         }).catch(() => { });
+
+        // Ping attendance tracker
+        fetch('/api/lms/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, duration: 1 }),
+        }).catch(() => { });
       }
     }, 60000);
   }, [courseId, activeLesson]);
@@ -359,6 +366,43 @@ export default function LearnCoursePage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // ── YouTube & Live Meetings helper logic ──
+  const getYoutubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}?autoplay=1&rel=0`;
+    }
+    return null;
+  };
+
+  const youtubeUrl = activeLesson ? getYoutubeEmbedUrl(activeLesson.videoUrl) : null;
+  const isLiveMeeting = activeLesson ? (activeLesson.videoUrl.includes('zoom.us') || activeLesson.videoUrl.includes('meet.google.com')) : false;
+
+  useEffect(() => {
+    let interval = null;
+    if (activeLesson && (youtubeUrl || isLiveMeeting)) {
+      // Start fallback progress and attendance tracking for YouTube/Zoom
+      interval = setInterval(() => {
+        fetch('/api/lms/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, action: 'watch' }),
+        }).catch(() => { });
+
+        fetch('/api/lms/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, duration: 1 }),
+        }).catch(() => { });
+      }, 60000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeLesson, youtubeUrl, isLiveMeeting, courseId]);
+
   // ── Picture-in-Picture Toggle ──
   const togglePiP = async () => {
     if (!videoRef.current) return;
@@ -559,63 +603,163 @@ export default function LearnCoursePage() {
           {/* Video Player */}
           <div className={styles.videoContainer} style={{ position: 'relative' }}>
             {activeLesson?.videoUrl ? (
-              <>
-                <video
-                  ref={videoRef}
-                  key={activeLesson.slug}
-                  controls
-                  controlsList="nodownload"
-                  onContextMenu={(e) => e.preventDefault()}
-                  autoPlay
-                  onPlay={startWatchTimer}
-                  onPause={stopWatchTimer}
-                  onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={(e) => {
-                    const video = e.target;
-                    
-                    // Sync original video duration to backend so it perfectly fixes the runtime data
-                    fetch('/api/lms/lesson/duration', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        courseId,
-                        lessonId: activeLesson._id,
-                        duration: video.duration
-                      })
-                    }).catch(() => {});
-
-                    const savedTime = localStorage.getItem(`gradify_resumeTime_${activeLesson.slug}`);
-                    // If progress was saved and the video isn't practically finished already, resume!
-                    if (savedTime && parseFloat(savedTime) < video.duration - 10) {
-                      video.currentTime = parseFloat(savedTime);
-                    }
-                  }}
-                  onEnded={() => { stopWatchTimer(); markComplete(); }}
-                >
-                  <source src={activeLesson.videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-
-                {/* Dynamically Floating Watermark */}
-                {session?.user?.email && (
+              isLiveMeeting ? (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  minHeight: '400px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: '12px',
+                  border: '1px solid var(--dash-border)',
+                  padding: '2rem',
+                  textAlign: 'center',
+                  gap: '1.5rem',
+                  color: 'var(--dash-text)'
+                }}>
                   <div style={{
-                    position: 'absolute',
-                    top: watermarkPos.top,
-                    left: watermarkPos.left,
-                    transform: watermarkPos.transform,
-                    color: 'rgba(255, 255, 255, 0.45)',
-                    fontSize: '10pt',
-                    fontFamily: 'sans-serif',
-                    fontWeight: 700,
-                    pointerEvents: 'none', // Prevents blocking controls
-                    userSelect: 'none',
-                    textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
-                    zIndex: 10,
+                    background: 'rgba(46, 213, 115, 0.1)',
+                    color: '#2ed573',
+                    padding: '0.4rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    animation: 'pulse 2s infinite'
                   }}>
-                    support@gradify.academy
+                    <span style={{ width: '8px', height: '8px', background: '#2ed573', borderRadius: '50%', display: 'inline-block' }}></span>
+                    LIVE SESSION
                   </div>
-                )}
-              </>
+                  <div>
+                    <h3 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{activeLesson.title}</h3>
+                    <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem', maxWidth: '500px', margin: '0 auto' }}>
+                      This lesson is scheduled as a Live doubt solving / interactive class on Zoom/Google Meet.
+                    </p>
+                  </div>
+                  
+                  <a
+                    href={activeLesson.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => {
+                      fetch('/api/lms/attendance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, duration: 5 })
+                      }).catch(() => {});
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.8rem 1.8rem',
+                      background: 'var(--color-primary)',
+                      color: 'white',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      fontWeight: 'bold',
+                      fontSize: '0.95rem',
+                      boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.filter = 'brightness(1.1)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.filter = 'none';
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="23 7 16 12 23 17" />
+                      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                    </svg>
+                    <span>Join Live Class Now</span>
+                  </a>
+
+                  <style>{`
+                    @keyframes pulse {
+                      0% { opacity: 0.6; }
+                      50% { opacity: 1; }
+                      100% { opacity: 0.6; }
+                    }
+                  `}</style>
+                </div>
+              ) : youtubeUrl ? (
+                <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: '400px' }}>
+                  <iframe
+                    src={youtubeUrl}
+                    title={activeLesson.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: '12px' }}
+                  ></iframe>
+                </div>
+              ) : (
+                <>
+                  <video
+                    ref={videoRef}
+                    key={activeLesson.slug}
+                    controls
+                    controlsList="nodownload"
+                    onContextMenu={(e) => e.preventDefault()}
+                    autoPlay
+                    onPlay={startWatchTimer}
+                    onPause={stopWatchTimer}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={(e) => {
+                      const video = e.target;
+                      
+                      // Sync original video duration to backend so it perfectly fixes the runtime data
+                      fetch('/api/lms/lesson/duration', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          courseId,
+                          lessonId: activeLesson._id,
+                          duration: video.duration
+                        })
+                      }).catch(() => {});
+
+                      const savedTime = localStorage.getItem(`gradify_resumeTime_${activeLesson.slug}`);
+                      // If progress was saved and the video isn't practically finished already, resume!
+                      if (savedTime && parseFloat(savedTime) < video.duration - 10) {
+                        video.currentTime = parseFloat(savedTime);
+                      }
+                    }}
+                    onEnded={() => { stopWatchTimer(); markComplete(); }}
+                  >
+                    <source src={activeLesson.videoUrl} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+
+                  {/* Dynamically Floating Watermark */}
+                  {session?.user?.email && (
+                    <div style={{
+                      position: 'absolute',
+                      top: watermarkPos.top,
+                      left: watermarkPos.left,
+                      transform: watermarkPos.transform,
+                      color: 'rgba(255, 255, 255, 0.45)',
+                      fontSize: '10pt',
+                      fontFamily: 'sans-serif',
+                      fontWeight: 700,
+                      pointerEvents: 'none', // Prevents blocking controls
+                      userSelect: 'none',
+                      textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
+                      zIndex: 10,
+                    }}>
+                      support@gradify.academy
+                    </div>
+                  )}
+                </>
+              )
             ) : (
               <div className={styles.videoPlaceholder}>
                 <span>🎬</span>

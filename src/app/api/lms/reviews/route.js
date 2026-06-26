@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 import Review from '@/models/Review';
+import Course from '@/models/Course';
 
 // GET: Fetch all reviews for a course
 export async function GET(req) {
@@ -32,7 +33,7 @@ export async function GET(req) {
     // Calculate average rating
     const totalRatings = reviews.length;
     const avgRating = totalRatings > 0
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalRatings).toFixed(1)
+      ? (reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalRatings).toFixed(1)
       : 0;
 
     return NextResponse.json({ success: true, reviews, myReview, avgRating: parseFloat(avgRating), totalRatings });
@@ -70,6 +71,9 @@ export async function POST(req) {
       },
       { upsert: true, returnDocument: 'after', runValidators: true }
     );
+
+    // Sync rating and reviews count on the Course
+    await Course.syncRatingsCount(courseId);
 
     return NextResponse.json({ success: true, review }, { status: 201 });
   } catch (error) {

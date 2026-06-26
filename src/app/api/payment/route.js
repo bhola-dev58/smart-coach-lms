@@ -28,7 +28,7 @@ export async function POST(request) {
     }
 
     await connectDB();
-    const { courseId, amount } = await request.json();
+    const { courseId, amount, batchId, batchName } = await request.json();
 
     if (!courseId || !amount) {
       return NextResponse.json({ success: false, error: 'courseId and amount are required' }, { status: 400 });
@@ -86,6 +86,12 @@ export async function POST(request) {
       amount: Math.round(amount * 100), // Store in paise
       razorpayOrderId: order.id,
       status: 'created',
+      notes: {
+        courseId,
+        studentId: session.user.id,
+        batchId: batchId || '',
+        batchName: batchName || ''
+      }
     });
 
     return NextResponse.json({
@@ -137,7 +143,7 @@ export async function PUT(request) {
         status: 'captured',
         paidAt: new Date(),
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!payment) {
@@ -151,9 +157,56 @@ export async function PUT(request) {
     });
 
     if (!existingEnrollment) {
+      // Resolve Batch
+      let resolvedBatchId = null;
+      try {
+        const User = (await import('@/models/User')).default;
+        const Batch = (await import('@/models/Batch')).default;
+        
+        const studentUser = await User.findById(payment.student).lean();
+        const studentEmail = studentUser ? studentUser.email : null;
+
+        const bId = payment.notes 
+          ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchId') : payment.notes.batchId)
+          : null;
+        const bName = payment.notes
+          ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchName') : payment.notes.batchName)
+          : null;
+
+        if (bId && bId.trim() !== '') {
+          const existingBatch = await Batch.findById(bId);
+          if (existingBatch) {
+            resolvedBatchId = existingBatch._id;
+            if (studentEmail && !existingBatch.students.includes(studentEmail)) {
+              existingBatch.students.push(studentEmail);
+              await existingBatch.save();
+            }
+          }
+        } else if (bName && bName.trim() !== '') {
+          let existingBatch = await Batch.findOne({ course: payment.course, name: bName });
+          if (!existingBatch) {
+            existingBatch = await Batch.create({
+              name: bName,
+              course: payment.course,
+              students: studentEmail ? [studentEmail] : [],
+              isActive: true
+            });
+          } else {
+            if (studentEmail && !existingBatch.students.includes(studentEmail)) {
+              existingBatch.students.push(studentEmail);
+              await existingBatch.save();
+            }
+          }
+          resolvedBatchId = existingBatch._id;
+        }
+      } catch (batchErr) {
+        console.error('Error resolving batch for enrollment:', batchErr);
+      }
+
       await Enrollment.create({
         student: payment.student,
         course: payment.course,
+        batch: resolvedBatchId,
         payment: payment._id,
         status: 'active',
         enrolledAt: new Date(),

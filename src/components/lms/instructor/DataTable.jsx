@@ -64,11 +64,28 @@ export default function DataTable({ columns, data, onEdit, onDelete, onAdd, reso
           <thead>
             <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
               {columns.map(col => (
-                <th key={col.key} style={{ padding: '1rem', color: 'var(--dash-text-secondary)', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid var(--dash-border)' }}>
+                <th key={col.key} style={{ 
+                  padding: '0.5rem 1rem', 
+                  color: 'var(--dash-text-secondary)', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600, 
+                  borderBottom: '1px solid var(--dash-border)',
+                  borderRight: '1px solid var(--dash-border)',
+                  whiteSpace: 'nowrap'
+                }}>
                   {col.label}
                 </th>
               ))}
-              <th style={{ padding: '1rem', color: 'var(--dash-text-secondary)', fontSize: '0.8rem', fontWeight: 600, borderBottom: '1px solid var(--dash-border)', width: '100px', textAlign: 'right' }}>
+              <th style={{ 
+                padding: '0.5rem 1rem', 
+                color: 'var(--dash-text-secondary)', 
+                fontSize: '0.8rem', 
+                fontWeight: 600, 
+                borderBottom: '1px solid var(--dash-border)', 
+                width: '100px', 
+                textAlign: 'right',
+                whiteSpace: 'nowrap'
+              }}>
                 Actions
               </th>
             </tr>
@@ -84,11 +101,17 @@ export default function DataTable({ columns, data, onEdit, onDelete, onAdd, reso
               filteredData.map((row, idx) => (
                 <tr key={row._id || idx} style={{ borderBottom: '1px solid var(--dash-border)' }}>
                   {columns.map(col => (
-                    <td key={col.key} style={{ padding: '1rem', color: 'var(--dash-text)', fontSize: '0.9rem' }}>
+                    <td key={col.key} style={{ 
+                      padding: '0.5rem 1rem', 
+                      color: 'var(--dash-text)', 
+                      fontSize: '0.9rem',
+                      borderRight: '1px solid var(--dash-border)',
+                      whiteSpace: 'nowrap'
+                    }}>
                       {col.render ? col.render(row[col.key], row) : row[col.key]}
                     </td>
                   ))}
-                  <td style={{ padding: '1rem', textAlign: 'right' }}>
+                  <td style={{ padding: '0.5rem 1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button onClick={() => onEdit(row)} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', marginRight: '0.75rem' }} title="Edit">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </button>

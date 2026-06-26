@@ -41,7 +41,7 @@ export async function PUT(req, { params }) {
     const course = await Course.findOneAndUpdate(
       { _id: unwrappedParams.courseId, instructor: session.user.id },
       { $set: { chapters } },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!course && session.user.role !== 'admin') {

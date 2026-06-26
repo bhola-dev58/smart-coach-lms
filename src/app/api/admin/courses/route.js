@@ -61,7 +61,7 @@ export async function PUT(request) {
 
     if (!_id) return NextResponse.json({ success: false, error: 'Course ID missing' }, { status: 400 });
 
-    const updatedCourse = await Course.findByIdAndUpdate(_id, updateData, { new: true });
+    const updatedCourse = await Course.findByIdAndUpdate(_id, updateData, { returnDocument: 'after' });
     
     return NextResponse.json({ success: true, data: updatedCourse, error: null });
   } catch (error) {
