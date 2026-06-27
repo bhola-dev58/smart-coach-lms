@@ -11,6 +11,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
   const [batchesList, setBatchesList] = useState([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState('');
+  const [loadError, setLoadError] = useState(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -54,24 +55,33 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
     setLoading(true);
     setShowModal(true);
     setLoadingBatches(true);
+    setLoadError(null);
 
     fetch(`/api/lms/course/${courseId}/batches`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('API server error');
+        return res.json();
+      })
       .then(json => {
-        if (json.success && json.batches && json.batches.length > 0) {
-          setBatchesList(json.batches);
-          setSelectedBatch(JSON.stringify({ id: json.batches[0]._id, name: json.batches[0].name }));
+        if (json.success) {
+          if (json.batches && json.batches.length > 0) {
+            setBatchesList(json.batches);
+            setSelectedBatch(JSON.stringify({ id: json.batches[0]._id, name: json.batches[0].name }));
+          } else {
+            // Success but empty list: safe to generate dynamic defaults
+            setBatchesList([]);
+            const fallbacks = getYearMonthBatches();
+            setSelectedBatch(JSON.stringify({ id: '', name: fallbacks[0] }));
+          }
         } else {
-          setBatchesList([]);
-          const fallbacks = getYearMonthBatches();
-          setSelectedBatch(JSON.stringify({ id: '', name: fallbacks[0] }));
+          throw new Error(json.error || 'Failed to load cohorts');
         }
       })
       .catch(err => {
         console.error('Failed to load batches:', err);
+        setLoadError('Failed to load available cohorts. Please try again later.');
         setBatchesList([]);
-        const fallbacks = getYearMonthBatches();
-        setSelectedBatch(JSON.stringify({ id: '', name: fallbacks[0] }));
+        setSelectedBatch('');
       })
       .finally(() => setLoadingBatches(false));
   };
@@ -295,6 +305,12 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
               )}
             </div>
 
+            {loadError && (
+              <div style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 500 }}>
+                {loadError}
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button
                 type="button"
@@ -324,21 +340,25 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
               <button
                 type="button"
                 onClick={triggerCheckout}
-                disabled={loadingBatches}
+                disabled={loadingBatches || !!loadError}
                 style={{
                   padding: '0.6rem 1.25rem',
                   borderRadius: '8px',
-                  background: '#3b82f6',
-                  color: '#ffffff',
+                  background: (loadingBatches || !!loadError) ? '#cbd5e1' : '#3b82f6',
+                  color: (loadingBatches || !!loadError) ? '#94a3b8' : '#ffffff',
                   border: 'none',
                   fontSize: '0.875rem',
                   fontWeight: 600,
-                  cursor: 'pointer',
+                  cursor: (loadingBatches || !!loadError) ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s',
-                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)',
+                  boxShadow: (loadingBatches || !!loadError) ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.2)',
                 }}
-                onMouseEnter={(e) => e.target.style.background = '#2563eb'}
-                onMouseLeave={(e) => e.target.style.background = '#3b82f6'}
+                onMouseEnter={(e) => {
+                  if (!loadingBatches && !loadError) e.target.style.background = '#2563eb';
+                }}
+                onMouseLeave={(e) => {
+                  if (!loadingBatches && !loadError) e.target.style.background = '#3b82f6';
+                }}
               >
                 Proceed to Pay
               </button>

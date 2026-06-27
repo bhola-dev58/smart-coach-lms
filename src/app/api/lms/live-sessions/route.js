@@ -30,8 +30,17 @@ export async function GET() {
     if (role === 'instructor') {
       filter.instructor = session.user.id;
     }
-    // Students only see sessions matching their batches or unbatched ones
+    // Students only see sessions matching their batches or unbatched ones, restricted to their enrolled courses
     else if (role === 'student') {
+      const Enrollment = (await import('@/models/Enrollment')).default;
+      const enrollments = await Enrollment.find({
+        student: session.user.id,
+        status: { $in: ['active', 'completed'] }
+      }).select('course').lean();
+      const enrolledCourseIds = enrollments.map(e => e.course);
+
+      filter.course = { $in: enrolledCourseIds };
+
       const userBatches = await Batch.find({ students: session.user.email, isActive: true }).select('_id').lean();
       const userBatchIds = userBatches.map(b => b._id);
       
@@ -51,6 +60,6 @@ export async function GET() {
     return NextResponse.json({ success: true, sessions });
   } catch (error) {
     console.error('Live sessions GET error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

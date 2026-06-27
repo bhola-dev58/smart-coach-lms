@@ -38,12 +38,12 @@ reviewSchema.post('save', async function(doc) {
   }
 });
 
-reviewSchema.post('remove', async function(doc) {
+reviewSchema.post('deleteOne', { document: true, query: false }, async function(doc) {
   try {
     const Course = (await import('./Course')).default;
     await Course.syncRatingsCount(doc.course);
   } catch (err) {
-    console.error('Review post-remove hook error:', err);
+    console.error('Review post-deleteOne hook error:', err);
   }
 });
 

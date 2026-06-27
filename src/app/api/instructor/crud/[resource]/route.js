@@ -98,38 +98,10 @@ export async function GET(request, { params }) {
 
     const data = await queryBuilder.sort({ createdAt: -1 }).limit(100).lean();
 
-    if (unwrappedParams.resource.toLowerCase() === 'courses') {
-      const Enrollment = (await import('@/models/Enrollment')).default;
-      const Review = (await import('@/models/Review')).default;
-      const Course = (await import('@/models/Course')).default;
-      
-      for (const course of data) {
-        // Sync totalStudents count
-        const totalStudents = await Enrollment.countDocuments({
-          course: course._id,
-          status: { $in: ['active', 'completed'] }
-        });
-        
-        // Sync rating and totalRatings count
-        const reviews = await Review.find({ course: course._id, isApproved: true });
-        const totalRatings = reviews.length;
-        const rating = totalRatings > 0
-          ? parseFloat((reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalRatings).toFixed(1))
-          : 0;
-          
-        if (course.totalStudents !== totalStudents || course.rating !== rating || course.totalRatings !== totalRatings) {
-          await Course.findByIdAndUpdate(course._id, { totalStudents, rating, totalRatings });
-          course.totalStudents = totalStudents;
-          course.rating = rating;
-          course.totalRatings = totalRatings;
-        }
-      }
-    }
-
     return NextResponse.json({ success: true, data });
   } catch (err) {
     console.error(`Error fetching resource:`, err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -168,7 +140,7 @@ export async function POST(request, { params }) {
     return NextResponse.json({ success: true, data: newItem });
   } catch (err) {
     console.error(`Error creating resource:`, err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -205,7 +177,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (err) {
     console.error(`Error updating resource:`, err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -227,6 +199,6 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ success: true, message: 'Deleted successfully' });
   } catch (err) {
     console.error(`Error deleting resource:`, err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

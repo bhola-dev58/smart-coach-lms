@@ -16,6 +16,15 @@ export async function GET(req, { params }) {
     await connectDB();
     const courseId = unwrappedParams.courseId;
 
+    // Verify course ownership if not admin (prevent IDOR)
+    if (session.user.role !== 'admin') {
+      const Course = (await import('@/models/Course')).default;
+      const course = await Course.findOne({ _id: courseId, instructor: session.user.id }).lean();
+      if (!course) {
+        return NextResponse.json({ success: false, error: 'Access Denied: You do not own this course' }, { status: 403 });
+      }
+    }
+
     // Fetch all active/completed enrollments for this course
     const enrollments = await Enrollment.find({
       course: courseId,
@@ -32,6 +41,6 @@ export async function GET(req, { params }) {
     return NextResponse.json({ success: true, students });
   } catch (err) {
     console.error('Error fetching course students:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

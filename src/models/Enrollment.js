@@ -87,12 +87,12 @@ enrollmentSchema.post('save', async function(doc) {
   }
 });
 
-enrollmentSchema.post('remove', async function(doc) {
+enrollmentSchema.post('deleteOne', { document: true, query: false }, async function(doc) {
   try {
     const Course = (await import('./Course')).default;
     await Course.syncEnrollmentsCount(doc.course);
   } catch (err) {
-    console.error('Enrollment post-remove hook error:', err);
+    console.error('Enrollment post-deleteOne hook error:', err);
   }
 });
 

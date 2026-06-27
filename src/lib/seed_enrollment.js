@@ -126,7 +126,7 @@ async function seed() {
     console.log('\n🔄 Syncing totalStudents counts on courses...');
     const allCourses = await Course.find({});
     for (const c of allCourses) {
-      const count = await Enrollment.countDocuments({ course: c._id, status: 'active' });
+      const count = await Enrollment.countDocuments({ course: c._id, status: { $in: ['active', 'completed'] } });
       await Course.findByIdAndUpdate(c._id, { totalStudents: count });
       console.log(`Synced ${c.title}: ${count} student(s)`);
     }

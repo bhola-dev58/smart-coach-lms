@@ -39,6 +39,7 @@ const Enrollment = mongoose.models.Enrollment || mongoose.model('Enrollment', en
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 
 async function run() {
+  let exitCode = 0;
   try {
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB Atlas');
@@ -75,9 +76,10 @@ async function run() {
     console.log('\n🎉 Recalculation complete!');
   } catch (err) {
     console.error('❌ Sync failed:', err);
+    exitCode = 1;
   } finally {
     await mongoose.disconnect();
-    process.exit(0);
+    process.exit(exitCode);
   }
 }
 

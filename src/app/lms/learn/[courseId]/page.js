@@ -56,6 +56,7 @@ export default function LearnCoursePage() {
   const hlsRef = useRef(null);
   const [isPiP, setIsPiP] = useState(false);
   const [theaterMode, setTheaterMode] = useState(false);
+  const [hasJoinedMeeting, setHasJoinedMeeting] = useState(false);
 
   const { data: session } = useSession();
   const [watermarkPos, setWatermarkPos] = useState({ top: '80%', left: '15%', transform: 'rotate(-30deg)' });
@@ -125,6 +126,11 @@ export default function LearnCoursePage() {
     }
     if (courseId) fetchCourse();
   }, [courseId]);
+
+  // Reset hasJoinedMeeting when activeLesson changes
+  useEffect(() => {
+    setHasJoinedMeeting(false);
+  }, [activeLesson]);
 
   // Watch time tracker (every 60s while video is playing)
   useEffect(() => {
@@ -378,11 +384,25 @@ export default function LearnCoursePage() {
   };
 
   const youtubeUrl = activeLesson ? getYoutubeEmbedUrl(activeLesson.videoUrl) : null;
-  const isLiveMeeting = activeLesson ? (activeLesson.videoUrl.includes('zoom.us') || activeLesson.videoUrl.includes('meet.google.com')) : false;
+  const isLiveMeeting = activeLesson ? (activeLesson.videoUrl.includes('zoom.us') || activeLesson.videoUrl.includes('meet.google.com') || activeLesson.videoUrl.includes('webex.com')) : false;
+
+  const getSafeMeetingUrl = (url) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:') return '';
+      const trustedHosts = ['zoom.us', 'zoom.com', 'meet.google.com', 'google.com', 'teams.microsoft.com', 'teams.live.com', 'youtube.com', 'youtu.be', 'webex.com'];
+      const isAllowed = trustedHosts.some(host => parsed.hostname === host || parsed.hostname.endsWith('.' + host));
+      return isAllowed ? url : '';
+    } catch (err) {
+      return '';
+    }
+  };
 
   useEffect(() => {
     let interval = null;
-    if (activeLesson && (youtubeUrl || isLiveMeeting)) {
+    const shouldTrack = activeLesson && (youtubeUrl || (isLiveMeeting && hasJoinedMeeting));
+    if (shouldTrack) {
       // Start fallback progress and attendance tracking for YouTube/Zoom
       interval = setInterval(() => {
         fetch('/api/lms/progress', {
@@ -401,7 +421,7 @@ export default function LearnCoursePage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [activeLesson, youtubeUrl, isLiveMeeting, courseId]);
+  }, [activeLesson, youtubeUrl, isLiveMeeting, hasJoinedMeeting, courseId]);
 
   // ── Picture-in-Picture Toggle ──
   const togglePiP = async () => {
@@ -642,14 +662,20 @@ export default function LearnCoursePage() {
                   </div>
                   
                   <a
-                    href={activeLesson.videoUrl}
+                    href={getSafeMeetingUrl(activeLesson.videoUrl) || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => {
+                    onClick={(e) => {
+                      if (!getSafeMeetingUrl(activeLesson.videoUrl)) {
+                        e.preventDefault();
+                        alert('This meeting link is not valid or from an untrusted source.');
+                        return;
+                      }
+                      setHasJoinedMeeting(true);
                       fetch('/api/lms/attendance', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, duration: 5 })
+                        body: JSON.stringify({ courseId, lessonSlug: activeLesson.slug, duration: 1 })
                       }).catch(() => {});
                     }}
                     style={{

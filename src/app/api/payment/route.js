@@ -34,6 +34,15 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'courseId and amount are required' }, { status: 400 });
     }
 
+    // Validate batch belongs to course if provided
+    if (batchId && batchId.trim() !== '') {
+      const Batch = (await import('@/models/Batch')).default;
+      const batchExists = await Batch.findOne({ _id: batchId, course: courseId });
+      if (!batchExists) {
+        return NextResponse.json({ success: false, error: 'Invalid batch for this course' }, { status: 400 });
+      }
+    }
+
     // ── Check if already enrolled ──
     const existingEnrollment = await Enrollment.findOne({
       student: session.user.id,
@@ -103,7 +112,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('❌ Payment POST Error:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -174,29 +183,25 @@ export async function PUT(request) {
           : null;
 
         if (bId && bId.trim() !== '') {
-          const existingBatch = await Batch.findById(bId);
+          const existingBatch = await Batch.findOne({ _id: bId, course: payment.course });
           if (existingBatch) {
             resolvedBatchId = existingBatch._id;
-            if (studentEmail && !existingBatch.students.includes(studentEmail)) {
-              existingBatch.students.push(studentEmail);
-              await existingBatch.save();
+            if (studentEmail) {
+              await Batch.findByIdAndUpdate(existingBatch._id, {
+                $addToSet: { students: studentEmail }
+              });
             }
           }
         } else if (bName && bName.trim() !== '') {
-          let existingBatch = await Batch.findOne({ course: payment.course, name: bName });
-          if (!existingBatch) {
-            existingBatch = await Batch.create({
-              name: bName,
-              course: payment.course,
-              students: studentEmail ? [studentEmail] : [],
-              isActive: true
-            });
-          } else {
-            if (studentEmail && !existingBatch.students.includes(studentEmail)) {
-              existingBatch.students.push(studentEmail);
-              await existingBatch.save();
-            }
+          const updateObj = { $setOnInsert: { isActive: true } };
+          if (studentEmail) {
+            updateObj.$addToSet = { students: studentEmail };
           }
+          const existingBatch = await Batch.findOneAndUpdate(
+            { course: payment.course, name: bName },
+            updateObj,
+            { upsert: true, returnDocument: 'after' }
+          );
           resolvedBatchId = existingBatch._id;
         }
       } catch (batchErr) {
@@ -216,6 +221,6 @@ export async function PUT(request) {
     return NextResponse.json({ success: true, message: 'Payment verified, enrollment created!' });
   } catch (error) {
     console.error('❌ Payment PUT Error:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Verification failed' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

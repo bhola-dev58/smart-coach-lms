@@ -116,14 +116,6 @@ courseSchema.statics.syncEnrollmentsCount = async function(courseId) {
       status: { $in: ['active', 'completed'] }
     });
     await this.findByIdAndUpdate(courseId, { totalStudents });
-    try {
-      const { cacheInvalidatePattern } = await import('@/lib/cache');
-      cacheInvalidatePattern('courses:*').catch(err => {
-        console.error('Non-blocking cache error:', err.message);
-      });
-    } catch (cErr) {
-      // Ignore if cache key invalidation fails
-    }
   } catch (err) {
     console.error('Error syncing enrollments count:', err);
   }
@@ -137,18 +129,24 @@ courseSchema.statics.syncRatingsCount = async function(courseId) {
       ? parseFloat((reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / totalRatings).toFixed(1))
       : 0;
     await this.findByIdAndUpdate(courseId, { rating, totalRatings });
-    try {
-      const { cacheInvalidatePattern } = await import('@/lib/cache');
-      cacheInvalidatePattern('courses:*').catch(err => {
-        console.error('Non-blocking cache error:', err.message);
-      });
-    } catch (cErr) {
-      // Ignore if cache key invalidation fails
-    }
   } catch (err) {
     console.error('Error syncing ratings count:', err);
   }
 };
+
+courseSchema.post('save', async function() {
+  try {
+    const { cacheInvalidatePattern } = await import('@/lib/cache');
+    cacheInvalidatePattern('courses:*').catch(() => {});
+  } catch (err) {}
+});
+
+courseSchema.post('findOneAndUpdate', async function() {
+  try {
+    const { cacheInvalidatePattern } = await import('@/lib/cache');
+    cacheInvalidatePattern('courses:*').catch(() => {});
+  } catch (err) {}
+});
 
 const CourseModel = mongoose.models.Course || mongoose.model('Course', courseSchema);
 CourseModel.syncEnrollmentsCount = CourseModel.syncEnrollmentsCount || courseSchema.statics.syncEnrollmentsCount.bind(CourseModel);
