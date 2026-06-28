@@ -1,12 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 export default function EnrollButton({ courseId, amount, courseTitle, className, style, children }) {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const [finalAmount, setFinalAmount] = useState(amount);
+  const [isDiscounted, setIsDiscounted] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      fetch(`/api/payment/check-discount?courseId=${courseId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.discountApplicable) {
+            setFinalAmount(data.discountedPrice);
+            setIsDiscounted(true);
+          } else {
+            setFinalAmount(amount);
+            setIsDiscounted(false);
+          }
+        })
+        .catch(err => console.error('Error checking discount eligibility:', err));
+    } else {
+      setFinalAmount(amount);
+      setIsDiscounted(false);
+    }
+  }, [session, courseId, amount]);
   const [showModal, setShowModal] = useState(false);
   const [batchesList, setBatchesList] = useState([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
@@ -111,7 +133,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
       const orderRes = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId, amount, batchId, batchName }),
+        body: JSON.stringify({ courseId, amount: finalAmount, batchId, batchName }),
       });
       const orderData = await orderRes.json();
 
@@ -220,7 +242,7 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
         className={className || 'btn btn-primary btn-lg'}
         style={style || { width: '100%', padding: '1rem' }}
       >
-        {loading ? 'Processing...' : (children || `Enroll Now — ₹${amount?.toLocaleString('en-IN')}`)}
+        {loading ? 'Processing...' : (children || (isDiscounted ? `Re-enroll (50% Off!) — ₹${finalAmount?.toLocaleString('en-IN')}` : `Enroll Now — ₹${finalAmount?.toLocaleString('en-IN')}`))}
       </button>
 
       {showModal && (
@@ -250,6 +272,26 @@ export default function EnrollButton({ courseId, amount, courseTitle, className,
             color: '#1e293b',
             position: 'relative',
           }}>
+            {isDiscounted && (
+              <div style={{
+                background: 'rgba(16,185,129,0.08)',
+                border: '1px solid rgba(16,185,129,0.25)',
+                color: '#10b981',
+                padding: '0.65rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                marginBottom: '1rem',
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}>
+                <span>🎉</span>
+                <span>Re-enrollment 50% discount automatically applied!</span>
+              </div>
+            )}
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.025em', color: '#0f172a' }}>
               Select Cohort / Batch
             </h3>

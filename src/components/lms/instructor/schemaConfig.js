@@ -111,15 +111,7 @@ export const schemaConfig = {
       { key: 'status', label: 'Status', type: 'select', options: ['scheduled', 'live', 'completed', 'cancelled'] }
     ]
   },
-  notifications: {
-    name: 'Notifications',
-    fields: [
-      { key: 'user', label: 'User ID (Empty for All)', type: 'text' },
-      { key: 'title', label: 'Title', type: 'text', required: true },
-      { key: 'message', label: 'Message', type: 'textarea', required: true },
-      { key: 'isRead', label: 'Read', type: 'boolean', default: false }
-    ]
-  },
+
   payments: {
     name: 'Payments',
     fields: [

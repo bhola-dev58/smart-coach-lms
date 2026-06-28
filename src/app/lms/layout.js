@@ -40,7 +40,7 @@ function CategorySelect() {
   };
 
   return (
-    <select 
+    <select
       className={styles.filterSelect}
       value={currentCategory}
       onChange={handleCategoryChange}
@@ -58,10 +58,13 @@ function CategorySelect() {
 export default function LMSLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
-  const userName = session?.user?.name || 'Student';
-  const userInitial = userName.charAt(0).toUpperCase();
+  const { data: session, status } = useSession();
+  const role = session?.user?.role || 'student';
+  const isInstructorAdmin = role === 'instructor' || role === 'admin';
+  const userName = session?.user?.name || '';
+  const userInitial = userName ? userName.charAt(0).toUpperCase() : '?';
   const userImageUrl = session?.user?.image || session?.user?.avatar;
+  const showSearchAndFilter = status !== 'loading' && !isInstructorAdmin && !pathname?.startsWith('/lms/instructor');
 
   const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile drawer
   const [isCollapsed, setIsCollapsed] = useState(false); // Desktop collapse
@@ -128,16 +131,22 @@ export default function LMSLayout({ children }) {
   };
 
   const getHeaderContent = () => {
+    if (status === 'loading') {
+      return {
+        title: '',
+        subtitle: ''
+      };
+    }
     if (pathname === '/lms') {
       return {
-        title: `Welcome back, ${userName}!`,
+        title: `Welcome back, ${userName || 'there'}!`,
         subtitle: "Let's conquer new heights today."
       };
     }
     if (pathname === '/lms/courses') {
-      const countText = enrolledCount === null 
-        ? "Loading your courses..." 
-        : enrolledCount > 0 
+      const countText = enrolledCount === null
+        ? "Loading your courses..."
+        : enrolledCount > 0
           ? `You have ${enrolledCount} enrolled course${enrolledCount > 1 ? 's' : ''}`
           : "No enrolled courses yet";
       return {
@@ -187,14 +196,14 @@ export default function LMSLayout({ children }) {
         subtitle: "Manage your courses, assignments, and student reviews."
       };
     }
-    
+
     if (pathname === '/lms/notifications') {
       return {
         title: 'Notifications',
         subtitle: 'Stay updated on your enrollments, announcements, and course activity.',
       };
     }
-    
+
     // Fallback/Default
     return {
       title: "LMS Portal",
@@ -232,87 +241,136 @@ export default function LMSLayout({ children }) {
 
   return (
     <div className={styles.lmsWrapper}>
-      <DashboardSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
+      <DashboardSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />
       <div className={`${styles.mainContent} ${isCollapsed ? styles.mainContentCollapsed : ''}`}>
-        
+
         {/* Universal Top Bar */}
         <div className={styles.topBar}>
           <div className={styles.welcomeText}>
-            <h1>{header.title}</h1>
-            <p>{header.subtitle}</p>
+            {status === 'loading' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', minHeight: '3rem' }}>
+                <style>{`
+                  @keyframes pulse-header {
+                    0%, 100% { opacity: 0.45; }
+                    50% { opacity: 0.85; }
+                  }
+                  .skeleton-title {
+                    height: 1.6rem;
+                    width: 200px;
+                    background: rgba(0,0,0,0.06);
+                    border-radius: 4px;
+                    animation: pulse-header 1.5s infinite ease-in-out;
+                  }
+                  .skeleton-subtitle {
+                    height: 0.9rem;
+                    width: 280px;
+                    background: rgba(0,0,0,0.04);
+                    border-radius: 4px;
+                    animation: pulse-header 1.5s infinite ease-in-out;
+                  }
+                  [data-theme='dark'] .skeleton-title {
+                    background: rgba(255,255,255,0.06) !important;
+                  }
+                  [data-theme='dark'] .skeleton-subtitle {
+                    background: rgba(255,255,255,0.04) !important;
+                  }
+                `}</style>
+                <div className="skeleton-title" />
+                <div className="skeleton-subtitle" />
+              </div>
+            ) : (
+              <>
+                <h1>{header.title}</h1>
+                <p>{header.subtitle}</p>
+              </>
+            )}
           </div>
           <div className={styles.topBarActions}>
-            <Suspense fallback={<select className={styles.filterSelect}><option>All Courses</option></select>}>
-              <CategorySelect />
-            </Suspense>
-            <div className={styles.searchBox}>
-                <button
-                  type="button"
-                  style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                  onClick={() => {
-                    const q = searchQuery.trim();
-                    if (q) router.push(`/lms/browse?q=${encodeURIComponent(q)}`);
-                    else router.push('/lms/browse');
-                  }}
-                  aria-label="Search courses"
-                >
-                  <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                </button>
-                <input
-                  type="text"
-                  placeholder="Search courses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+            {showSearchAndFilter && (
+              <>
+                <Suspense fallback={<select className={styles.filterSelect}><option>All Courses</option></select>}>
+                  <CategorySelect />
+                </Suspense>
+                <div className={styles.searchBox}>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                    onClick={() => {
                       const q = searchQuery.trim();
                       if (q) router.push(`/lms/browse?q=${encodeURIComponent(q)}`);
                       else router.push('/lms/browse');
-                    }
-                  }}
-                  style={{ width: 150 }}
-                />
-              </div>
+                    }}
+                    aria-label="Search courses"
+                  >
+                    <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </button>
+                  <input
+                    type="text"
+                    placeholder="Search courses..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const q = searchQuery.trim();
+                        if (q) router.push(`/lms/browse?q=${encodeURIComponent(q)}`);
+                        else router.push('/lms/browse');
+                      }
+                    }}
+                    style={{ width: 150 }}
+                  />
+                </div>
+              </>
+            )}
 
             <button className={styles.notifBtn} onClick={toggleTheme} aria-label="Toggle Theme" title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}>
               {theme === 'dark' ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
               )}
             </button>
-            
+
             {/* 🔔 Live Notification Bell */}
             <NotificationBell />
 
             <div className={styles.profileWrapper} onClick={(e) => e.stopPropagation()}>
-              <button 
-                className={styles.profileBtn}
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                <div 
-                  className={styles.avatar} 
-                  style={{ 
-                    overflow: 'hidden',
-                    background: userImageUrl ? 'transparent' : 'var(--dash-accent)' 
-                  }}
+              {status === 'loading' ? (
+                <div style={{
+                  width: '95px',
+                  height: '36px',
+                  borderRadius: '20px',
+                  background: 'rgba(0,0,0,0.05)',
+                  animation: 'pulse-header 1.5s infinite ease-in-out'
+                }} />
+              ) : (
+                <button
+                  className={styles.profileBtn}
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
-                  {userImageUrl ? (
-                    <img src={userImageUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                  ) : (
-                    userInitial
-                  )}
-                </div>
-                <span className={styles.profileName}>Profile</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
+                  <div
+                    className={styles.avatar}
+                    style={{
+                      overflow: 'hidden',
+                      background: userImageUrl ? 'transparent' : 'var(--dash-accent)'
+                    }}
+                  >
+                    {userImageUrl ? (
+                      <img src={userImageUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    ) : (
+                      userInitial
+                    )}
+                  </div>
+                  <span className={styles.profileName}>Profile</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+              )}
               {dropdownOpen && (
                 <div className={styles.dropdownMenu}>
                   <div className={styles.dropdownHeader}>
@@ -332,7 +390,7 @@ export default function LMSLayout({ children }) {
                     </Link>
                   )}
                   <button onClick={() => signOut({ callbackUrl: '/' })} className={styles.dropdownItem}>
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     Logout
                   </button>
                 </div>

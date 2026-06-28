@@ -174,6 +174,53 @@ export async function PUT(request, { params }) {
     }
 
     const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { returnDocument: 'after', runValidators: true }).lean();
+
+    // ── Live Session Completed Hook: Auto-add to Course Curriculum ──
+    if (resourceName === 'livesessions' && updatedItem.status === 'completed' && updatedItem.joinUrl && updatedItem.course) {
+      try {
+        const Course = (await import('@/models/Course')).default;
+        const slugify = (await import('slugify')).default;
+        
+        const course = await Course.findById(updatedItem.course);
+        if (course) {
+          // Check if "Recorded Live Classes" chapter exists
+          let chapter = course.chapters.find(ch => ch.title === 'Recorded Live Classes');
+          if (!chapter) {
+            // Create a new chapter
+            course.chapters.push({
+              title: 'Recorded Live Classes',
+              description: 'Recordings of live sessions for offline viewing',
+              order: course.chapters.length,
+              lessons: []
+            });
+            chapter = course.chapters[course.chapters.length - 1];
+          }
+
+          // Check if lesson with this video url or slug already exists to prevent duplicates
+          const baseSlug = slugify(updatedItem.title, { lower: true, strict: true }) || 'live-recording';
+          const existingLesson = chapter.lessons.find(l => l.videoUrl === updatedItem.joinUrl || l.slug.startsWith(baseSlug));
+          
+          if (!existingLesson) {
+            // Add lesson
+            const lessonSlug = `${baseSlug}-${Date.now()}`;
+            chapter.lessons.push({
+              title: updatedItem.title,
+              slug: lessonSlug,
+              type: 'video',
+              duration: updatedItem.duration || 60,
+              videoUrl: updatedItem.joinUrl,
+              order: chapter.lessons.length,
+              isFree: false
+            });
+            await course.save();
+            console.log(`✅ Auto-attached recorded live session to course curriculum: ${updatedItem.title}`);
+          }
+        }
+      } catch (err) {
+        console.error('Error auto-attaching live session recording to course curriculum:', err);
+      }
+    }
+
     return NextResponse.json({ success: true, data: updatedItem });
   } catch (err) {
     console.error(`Error updating resource:`, err);

@@ -28,10 +28,16 @@ export async function POST(request) {
     }
 
     await connectDB();
-    const { courseId, amount, batchId, batchName } = await request.json();
+    const { courseId, batchId, batchName } = await request.json();
 
-    if (!courseId || !amount) {
-      return NextResponse.json({ success: false, error: 'courseId and amount are required' }, { status: 400 });
+    if (!courseId) {
+      return NextResponse.json({ success: false, error: 'courseId is required' }, { status: 400 });
+    }
+
+    const Course = (await import('@/models/Course')).default;
+    const course = await Course.findById(courseId).lean();
+    if (!course) {
+      return NextResponse.json({ success: false, error: 'Course not found' }, { status: 404 });
     }
 
     // Validate batch belongs to course if provided
@@ -43,7 +49,7 @@ export async function POST(request) {
       }
     }
 
-    // ── Check if already enrolled ──
+    // ── Check if already active/completed enrolled ──
     const existingEnrollment = await Enrollment.findOne({
       student: session.user.id,
       course: courseId,
@@ -56,6 +62,16 @@ export async function POST(request) {
         error: 'You are already enrolled in this course!',
       }, { status: 409 });
     }
+
+    // ── Check if expired enrollment exists for 50% discount ──
+    const expiredEnrollment = await Enrollment.findOne({
+      student: session.user.id,
+      course: courseId,
+      status: 'expired'
+    });
+
+    // 50% discount if expired, otherwise regular price
+    const finalPrice = expiredEnrollment ? Math.round(course.price * 0.5) : course.price;
 
     // ── Create Razorpay Order ──
     // Dynamic import to handle cases where razorpay package might not work
@@ -75,7 +91,7 @@ export async function POST(request) {
     let order;
     try {
       order = await razorpay.orders.create({
-        amount: Math.round(amount * 100), // Razorpay uses paise (₹499 = 49900)
+        amount: Math.round(finalPrice * 100), // Razorpay uses paise (₹499 = 49900)
         currency: 'INR',
         receipt: `rcpt_${courseId.slice(-6)}_${Date.now()}`,
         notes: { courseId, studentId: session.user.id },
@@ -92,7 +108,7 @@ export async function POST(request) {
     await Payment.create({
       student: session.user.id,
       course: courseId,
-      amount: Math.round(amount * 100), // Store in paise
+      amount: Math.round(finalPrice * 100), // Store in paise
       razorpayOrderId: order.id,
       status: 'created',
       notes: {
@@ -159,55 +175,56 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, error: 'Payment record not found' }, { status: 404 });
     }
 
-    // ── Create Enrollment (only if not already exists) ──
+    // ── Create or Reactivate Enrollment ──
     const existingEnrollment = await Enrollment.findOne({
       student: payment.student,
       course: payment.course,
     });
 
-    if (!existingEnrollment) {
-      // Resolve Batch
-      let resolvedBatchId = null;
-      try {
-        const User = (await import('@/models/User')).default;
-        const Batch = (await import('@/models/Batch')).default;
-        
-        const studentUser = await User.findById(payment.student).lean();
-        const studentEmail = studentUser ? studentUser.email : null;
+    // Resolve Batch
+    let resolvedBatchId = null;
+    try {
+      const User = (await import('@/models/User')).default;
+      const Batch = (await import('@/models/Batch')).default;
+      
+      const studentUser = await User.findById(payment.student).lean();
+      const studentEmail = studentUser ? studentUser.email : null;
 
-        const bId = payment.notes 
-          ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchId') : payment.notes.batchId)
-          : null;
-        const bName = payment.notes
-          ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchName') : payment.notes.batchName)
-          : null;
+      const bId = payment.notes 
+        ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchId') : payment.notes.batchId)
+        : null;
+      const bName = payment.notes
+        ? (typeof payment.notes.get === 'function' ? payment.notes.get('batchName') : payment.notes.batchName)
+        : null;
 
-        if (bId && bId.trim() !== '') {
-          const existingBatch = await Batch.findOne({ _id: bId, course: payment.course });
-          if (existingBatch) {
-            resolvedBatchId = existingBatch._id;
-            if (studentEmail) {
-              await Batch.findByIdAndUpdate(existingBatch._id, {
-                $addToSet: { students: studentEmail }
-              });
-            }
-          }
-        } else if (bName && bName.trim() !== '') {
-          const updateObj = { $setOnInsert: { isActive: true } };
-          if (studentEmail) {
-            updateObj.$addToSet = { students: studentEmail };
-          }
-          const existingBatch = await Batch.findOneAndUpdate(
-            { course: payment.course, name: bName },
-            updateObj,
-            { upsert: true, returnDocument: 'after' }
-          );
+      if (bId && bId.trim() !== '') {
+        const existingBatch = await Batch.findOne({ _id: bId, course: payment.course });
+        if (existingBatch) {
           resolvedBatchId = existingBatch._id;
+          if (studentEmail) {
+            await Batch.findByIdAndUpdate(existingBatch._id, {
+              $addToSet: { students: studentEmail }
+            });
+          }
         }
-      } catch (batchErr) {
-        console.error('Error resolving batch for enrollment:', batchErr);
+      } else if (bName && bName.trim() !== '') {
+        const updateObj = { $setOnInsert: { isActive: true } };
+        if (studentEmail) {
+          updateObj.$addToSet = { students: studentEmail };
+        }
+        const existingBatch = await Batch.findOneAndUpdate(
+          { course: payment.course, name: bName },
+          updateObj,
+          { upsert: true, returnDocument: 'after' }
+        );
+        resolvedBatchId = existingBatch._id;
       }
+    } catch (batchErr) {
+      console.error('Error resolving batch for enrollment:', batchErr);
+    }
 
+    if (!existingEnrollment) {
+      // Brand new enrollment
       await Enrollment.create({
         student: payment.student,
         course: payment.course,
@@ -215,7 +232,31 @@ export async function PUT(request) {
         payment: payment._id,
         status: 'active',
         enrolledAt: new Date(),
+        // expiresAt will be automatically set to 6 months by the Enrollment pre-save hook
       });
+    } else if (existingEnrollment.status === 'expired') {
+      // Reactivate expired enrollment
+      existingEnrollment.status = 'active';
+      existingEnrollment.enrolledAt = new Date();
+      
+      // Explicitly set 6 months validity from now
+      const expDate = new Date();
+      expDate.setMonth(expDate.getMonth() + 6);
+      existingEnrollment.expiresAt = expDate;
+      
+      existingEnrollment.payment = payment._id;
+      existingEnrollment.batch = resolvedBatchId;
+      // Reset progress percentage so they can learn again
+      existingEnrollment.progress = {
+        completedLessons: [],
+        currentLesson: '',
+        percentage: 0,
+        lastAccessedAt: new Date(),
+        totalWatchTimeMin: 0
+      };
+      
+      await existingEnrollment.save();
+      console.log(`✅ Reactivated expired enrollment for student ${payment.student} in course ${payment.course}`);
     }
 
     return NextResponse.json({ success: true, message: 'Payment verified, enrollment created!' });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, notFound } from 'next/navigation';
 import { schemaConfig } from '@/components/lms/instructor/schemaConfig';
 import DataTable from '@/components/lms/instructor/DataTable';
 import SchemaFormModal from '@/components/lms/instructor/SchemaFormModal';
@@ -109,12 +109,7 @@ export default function GenericResourcePage({ params }) {
   };
 
   if (!dynamicConfig) {
-    return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: '#ef4444' }}>
-        <h2>Resource Not Found</h2>
-        <p>The system does not have an admin configuration for "{resource}".</p>
-      </div>
-    );
+    notFound();
   }
 
   // Build columns for DataTable from config fields

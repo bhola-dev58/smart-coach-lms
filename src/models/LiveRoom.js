@@ -71,7 +71,6 @@ const liveRoomSchema = new mongoose.Schema(
 );
 
 // ── Indexes ──
-liveRoomSchema.index({ roomCode: 1 });
 liveRoomSchema.index({ host: 1 });
 liveRoomSchema.index({ status: 1 });
 liveRoomSchema.index({ scheduledAt: -1 });
