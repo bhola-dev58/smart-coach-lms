@@ -79,13 +79,12 @@ enrollmentSchema.index({ student: 1, status: 1 });
 enrollmentSchema.index({ course: 1 });
 
 // ── Auto-set Expiry Date Hook (6 Months Validity) ──
-enrollmentSchema.pre('save', function(next) {
+enrollmentSchema.pre('save', async function() {
   if (!this.expiresAt) {
     const date = new Date(this.enrolledAt || Date.now());
     date.setMonth(date.getMonth() + 6);
     this.expiresAt = date;
   }
-  next();
 });
 
 enrollmentSchema.post('save', async function(doc) {

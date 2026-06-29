@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 import LiveSession from '@/models/LiveSession';
-import Batch from '@/models/Batch';
 
 // GET: Fetch live sessions visible to the current user
 // Sessions from the past 24 hours or any future sessions are shown.
@@ -26,35 +25,60 @@ export async function GET() {
       status: { $in: ['scheduled', 'live'] },
     };
 
-    // Instructors only see their own sessions
+    // ── Instructors: only see their own sessions ──
     if (role === 'instructor') {
       filter.instructor = session.user.id;
-    }
-    // Students only see sessions matching their batches or unbatched ones, restricted to their enrolled courses
-    else if (role === 'student') {
+
+    // ── Students: see sessions for ALL courses they are enrolled in ──
+    } else if (role === 'student') {
       const Enrollment = (await import('@/models/Enrollment')).default;
+      const Batch = (await import('@/models/Batch')).default;
+
+      // 1. Get all active/completed enrollments for this student
       const enrollments = await Enrollment.find({
         student: session.user.id,
-        status: { $in: ['active', 'completed'] }
-      }).select('course').lean();
+        status: { $in: ['active', 'completed'] },
+      }).select('course batch').lean();
+
+      if (enrollments.length === 0) {
+        // Student has no enrollments — return empty
+        return NextResponse.json({ success: true, sessions: [] });
+      }
+
       const enrolledCourseIds = enrollments.map(e => e.course);
 
-      filter.course = { $in: enrolledCourseIds };
+      // 2. Get all batches this student belongs to (by email)
+      const userBatches = await Batch.find({
+        students: session.user.email,
+        isActive: true,
+      }).select('_id').lean();
+      const userBatchIds = userBatches.map(b => b._id.toString());
 
-      const userBatches = await Batch.find({ students: session.user.email, isActive: true }).select('_id').lean();
-      const userBatchIds = userBatches.map(b => b._id);
-      
+      // 3. Also get batch IDs directly from their enrollment records
+      const enrollmentBatchIds = enrollments
+        .filter(e => e.batch)
+        .map(e => e.batch.toString());
+
+      // Merge both batch ID sources
+      const allUserBatchIds = [...new Set([...userBatchIds, ...enrollmentBatchIds])];
+
+      // 4. Build filter:
+      //    - Course must be one the student is enrolled in
+      //    - Batch condition (soft): show if:
+      //        a) session has no batch (open to all enrolled students), OR
+      //        b) session batch matches one of the student's batches
+      filter.course = { $in: enrolledCourseIds };
       filter.$or = [
-        { batch: { $in: userBatchIds } },
         { batch: { $exists: false } },
-        { batch: null }
+        { batch: null },
+        { batch: { $in: allUserBatchIds } },
       ];
     }
-    // Admins see all sessions
+    // ── Admins: see all sessions (no extra filter) ──
 
     const sessions = await LiveSession.find(filter)
       .sort({ scheduledAt: 1 })
-      .limit(30)
+      .limit(50)
       .lean();
 
     return NextResponse.json({ success: true, sessions });

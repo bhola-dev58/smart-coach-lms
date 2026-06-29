@@ -1,22 +1,44 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import LiveClassroom from '@/components/lms/LiveClassroom';
 
 // ============================================
 // 🎥 LIVE CLASSES PAGE
 // Shows both:
-//   1. Zoom/External sessions (from LiveSession model)
+//   1. YouTube/Scheduled sessions (embedded iframe player — no external redirect)
 //   2. In-app WebRTC rooms (from LiveRoom model)
 // ============================================
+
+// ── Helper: Convert any YouTube URL → embeddable URL ──
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    // youtube.com/watch?v=VIDEO_ID
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1&rel=0`;
+
+    // youtube.com/live/VIDEO_ID
+    const liveMatch = url.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/);
+    if (liveMatch) return `https://www.youtube.com/embed/${liveMatch[1]}?autoplay=1&rel=0`;
+
+    // Already an embed URL
+    if (url.includes('youtube.com/embed/')) return url;
+
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export default function LiveClassesPage() {
   const { data: session } = useSession();
   const [rooms, setRooms] = useState([]);
   const [zoomSessions, setZoomSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeRoom, setActiveRoom] = useState(null); // WebRTC Room code to join
+  const [activeRoom, setActiveRoom] = useState(null);       // WebRTC Room code
+  const [activeEmbed, setActiveEmbed] = useState(null);     // { title, embedUrl, isLive }
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState({
     title: '',
@@ -27,13 +49,9 @@ export default function LiveClassesPage() {
 
   const isInstructor = session?.user?.role === 'instructor' || session?.user?.role === 'admin';
 
-  useEffect(() => {
-    fetchAll();
-  }, []);
-
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
     try {
-      // Fetch in-app WebRTC rooms
       const roomRes = await fetch('/api/live/room');
       const roomData = await roomRes.json();
       if (roomData.success) setRooms(roomData.rooms || []);
@@ -42,17 +60,19 @@ export default function LiveClassesPage() {
     }
 
     try {
-      // Fetch Zoom/external live sessions scheduled by instructors
       const sessRes = await fetch('/api/lms/live-sessions');
       const sessData = await sessRes.json();
       if (sessData.success) setZoomSessions(sessData.sessions || []);
     } catch (err) {
-      // Silently skip if no API yet
-      console.error('Failed to fetch zoom sessions:', err);
+      console.error('Failed to fetch live sessions:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const createRoom = async () => {
     if (!createForm.title.trim()) return;
@@ -66,7 +86,6 @@ export default function LiveClassesPage() {
       if (data.success) {
         setShowCreateForm(false);
         setCreateForm({ title: '', description: '', maxParticipants: 100 });
-        // Auto-join the created room
         setActiveRoom(data.roomCode);
       }
     } catch (err) {
@@ -76,12 +95,85 @@ export default function LiveClassesPage() {
 
   const joinByCode = () => {
     const code = joinCode.trim().toUpperCase();
-    if (code.length >= 4) {
-      setActiveRoom(code);
-    }
+    if (code.length >= 4) setActiveRoom(code);
   };
 
-  // If actively in a WebRTC room, show the LiveClassroom
+  // ── Inline embed player for YouTube live/recorded sessions ──
+  if (activeEmbed) {
+    return (
+      <div style={{ padding: '1.5rem', maxWidth: 1100, margin: '0 auto' }}>
+        {/* Back button */}
+        <button
+          onClick={() => setActiveEmbed(null)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
+            background: 'var(--dash-surface)', border: '1px solid var(--dash-border)',
+            color: 'var(--dash-text)', padding: '0.5rem 1rem', borderRadius: '8px',
+            cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1.25rem',
+          }}
+        >
+          ← Back to Live Classes
+        </button>
+
+        {/* Session Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+          {activeEmbed.isLive && (
+            <span style={{
+              background: '#e74c3c', color: 'white',
+              padding: '3px 12px', borderRadius: '20px',
+              fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.5px',
+              display: 'flex', alignItems: 'center', gap: '5px',
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%', background: 'white',
+                display: 'inline-block', animation: 'pulse 1.5s infinite',
+              }} />
+              LIVE
+            </span>
+          )}
+          <h2 style={{ margin: 0, fontSize: '1.3rem', color: 'var(--dash-text)', fontWeight: 700 }}>
+            {activeEmbed.title}
+          </h2>
+        </div>
+
+        {/* Embedded YouTube Player */}
+        <div style={{
+          position: 'relative', width: '100%', paddingTop: '56.25%', /* 16:9 */
+          background: '#000', borderRadius: '14px', overflow: 'hidden',
+          border: '1px solid var(--dash-border)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        }}>
+          <iframe
+            src={activeEmbed.embedUrl}
+            title={activeEmbed.title}
+            style={{
+              position: 'absolute', top: 0, left: 0,
+              width: '100%', height: '100%', border: 'none',
+            }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+
+        {/* Security notice */}
+        <p style={{
+          fontSize: '0.75rem', color: 'var(--dash-text-muted)', marginTop: '0.75rem',
+          textAlign: 'center',
+        }}>
+          🔒 This session is only accessible to enrolled students via the LMS portal.
+        </p>
+
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // ── WebRTC In-App Room ──
   if (activeRoom) {
     return (
       <LiveClassroom
@@ -95,8 +187,6 @@ export default function LiveClassesPage() {
   }
 
   const now = new Date();
-  // Show all sessions returned by API — includes sessions from past 24h (still joinable)
-  // Sort: live first, then by scheduledAt
   const upcomingZoom = [...zoomSessions].sort((a, b) => {
     if (a.status === 'live' && b.status !== 'live') return -1;
     if (b.status === 'live' && a.status !== 'live') return 1;
@@ -105,18 +195,18 @@ export default function LiveClassesPage() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: 960, margin: '0 auto' }}>
-      {/* Header */}
+      {/* ── Page Header ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--dash-text)' }}>
             Live Classes
           </h1>
           <p style={{ color: 'var(--dash-text-muted)', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
-            Join Zoom sessions or real-time in-app classroom sessions
+            Watch live sessions or join real-time in-app classroom sessions
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {/* Join In-App WebRTC Room by Code — NOT for Zoom codes */}
+          {/* Join In-App WebRTC Room by Code */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', gap: '0.25rem' }}>
               <input
@@ -146,7 +236,7 @@ export default function LiveClassesPage() {
               </button>
             </div>
             <span style={{ fontSize: '0.65rem', color: 'var(--dash-text-muted)' }}>
-              For in-app rooms only — not Zoom codes
+              For in-app WebRTC rooms only
             </span>
           </div>
           {isInstructor && (
@@ -164,19 +254,7 @@ export default function LiveClassesPage() {
         </div>
       </div>
 
-      {/* Info Banner for "Join by Code" */}
-      <div style={{
-        background: 'rgba(52,152,219,0.08)', border: '1px solid rgba(52,152,219,0.25)',
-        borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.5rem',
-        fontSize: '0.85rem', color: 'var(--dash-text-secondary)'
-      }}>
-        <span>
-          <strong>Join by Code</strong> is for in-app WebRTC rooms only. For Zoom/Google Meet sessions,
-          click <strong>"Join Zoom"</strong> on the session cards below — they open directly in your browser or Zoom app.
-        </span>
-      </div>
-
-      {/* Create Room Form */}
+      {/* ── Create Room Form ── */}
       {showCreateForm && (
         <div style={{
           background: 'var(--dash-surface)', border: '1px solid var(--dash-border)',
@@ -247,11 +325,15 @@ export default function LiveClassesPage() {
         <p style={{ textAlign: 'center', color: 'var(--dash-text-muted)', padding: '3rem 0' }}>Loading live sessions...</p>
       ) : (
         <>
-          {/* ── SECTION 1: Zoom / External Sessions ── */}
+          {/* ── SECTION 1: Scheduled / YouTube Sessions ── */}
           <div style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem' }}>
-              Zoom &amp; External Sessions
-              <span style={{ fontSize: '0.7rem', background: 'rgba(255,171,0,0.15)', color: '#ffab00', border: '1px solid rgba(255,171,0,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, marginLeft: '0.5rem' }}>
+              Scheduled Live Sessions
+              <span style={{
+                fontSize: '0.7rem', background: 'rgba(255,171,0,0.15)', color: '#ffab00',
+                border: '1px solid rgba(255,171,0,0.3)', padding: '2px 8px', borderRadius: '12px',
+                fontWeight: 600, marginLeft: '0.5rem',
+              }}>
                 Scheduled
               </span>
             </h2>
@@ -262,20 +344,28 @@ export default function LiveClassesPage() {
                 borderRadius: '12px', padding: '2rem', textAlign: 'center',
               }}>
                 <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem', margin: 0 }}>
-                  No upcoming Zoom sessions. {isInstructor ? 'Go to "Live Sessions" in the instructor panel to schedule one.' : 'Check back later.'}
+                  No upcoming live sessions.{' '}
+                  {isInstructor
+                    ? 'Go to "Live Sessions" in the instructor panel to schedule one.'
+                    : 'Check back later or make sure you are enrolled in the course.'}
                 </p>
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {upcomingZoom.map((s) => {
                   const isLive = s.status === 'live' || new Date(s.scheduledAt) <= now;
+                  const embedUrl = getYouTubeEmbedUrl(s.joinUrl);
+                  const hasEmbed = !!embedUrl;
+
                   return (
                     <div
                       key={s._id}
                       style={{
-                        background: 'var(--dash-surface)', border: `1px solid ${isLive ? 'rgba(231,76,60,0.4)' : 'var(--dash-border)'}`,
+                        background: 'var(--dash-surface)',
+                        border: `1px solid ${isLive ? 'rgba(231,76,60,0.4)' : 'var(--dash-border)'}`,
                         borderRadius: '12px', padding: '1.25rem',
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
+                        display: 'flex', justifyContent: 'space-between',
+                        alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
                       }}
                     >
                       <div style={{ flex: 1 }}>
@@ -286,36 +376,58 @@ export default function LiveClassesPage() {
                             border: isLive ? 'none' : '1px solid rgba(255,171,0,0.3)',
                             padding: '3px 10px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700,
                           }}>
-                            {isLive ? 'LIVE' : 'Upcoming'}
+                            {isLive ? '🔴 LIVE' : '⏰ Upcoming'}
                           </span>
-                          <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 700 }}>{s.title}</h3>
+                          <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 700 }}>
+                            {s.title}
+                          </h3>
                         </div>
                         <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--dash-text-muted)', flexWrap: 'wrap' }}>
-                          <span>Time: {new Date(s.scheduledAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                          {s.duration && (
-                            <span>Duration: {s.duration} mins</span>
-                          )}
+                          <span>🕐 {new Date(s.scheduledAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                          {s.duration && <span>⏱ {s.duration} mins</span>}
                           {s.description && <span>{s.description}</span>}
                         </div>
                       </div>
-                      {s.joinUrl ? (
-                        <a
-                          href={s.joinUrl}
-                          target="_blank"
-                          rel="noreferrer"
+
+                      {/* ── Action Button ── */}
+                      {hasEmbed ? (
+                        // YouTube link → open embedded player inside LMS (no redirect)
+                        <button
+                          onClick={() => setActiveEmbed({ title: s.title, embedUrl, isLive })}
                           style={{
-                            padding: '0.6rem 1.5rem', borderRadius: '8px', textDecoration: 'none',
+                            padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none',
                             background: isLive ? '#e74c3c' : 'var(--color-primary)',
-                            color: 'white', fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap',
+                            color: 'white', fontWeight: 600, fontSize: '0.9rem',
+                            cursor: 'pointer', whiteSpace: 'nowrap',
                             transition: 'opacity 0.2s',
                           }}
                           onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
                           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                         >
-                          {isLive ? 'Join Zoom Now' : 'Join Zoom'}
-                        </a>
+                          {isLive ? '▶ Watch Live' : '▶ Watch'}
+                        </button>
+                      ) : s.joinUrl ? (
+                        // Non-YouTube link (e.g. Zoom, Meet) — show disabled for security
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                          <button
+                            disabled
+                            title="External links are disabled for security. Contact your instructor."
+                            style={{
+                              padding: '0.6rem 1.5rem', borderRadius: '8px', border: '1px solid var(--dash-border)',
+                              background: 'var(--dash-border)', color: 'var(--dash-text-muted)',
+                              fontWeight: 600, fontSize: '0.9rem', cursor: 'not-allowed', whiteSpace: 'nowrap',
+                            }}
+                          >
+                            🔒 Restricted
+                          </button>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--dash-text-muted)' }}>
+                            External links are disabled
+                          </span>
+                        </div>
                       ) : (
-                        <span style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', fontStyle: 'italic' }}>No link yet</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', fontStyle: 'italic' }}>
+                          No link yet
+                        </span>
                       )}
                     </div>
                   );
@@ -328,7 +440,11 @@ export default function LiveClassesPage() {
           <div>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '1rem' }}>
               In-App Live Rooms
-              <span style={{ fontSize: '0.7rem', background: 'rgba(46,213,115,0.12)', color: '#2ed573', border: '1px solid rgba(46,213,115,0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, marginLeft: '0.5rem' }}>
+              <span style={{
+                fontSize: '0.7rem', background: 'rgba(46,213,115,0.12)', color: '#2ed573',
+                border: '1px solid rgba(46,213,115,0.3)', padding: '2px 8px', borderRadius: '12px',
+                fontWeight: 600, marginLeft: '0.5rem',
+              }}>
                 WebRTC
               </span>
             </h2>
