@@ -12,6 +12,17 @@ export default function LearnCoursePage() {
   const router = useRouter();
   const videoRef = useRef(null);
   const watchTimerRef = useRef(null);
+  const ytContainerRef = useRef(null); // Container ref for YouTube embed — used for container-level fullscreen
+  const iframeRef = useRef(null); // Ref for YouTube <iframe> to attach Player API
+  const [ytIsFullscreen, setYtIsFullscreen] = useState(false);
+  
+  // Custom YouTube Player states
+  const [ytPlayer, setYtPlayer] = useState(null);
+  const [ytPlaying, setYtPlaying] = useState(false);
+  const [ytCurrentTime, setYtCurrentTime] = useState(0);
+  const [ytDuration, setYtDuration] = useState(0);
+  const [ytVolume, setYtVolume] = useState(100);
+  const [ytMuted, setYtMuted] = useState(false);
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,30 +71,35 @@ export default function LearnCoursePage() {
 
   const { data: session } = useSession();
   const [watermarkPos, setWatermarkPos] = useState({ top: '80%', left: '15%', transform: 'rotate(-30deg)' });
+  const lastWatermarkMoveRef = useRef(0);
+
+  // Update watermark to a random position across the player
+  const updateWatermarkRandomly = useCallback(() => {
+    const randomTop = Math.floor(Math.random() * 60) + 15; // 15% to 75%
+    const randomLeft = Math.floor(Math.random() * 60) + 15; // 15% to 75%
+    const randomRotate = Math.floor(Math.random() * 60) - 30; // -30deg to 30deg
+    setWatermarkPos({
+      top: `${randomTop}%`,
+      left: `${randomLeft}%`,
+      transform: `translate(-50%, -50%) rotate(${randomRotate}deg)`
+    });
+  }, []);
 
   // Handle video time update to change watermark position & auto-resume
   const handleTimeUpdate = (e) => {
     const video = e.target;
     if (!video.duration) return;
-    const progress = video.currentTime / video.duration;
 
     // Save Auto-Resume progress every ~2 seconds to local storage
     if (Math.floor(video.currentTime) % 2 === 0 && activeLesson) {
       localStorage.setItem(`gradify_resumeTime_${activeLesson.slug}`, video.currentTime);
     }
 
-    if (progress < 0.25) {
-      // Up to 25%: left
-      setWatermarkPos({ top: '80%', left: '15%', transform: 'rotate(-30deg)' });
-    } else if (progress < 0.50) {
-      // 25% to 50%: top-center
-      setWatermarkPos({ top: '15%', left: '50%', transform: 'translateX(-50%) rotate(-30deg)' });
-    } else if (progress < 0.75) {
-      // 50% to 75%: right-center
-      setWatermarkPos({ top: '50%', left: '85%', transform: 'translate(-100%, -50%) rotate(-30deg)' });
-    } else {
-      // 75% to 100%: center
-      setWatermarkPos({ top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-30deg)' });
+    // Move watermark randomly every 12 seconds
+    const currentSecond = Math.floor(video.currentTime);
+    if (currentSecond - lastWatermarkMoveRef.current >= 12 || currentSecond < lastWatermarkMoveRef.current) {
+      lastWatermarkMoveRef.current = currentSecond;
+      updateWatermarkRandomly();
     }
   };
 
@@ -375,16 +391,206 @@ export default function LearnCoursePage() {
   // ── YouTube & Live Meetings helper logic ──
   const getYoutubeEmbedUrl = (url) => {
     if (!url) return null;
+    // controls=0: hides controls completely
+    // modestbranding=1: hides YouTube logo
+    // cc_load_policy=0: disables captions/subtitles by default
+    // iv_load_policy=3: disables annotations
+    // fs=0: disables native fullscreen button
+    // disablekb=1: disables keyboard controls
+    // enablejsapi=1: required for JS API control
+    const params = 'autoplay=1&controls=0&rel=0&modestbranding=1&cc_load_policy=0&iv_load_policy=3&fs=0&disablekb=1&enablejsapi=1';
+    
+    // Handle youtube.com/live/VIDEO_ID format (live streams)
+    const liveMatch = url.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/);
+    if (liveMatch) {
+      return `https://www.youtube.com/embed/${liveMatch[1]}?${params}`;
+    }
+    // Handle standard watch URLs and short URLs
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     if (match && match[2].length === 11) {
-      return `https://www.youtube.com/embed/${match[2]}?autoplay=1&rel=0`;
+      return `https://www.youtube.com/embed/${match[2]}?${params}`;
     }
     return null;
   };
 
+  const getYoutubeVideoId = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return match[2];
+    }
+    const liveMatch = url.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/);
+    if (liveMatch) {
+      return liveMatch[1];
+    }
+    return null;
+  };
+
+  const youtubeVideoId = activeLesson ? getYoutubeVideoId(activeLesson.videoUrl) : null;
   const youtubeUrl = activeLesson ? getYoutubeEmbedUrl(activeLesson.videoUrl) : null;
   const isLiveMeeting = activeLesson ? (activeLesson.videoUrl.includes('zoom.us') || activeLesson.videoUrl.includes('meet.google.com') || activeLesson.videoUrl.includes('webex.com')) : false;
+
+  // ── YouTube API Setup Effect ──
+  useEffect(() => {
+    if (!youtubeVideoId) return;
+
+    let playerInstance = null;
+    let destroyed = false;
+
+    const initPlayer = () => {
+      if (destroyed || !iframeRef.current) return;
+      
+      try {
+        playerInstance = new window.YT.Player(iframeRef.current, {
+          videoId: youtubeVideoId,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            cc_load_policy: 0,
+            iv_load_policy: 3,
+            fs: 0,
+            disablekb: 1,
+            enablejsapi: 1
+          },
+          events: {
+            onReady: (event) => {
+              if (destroyed) return;
+              setYtPlayer(event.target);
+              setYtDuration(event.target.getDuration() || 0);
+              // Set volume to initial state
+              event.target.setVolume(ytVolume);
+              if (ytMuted) event.target.mute();
+            },
+            onStateChange: (event) => {
+              if (destroyed) return;
+              // event.data: 1 = Playing, 2 = Paused, 0 = Ended
+              setYtPlaying(event.data === 1);
+              if (event.data === 0) {
+                markComplete();
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.error("Failed to initialize YT Player:", err);
+      }
+    };
+
+    if (window.YT && window.YT.Player) {
+      // Delay slightly to ensure iframe element is fully rendered in DOM
+      setTimeout(initPlayer, 200);
+    } else {
+      // Load YouTube API if not already present
+      if (!window.onYouTubeIframeAPIReady) {
+        window.onYouTubeIframeAPIReady = () => {
+          initPlayer();
+        };
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      } else {
+        // Poll for ready
+        const timer = setInterval(() => {
+          if (window.YT && window.YT.Player) {
+            initPlayer();
+            clearInterval(timer);
+          }
+        }, 150);
+      }
+    }
+
+    return () => {
+      destroyed = true;
+      if (playerInstance && typeof playerInstance.destroy === 'function') {
+        try {
+          playerInstance.destroy();
+        } catch (e) {}
+      }
+      setYtPlayer(null);
+      setYtPlaying(false);
+      setYtCurrentTime(0);
+      setYtDuration(0);
+    };
+  }, [youtubeVideoId]);
+
+  // Update YouTube current time tracker when playing
+  useEffect(() => {
+    let timer = null;
+    if (ytPlaying && ytPlayer) {
+      timer = setInterval(() => {
+        try {
+          const currentTime = ytPlayer.getCurrentTime() || 0;
+          setYtCurrentTime(currentTime);
+
+          // Move watermark randomly every 12 seconds of playback
+          const currentSecond = Math.floor(currentTime);
+          if (currentSecond - lastWatermarkMoveRef.current >= 12 || currentSecond < lastWatermarkMoveRef.current) {
+            lastWatermarkMoveRef.current = currentSecond;
+            updateWatermarkRandomly();
+          }
+        } catch (e) {}
+      }, 500);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [ytPlaying, ytPlayer, updateWatermarkRandomly]);
+
+  // ── Custom YouTube Controls Handlers ──
+  const toggleYtPlay = () => {
+    if (!ytPlayer) return;
+    if (ytPlaying) {
+      ytPlayer.pauseVideo();
+    } else {
+      ytPlayer.playVideo();
+    }
+  };
+
+  const handleYtSeek = (e) => {
+    if (!ytPlayer) return;
+    const time = parseFloat(e.target.value);
+    ytPlayer.seekTo(time, true);
+    setYtCurrentTime(time);
+  };
+
+  const toggleYtMute = () => {
+    if (!ytPlayer) return;
+    if (ytMuted) {
+      ytPlayer.unMute();
+      setYtMuted(false);
+    } else {
+      ytPlayer.mute();
+      setYtMuted(true);
+    }
+  };
+
+  const handleYtVolumeChange = (e) => {
+    if (!ytPlayer) return;
+    const vol = parseInt(e.target.value);
+    ytPlayer.setVolume(vol);
+    setYtVolume(vol);
+    if (vol > 0 && ytMuted) {
+      ytPlayer.unMute();
+      setYtMuted(false);
+    }
+  };
+
+  // Toggle container-level fullscreen (overlays remain active, YouTube action menu never shows)
+  const toggleYtFullscreen = () => {
+    if (!ytContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      ytContainerRef.current.requestFullscreen?.();
+      setYtIsFullscreen(true);
+    } else {
+      document.exitFullscreen?.();
+      setYtIsFullscreen(false);
+    }
+  };
 
   const getSafeMeetingUrl = (url) => {
     if (!url) return '';
@@ -717,15 +923,129 @@ export default function LearnCoursePage() {
                   `}</style>
                 </div>
               ) : youtubeUrl ? (
-                <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: '400px' }}>
-                  <iframe
-                    src={youtubeUrl}
-                    title={activeLesson.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: '12px' }}
-                  ></iframe>
+                <div
+                  ref={ytContainerRef}
+                  style={{ position: 'relative', width: '100%', height: '100%', minHeight: '400px', borderRadius: '12px', overflow: 'hidden', background: '#000' }}
+                  onFullscreenChange={() => setYtIsFullscreen(!!document.fullscreenElement)}
+                >
+                  {/* YouTube Embed Placeholder — React does not manage the iframe directly, preventing DOM removeChild crashes */}
+                  <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+                    <div ref={iframeRef} style={{ width: '100%', height: '100%' }}></div>
+                  </div>
+
+                  {/* ── Overlay 1: Solid top block covering the title & channel details ── */}
+                  <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, height: '62px',
+                    background: '#111', pointerEvents: 'all',
+                    zIndex: 10, cursor: 'default', userSelect: 'none',
+                  }} />
+
+                  {/* ── Custom HTML Control Bar (completely overrides YouTube's controls) ── */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    height: '48px', background: 'rgba(15, 15, 20, 0.95)',
+                    display: 'flex', alignItems: 'center', padding: '0 15px',
+                    gap: '15px', zIndex: 25, borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px',
+                    userSelect: 'none', color: 'white',
+                    fontFamily: 'Inter, sans-serif', fontSize: '0.85rem'
+                  }}>
+                    {/* Play/Pause Button */}
+                    <button
+                      onClick={toggleYtPlay}
+                      style={{
+                        background: 'transparent', border: 'none', color: 'white',
+                        cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', padding: 0
+                      }}
+                    >
+                      {ytPlaying ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                      )}
+                    </button>
+
+                    {/* Time Display */}
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, minWidth: '95px' }}>
+                      {formatTimestamp(ytCurrentTime)} / {formatTimestamp(ytDuration)}
+                    </span>
+
+                    {/* Progress Slider */}
+                    <input
+                      type="range"
+                      min={0}
+                      max={ytDuration || 100}
+                      value={ytCurrentTime}
+                      onChange={handleYtSeek}
+                      style={{
+                        flex: 1, accentColor: 'var(--color-primary)', height: '4px',
+                        cursor: 'pointer', outline: 'none', borderRadius: '2px',
+                        background: 'rgba(255,255,255,0.2)'
+                      }}
+                    />
+
+                    {/* Volume Button */}
+                    <button
+                      onClick={toggleYtMute}
+                      style={{
+                        background: 'transparent', border: 'none', color: 'white',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0
+                      }}
+                    >
+                      {ytMuted || ytVolume === 0 ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM4.3 8.3H1.5v7.4h2.8l4.4 4.4V3.9L4.3 8.3z"/></svg>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                      )}
+                    </button>
+
+                    {/* Volume Slider */}
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={ytMuted ? 0 : ytVolume}
+                      onChange={handleYtVolumeChange}
+                      style={{
+                        width: '70px', accentColor: 'white', height: '4px',
+                        cursor: 'pointer', outline: 'none', borderRadius: '2px',
+                        background: 'rgba(255,255,255,0.2)'
+                      }}
+                    />
+
+                    {/* Custom Fullscreen Button */}
+                    <button
+                      onClick={toggleYtFullscreen}
+                      title={ytIsFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                      style={{
+                        background: 'transparent', border: 'none', color: 'white',
+                        cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', padding: 0
+                      }}
+                    >
+                      {ytIsFullscreen ? '⊡' : '⛶'}
+                    </button>
+                  </div>
+
+                  {/* ── LMS Portal Watermark (Clean plain text, no emoji/bg) ── */}
+                  {session?.user?.email && (
+                    <div style={{
+                      position: 'absolute',
+                      top: watermarkPos.top,
+                      left: watermarkPos.left,
+                      transform: watermarkPos.transform,
+                      color: 'rgba(255, 255, 255, 0.45)',
+                      fontSize: '10pt',
+                      fontFamily: 'sans-serif',
+                      fontWeight: 700,
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                      textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
+                      zIndex: 11,
+                    }}>
+                      {session.user.email}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
