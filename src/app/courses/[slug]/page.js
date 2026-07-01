@@ -11,9 +11,34 @@ export async function generateMetadata({ params }) {
   
   if (!course) return { title: 'Course Not Found' };
   
+  const keywords = [
+    course.title,
+    course.category,
+    ...(course.tags || []),
+    "Gradify Academy",
+    "Online Course",
+    "Coding Course in Hindi",
+    "Best Coding Institute",
+    "DSA Course",
+    "Web Development Syllabus",
+  ].filter(Boolean);
+
   return {
-    title: `${course.title} | Gradify Academy`,
-    description: course.shortDescription || course.description,
+    title: `${course.title} - Learn ${course.category || 'Coding'} | Gradify Academy`,
+    description: course.shortSubtitle || course.description?.substring(0, 160) || `Master ${course.title} with Gradify Academy. Online classes, syllabus, projects, certificate of completion, and placement assistance.`,
+    keywords: keywords.join(', '),
+    openGraph: {
+      title: `${course.title} | Gradify Academy`,
+      description: course.shortSubtitle || course.description?.substring(0, 160),
+      images: course.thumbnail ? [{ url: course.thumbnail }] : [],
+      type: 'video.other',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${course.title} | Gradify Academy`,
+      description: course.shortSubtitle || course.description?.substring(0, 160),
+      images: course.thumbnail ? [course.thumbnail] : [],
+    }
   };
 }
 
@@ -53,11 +78,67 @@ export default async function CourseDetailsPage({ params }) {
     totalHours: Math.ceil(computedDurationMinutes / 60),
   }));
 
+  // Google Search Course Rich Snippet Schema
+  const courseJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": course.title,
+    "description": course.shortSubtitle || course.description || "",
+    "image": course.thumbnail || "",
+    "provider": {
+      "@type": "Organization",
+      "name": "Gradify Academy",
+      "sameAs": "https://gradify.com"
+    },
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "On-demand / Self-paced",
+      "inLanguage": course.language || "Hindi",
+      "courseWorkload": `PT${serialized.totalHours || 0}H`
+    },
+    "offers": {
+      "@type": "Offer",
+      "category": "Paid",
+      "price": course.price || 0,
+      "priceCurrency": "INR"
+    },
+    "educationalCredentialAwarded": "Certificate of Completion",
+    "teaches": (course.learningOutcomes || []).slice(0, 5)
+  };
+
+  // Google Search FAQ Rich Snippet Schema
+  const faqJsonLd = (course.faqs && course.faqs.length > 0) ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": course.faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  } : null;
+
   return (
-    <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', display: 'flex', justifyContent: 'center', width: '100%' }}>
-      <div style={{ width: '100%', maxWidth: '1000px' }}>
-        <LmsCourseDetail course={serialized} backLink="/courses" />
+    <>
+      {/* Injecting Course Schema Markup */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      {/* Injecting FAQ Schema Markup */}
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
+      <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <div style={{ width: '100%', maxWidth: '1000px' }}>
+          <LmsCourseDetail course={serialized} backLink="/courses" />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
