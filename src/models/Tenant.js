@@ -71,7 +71,6 @@ const tenantSchema = new mongoose.Schema(
 );
 
 // ── Indexes ──
-tenantSchema.index({ subdomain: 1 });
 tenantSchema.index({ owner: 1 });
 tenantSchema.index({ isActive: 1 });
 
