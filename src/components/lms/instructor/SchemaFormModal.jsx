@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export default function SchemaFormModal({ config, initialData, onClose, onSave }) {
+export default function SchemaFormModal({ config, initialData, onClose, onSave, inline = false }) {
   const [formData, setFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -17,6 +17,10 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
   const [studentSearch, setStudentSearch] = useState('');
   const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
   const [prevCourseId, setPrevCourseId] = useState(null);
+  
+  // Bulk Import state
+  const [showBulkFaqFieldKey, setShowBulkFaqFieldKey] = useState(null);
+  const [showBulkStringArrayKey, setShowBulkStringArrayKey] = useState(null);
 
   // Fetch enrolled students when the selected course changes (for Batch creation)
   useEffect(() => {
@@ -186,12 +190,39 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
     return pluralName;
   };
 
+  const wrapperStyle = inline ? {
+    width: '100%',
+    boxSizing: 'border-box'
+  } : {
+    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+  };
+
+  const containerStyle = inline ? {
+    background: 'var(--dash-surface)',
+    width: '100%',
+    borderRadius: '14px',
+    border: '1px solid var(--dash-border)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+    display: 'flex',
+    flexDirection: 'column',
+    boxSizing: 'border-box',
+    overflow: 'visible',
+  } : {
+    background: 'var(--dash-surface) !important',
+    width: '95% !important',
+    maxWidth: '750px !important',
+    maxHeight: '90vh !important',
+    borderRadius: 'var(--dash-radius) !important',
+    border: '1px solid var(--dash-border) !important',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.3) !important',
+    display: 'flex !important',
+    flexDirection: 'column !important',
+  };
+
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-    }}>
+    <div style={wrapperStyle}>
       <style>{`
         .modal-input, .modal-select, .modal-textarea {
           background: #ffffff !important;
@@ -291,7 +322,7 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
           }
         }
       `}</style>
-      <div className="modal-container">
+      <div className={inline ? "" : "modal-container"} style={containerStyle}>
         {/* Header */}
         <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--dash-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ margin: 0 }}>{initialData ? 'Edit' : 'Create'} {config.name}</h3>
@@ -322,7 +353,138 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                     {field.label.replace(/\(comma\s+separated\)/i, '').trim()} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
                   </label>
                   
-                  {field.key === 'language' ? (
+                  {field.key === 'tags' ? (
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '6px',
+                      alignItems: 'center',
+                      padding: '6px 10px',
+                      background: '#ffffff',
+                      border: '2px solid var(--dash-border)',
+                      borderRadius: '8px',
+                      minHeight: '42px',
+                      cursor: 'text',
+                      boxSizing: 'border-box',
+                      width: '100%',
+                    }}
+                    onClick={() => {
+                      const inputEl = document.getElementById('tags-inline-input');
+                      if (inputEl) inputEl.focus();
+                    }}
+                    >
+                      {/* Render tag chips */}
+                      {(formData[field.key] || []).map((tag, idx) => (
+                        <span key={idx} style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: 'rgba(59, 130, 246, 0.1)',
+                          color: '#1e40af',
+                          border: '1px solid rgba(59, 130, 246, 0.2)',
+                          padding: '3px 8px',
+                          borderRadius: '16px',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          lineHeight: 1,
+                          userSelect: 'none',
+                        }}>
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const newTags = (formData[field.key] || []).filter((_, i) => i !== idx);
+                              handleChange(field.key, newTags);
+                            }}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              padding: 0,
+                              fontSize: '0.8rem',
+                              lineHeight: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '12px',
+                              height: '12px',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+
+                      {/* Inline Input Field */}
+                      <input
+                        type="text"
+                        id="tags-inline-input"
+                        placeholder={(formData[field.key] || []).length === 0 ? "Enter tags (separated by comma or Enter)..." : ""}
+                        value={newValues[field.key] || ''}
+                        onChange={e => {
+                          const text = e.target.value;
+                          // If they typed a comma, treat as separator
+                          if (text.endsWith(',')) {
+                            const newTag = text.slice(0, -1).trim();
+                            if (newTag) {
+                              const currentTags = formData[field.key] || [];
+                              if (!currentTags.includes(newTag)) {
+                                handleChange(field.key, [...currentTags, newTag]);
+                              }
+                            }
+                            setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                          } else {
+                            setNewValues(prev => ({ ...prev, [field.key]: text }));
+                          }
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = (newValues[field.key] || '').trim();
+                            if (val) {
+                              const currentTags = formData[field.key] || [];
+                              if (!currentTags.includes(val)) {
+                                handleChange(field.key, [...currentTags, val]);
+                              }
+                            }
+                            setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                          } else if (e.key === 'Backspace' && !newValues[field.key]) {
+                            // Backspace on empty input removes the last tag chip
+                            const currentTags = formData[field.key] || [];
+                            if (currentTags.length > 0) {
+                              handleChange(field.key, currentTags.slice(0, -1));
+                            }
+                          }
+                        }}
+                        onPaste={e => {
+                          const pastedText = e.clipboardData.getData('text');
+                          if (pastedText.includes(',')) {
+                            e.preventDefault();
+                            const parts = pastedText.split(',').map(p => p.trim()).filter(Boolean);
+                            if (parts.length > 0) {
+                              const currentTags = formData[field.key] || [];
+                              const merged = Array.from(new Set([...currentTags, ...parts]));
+                              handleChange(field.key, merged);
+                              setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                            }
+                          }
+                        }}
+                        style={{
+                          border: 'none',
+                          outline: 'none',
+                          padding: '4px 0',
+                          fontSize: '0.9rem',
+                          color: '#1f2937',
+                          background: 'transparent',
+                          flex: 1,
+                          minWidth: '150px',
+                        }}
+                      />
+                    </div>
+                  ) : field.key === 'language' ? (
                     <select
                       value={formData[field.key] || 'Hindi'}
                       onChange={e => handleChange(field.key, e.target.value)}
@@ -762,81 +924,135 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                           </div>
                         ))}
                         
-                        {/* Blank toggle/add input box */}
-                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="text"
-                            placeholder={`Add new ${getSingularName(field.label.replace(/\(comma\s+separated\)/i, '').trim()).toLowerCase()}...`}
-                            value={newValues[field.key] || ''}
-                            onChange={e => {
-                              const text = e.target.value;
-                              if (text.includes(',')) {
-                                const parts = text.split(',');
-                                const newItems = parts.slice(0, -1).map(p => p.trim()).filter(Boolean);
-                                if (newItems.length > 0) {
-                                  const newArr = [...(formData[field.key] || []), ...newItems];
-                                  handleChange(field.key, newArr);
+                        {/* Bulk String Array Input Area */}
+                        {showBulkStringArrayKey === field.key && (
+                          <div style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid var(--dash-border)', borderRadius: '8px', padding: '0.85rem', marginTop: '0.5rem', marginBottom: '0.75rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>
+                              Paste {field.label.replace(/\(comma\s+separated\)/i, '').trim()} List (One item per line)
+                            </label>
+                            <textarea
+                              placeholder={`e.g.&#10;• First item&#10;• Second item&#10;• Third item`}
+                              rows="4"
+                              className="modal-textarea"
+                              style={{ fontFamily: 'monospace', resize: 'vertical', marginBottom: '0.6rem', height: '100px' }}
+                              id={`bulk-stringarray-textarea-${field.key}`}
+                            />
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                              <button
+                                type="button"
+                                onClick={() => setShowBulkStringArrayKey(null)}
+                                style={{ padding: '0.35rem 0.85rem', background: 'transparent', border: '1px solid var(--dash-border)', color: 'var(--dash-text)', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const el = document.getElementById(`bulk-stringarray-textarea-${field.key}`);
+                                  if (el) {
+                                    const text = el.value;
+                                    if (text && text.trim()) {
+                                      const parts = text.split('\n')
+                                        .map(p => p.trim().replace(/^[•\-\*\u2022]\s*/, '').replace(/^\d+[\.\)]\s*/, '').trim())
+                                        .filter(Boolean);
+                                      if (parts.length > 0) {
+                                        const currentArr = formData[field.key] || [];
+                                        handleChange(field.key, [...currentArr, ...parts]);
+                                        setShowBulkStringArrayKey(null);
+                                      }
+                                    }
+                                    el.value = '';
+                                  }
+                                }}
+                                style={{ padding: '0.35rem 1rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                              >
+                                Import Items
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                          <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              placeholder={`Add single ${getSingularName(field.label.replace(/\(comma\s+separated\)/i, '').trim()).toLowerCase()}...`}
+                              value={newValues[field.key] || ''}
+                              onChange={e => setNewValues(prev => ({ ...prev, [field.key]: e.target.value }))}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const val = (newValues[field.key] || '').trim();
+                                  if (val) {
+                                    const cleanVal = val.replace(/^[•\-\*\u2022]\s*/, '').replace(/^\d+[\.\)]\s*/, '').trim();
+                                    if (cleanVal) {
+                                      const newArr = [...(formData[field.key] || []), cleanVal];
+                                      handleChange(field.key, newArr);
+                                    }
+                                    setNewValues(prev => ({ ...prev, [field.key]: '' }));
+                                  }
                                 }
-                                setNewValues(prev => ({ ...prev, [field.key]: parts[parts.length - 1] }));
-                              } else {
-                                setNewValues(prev => ({ ...prev, [field.key]: text }));
-                              }
-                            }}
-                            onPaste={e => {
-                              const pastedText = e.clipboardData.getData('text');
-                              if (pastedText.includes(',')) {
-                                e.preventDefault();
-                                const parts = pastedText.split(',').map(p => p.trim()).filter(Boolean);
-                                if (parts.length > 0) {
-                                  const newArr = [...(formData[field.key] || []), ...parts];
-                                  handleChange(field.key, newArr);
-                                  setNewValues(prev => ({ ...prev, [field.key]: '' }));
-                                }
-                              }
-                            }}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
+                              }}
+                              className="modal-input"
+                              style={{ paddingRight: '2.5rem', flex: 1 }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
                                 const val = (newValues[field.key] || '').trim();
                                 if (val) {
-                                  const newArr = [...(formData[field.key] || []), val];
-                                  handleChange(field.key, newArr);
+                                  const cleanVal = val.replace(/^[•\-\*\u2022]\s*/, '').replace(/^\d+[\.\)]\s*/, '').trim();
+                                  if (cleanVal) {
+                                    const newArr = [...(formData[field.key] || []), cleanVal];
+                                    handleChange(field.key, newArr);
+                                  }
                                   setNewValues(prev => ({ ...prev, [field.key]: '' }));
                                 }
-                              }
-                            }}
-                            className="modal-input"
-                            style={{ paddingRight: '2.5rem', flex: 1 }}
-                          />
+                              }}
+                              style={{
+                                position: 'absolute',
+                                right: '12px',
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'var(--dash-accent, #3b82f6)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '20px',
+                                height: '20px',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                padding: 0,
+                              }}
+                              title="Add item"
+                            >
+                              ＋
+                            </button>
+                          </div>
                           <button
                             type="button"
-                            onClick={() => {
-                              const val = (newValues[field.key] || '').trim();
-                              if (val) {
-                                const newArr = [...(formData[field.key] || []), val];
-                                handleChange(field.key, newArr);
-                                setNewValues(prev => ({ ...prev, [field.key]: '' }));
-                              }
-                            }}
+                            onClick={() => setShowBulkStringArrayKey(showBulkStringArrayKey === field.key ? null : field.key)}
                             style={{
-                              position: 'absolute',
-                              right: '12px',
+                              padding: '0.65rem 1.15rem',
                               background: 'transparent',
-                              border: 'none',
-                              color: 'var(--dash-accent, #3b82f6)',
+                              border: '2px solid var(--color-primary, #3b82f6)',
+                              borderRadius: '8px',
+                              color: 'var(--color-primary, #3b82f6)',
+                              fontSize: '0.85rem',
+                              fontWeight: 600,
                               cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '20px',
-                              height: '20px',
-                              fontSize: '1.2rem',
-                              fontWeight: 'bold',
-                              padding: 0,
+                              transition: 'all 0.2s',
+                              fontFamily: 'inherit',
                             }}
-                            title="Add item"
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = 'rgba(220, 20, 60, 0.05)';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = 'transparent';
+                            }}
                           >
-                            ＋
+                            ⚡ Bulk Add
                           </button>
                         </div>
                       </div>
@@ -923,40 +1139,139 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave }
                         </div>
                       ))}
                       
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newFaqs = [...(formData[field.key] || [])];
-                          newFaqs.push({ question: '', answer: '' });
-                          handleChange(field.key, newFaqs);
-                        }}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.02)',
-                          border: '2px dashed var(--dash-border)',
-                          borderRadius: '8px',
-                          color: 'var(--dash-accent, #3b82f6)',
-                          padding: '0.75rem',
-                          cursor: 'pointer',
-                          fontWeight: 'bold',
-                          fontSize: '0.9rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          transition: 'all 0.2s',
-                          fontFamily: 'inherit',
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.borderColor = 'var(--dash-accent)';
-                          e.currentTarget.style.background = 'rgba(59, 130, 246, 0.03)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.borderColor = 'var(--dash-border)';
-                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                        }}
-                      >
-                        ＋ Add FAQ Item
-                      </button>
+                      {/* Bulk FAQ Input Area */}
+                      {showBulkFaqFieldKey === field.key && (
+                        <div style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid var(--dash-border)', borderRadius: '8px', padding: '1rem', marginTop: '0.5rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>
+                            Paste FAQs List
+                          </label>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--dash-text-muted)', marginBottom: '0.5rem', lineHeight: '1.3' }}>
+                            Format: Put a blank line between each Q&A block. You can prefix them with Q: and A:, or just write Question on first line, Answer on next lines.
+                          </div>
+                          <textarea
+                            placeholder="e.g.&#10;Q: Do I get placement support?&#10;A: Yes, we provide 100% placement assistance.&#10;&#10;Q: Is there any eligibility criteria?&#10;A: No, anyone with basic computer knowledge can join."
+                            rows="5"
+                            className="modal-textarea"
+                            style={{ fontFamily: 'monospace', resize: 'vertical', marginBottom: '0.75rem', height: '120px' }}
+                            id={`bulk-faq-textarea-${field.key}`}
+                          />
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <button
+                              type="button"
+                              onClick={() => setShowBulkFaqFieldKey(null)}
+                              style={{ padding: '0.35rem 0.85rem', background: 'transparent', border: '1px solid var(--dash-border)', color: 'var(--dash-text)', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const el = document.getElementById(`bulk-faq-textarea-${field.key}`);
+                                if (el) {
+                                  // Inlined FAQ Parser
+                                  const text = el.value;
+                                  if (text && text.trim()) {
+                                    const parsedFaqs = [];
+                                    const blocks = text.split(/\n\s*\n/);
+                                    blocks.forEach(block => {
+                                      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+                                      if (lines.length >= 2) {
+                                        let question = '';
+                                        let answer = '';
+                                        const qLine = lines.find(l => /^q[:a-z]?\s+/i.test(l));
+                                        const aLine = lines.find(l => /^a[:a-z]?\s+/i.test(l));
+                                        if (qLine && aLine) {
+                                          question = qLine.replace(/^q[:a-z]?\s+/i, '').trim();
+                                          answer = aLine.replace(/^a[:a-z]?\s+/i, '').trim();
+                                        } else {
+                                          question = lines[0];
+                                          answer = lines.slice(1).join('\n');
+                                        }
+                                        if (question && answer) {
+                                          parsedFaqs.push({ question, answer });
+                                        }
+                                      }
+                                    });
+                                    if (parsedFaqs.length > 0) {
+                                      const currentFaqs = formData[field.key] || [];
+                                      handleChange(field.key, [...currentFaqs, ...parsedFaqs]);
+                                      setShowBulkFaqFieldKey(null);
+                                    } else {
+                                      alert('Could not parse any FAQs. Check format.');
+                                    }
+                                  }
+                                  el.value = '';
+                                }
+                              }}
+                              style={{ padding: '0.35rem 1rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                            >
+                              Import FAQs
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newFaqs = [...(formData[field.key] || [])];
+                            newFaqs.push({ question: '', answer: '' });
+                            handleChange(field.key, newFaqs);
+                          }}
+                          style={{
+                            flex: 1,
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            border: '2px dashed var(--dash-border)',
+                            borderRadius: '8px',
+                            color: 'var(--dash-accent, #3b82f6)',
+                            padding: '0.75rem',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            transition: 'all 0.2s',
+                            fontFamily: 'inherit',
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.borderColor = 'var(--dash-accent)';
+                            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.03)';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.borderColor = 'var(--dash-border)';
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                          }}
+                        >
+                          ＋ Add Single FAQ Item
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowBulkFaqFieldKey(showBulkFaqFieldKey === field.key ? null : field.key)}
+                          style={{
+                            padding: '0.75rem 1.25rem',
+                            background: 'transparent',
+                            border: '2px solid var(--color-primary, #3b82f6)',
+                            borderRadius: '8px',
+                            color: 'var(--color-primary, #3b82f6)',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '0.9rem',
+                            transition: 'all 0.2s',
+                            fontFamily: 'inherit',
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = 'rgba(220, 20, 60, 0.05)';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          ⚡ Bulk Add FAQs
+                        </button>
+                      </div>
                     </div>
                   ) : field.key === 'totalHours' ? (
                     <input 

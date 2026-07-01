@@ -33,7 +33,10 @@ export async function GET(req) {
       .limit(10)
       .lean();
 
-    return NextResponse.json({ success: true, enrollments });
+    // Filter out enrollments where the populated course is null (deleted courses)
+    const activeEnrollments = enrollments.filter(e => e.course !== null && e.course !== undefined);
+
+    return NextResponse.json({ success: true, enrollments: activeEnrollments });
   } catch (error) {
     console.error('Dashboard API Error:', error);
     return NextResponse.json({ success: false, error: 'Failed to fetch dashboard data' }, { status: 500 });

@@ -22,8 +22,11 @@ export async function GET() {
       .sort({ 'progress.lastAccessedAt': -1 })
       .lean();
 
+    // Filter out enrollments where the populated course is null (deleted courses)
+    const activeEnrollments = enrollments.filter((enr) => enr.course !== null && enr.course !== undefined);
+
     // ── Compute accurate stats (exclude assignments) ──
-    const enriched = enrollments.map((enr) => {
+    const enriched = activeEnrollments.map((enr) => {
       const course = enr.course;
       let totalLessons = 0;
       let computedDurationMinutes = 0;

@@ -39,6 +39,10 @@ export default function CourseCurriculumBuilder({ params }) {
   const [editingLessonId, setEditingLessonId] = useState(null);
   const [activeLessonForm, setActiveLessonForm] = useState(null); // { chapIdx, lIdx, lesson } or null
 
+  // Bulk Import state variables
+  const [showBulkChapterInput, setShowBulkChapterInput] = useState(false);
+  const [showBulkLessonsForChapIdx, setShowBulkLessonsForChapIdx] = useState(null);
+
   useEffect(() => {
     fetchCurriculum();
   }, [courseId]);
@@ -121,6 +125,55 @@ export default function CourseCurriculumBuilder({ params }) {
     setChapters(newChapters);
     // Auto-open editing form for the new lesson so it shows placeholders
     setActiveLessonForm({ chapIdx, lIdx: newChapters[chapIdx].lessons.length - 1, lesson: newLesson });
+  };
+
+  // Bulk Operations Handlers
+  const handleBulkChaptersImport = (text) => {
+    if (!text || !text.trim()) {
+      alert('Please enter at least one chapter title.');
+      return;
+    }
+    const titles = text.split('\n').map(t => t.trim()).filter(t => t.length > 0);
+    if (titles.length === 0) return;
+
+    const newChapters = [...chapters, ...titles.map(title => ({ title, lessons: [] }))];
+    setChapters(newChapters);
+    saveCurriculum(newChapters);
+    setShowBulkChapterInput(false);
+  };
+
+  const handleBulkLessonsImport = (chapIdx, text) => {
+    if (!text || !text.trim()) {
+      alert('Please enter at least one lesson title.');
+      return;
+    }
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return;
+
+    const parsedLessons = lines.map((line, idx) => {
+      // Matches things like (10 mins), (15 min), (20m), (12)
+      const durationRegex = /\((\d+)\s*(?:min|mins|m)?\)/i;
+      const match = line.match(durationRegex);
+      let duration = 15; // default duration
+      let title = line;
+      if (match) {
+        duration = parseInt(match[1], 10);
+        title = line.replace(durationRegex, '').trim();
+      }
+      return {
+        title,
+        type: 'video',
+        duration,
+        videoUrl: '',
+        slug: `lesson-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`
+      };
+    });
+
+    const newChapters = [...chapters];
+    newChapters[chapIdx].lessons = [...newChapters[chapIdx].lessons, ...parsedLessons];
+    setChapters(newChapters);
+    saveCurriculum(newChapters);
+    setShowBulkLessonsForChapIdx(null);
   };
 
   const handleCancelLessonEdit = () => {
@@ -255,13 +308,57 @@ export default function CourseCurriculumBuilder({ params }) {
           </Link>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginTop: '0.4rem', color: 'var(--dash-text)' }}>Curriculum Builder</h2>
         </div>
-        <button
-          onClick={addChapter}
-          style={{ padding: '0.55rem 1.25rem', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s' }}
-        >
-          + Add New Chapter
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowBulkChapterInput(!showBulkChapterInput)}
+            style={{ padding: '0.55rem 1.25rem', background: 'transparent', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', borderRadius: '8px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            {showBulkChapterInput ? 'Hide Bulk Add' : '⚡ Bulk Add Chapters'}
+          </button>
+          <button
+            onClick={addChapter}
+            style={{ padding: '0.55rem 1.25rem', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            + Add New Chapter
+          </button>
+        </div>
       </div>
+
+      {/* Bulk Chapters Text Area Wrapper */}
+      {showBulkChapterInput && (
+        <div style={{ background: 'var(--dash-surface)', border: '1px solid var(--dash-border)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--dash-text)' }}>
+            Paste Chapter Names (One chapter title per line)
+          </label>
+          <textarea
+            placeholder="e.g.&#10;Chapter 1: Welcome & Environment Setup&#10;Chapter 2: Variables & Core Data Types&#10;Chapter 3: Control Statements & Loops"
+            rows="5"
+            className="builder-input"
+            style={{ fontFamily: 'monospace', resize: 'vertical', marginBottom: '0.75rem', height: '120px' }}
+            id="bulk-chapters-textarea"
+          />
+          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setShowBulkChapterInput(false)}
+              style={{ padding: '0.45rem 1rem', background: 'transparent', border: '1px solid var(--dash-border)', color: 'var(--dash-text)', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('bulk-chapters-textarea');
+                if (el) {
+                  handleBulkChaptersImport(el.value);
+                  el.value = '';
+                }
+              }}
+              style={{ padding: '0.45rem 1.25rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Import Chapters
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Chapters Array */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -400,20 +497,73 @@ export default function CourseCurriculumBuilder({ params }) {
                 );
               })}
 
-              <button
-                onClick={() => addLesson(cIdx)}
-                style={{ width: '100%', padding: '0.65rem', background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--dash-border)', color: 'var(--dash-text-secondary)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', marginTop: '0.5rem', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.03)';
-                  e.target.style.borderColor = 'var(--dash-text-secondary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.01)';
-                  e.target.style.borderColor = 'var(--dash-border)';
-                }}
-              >
-                + Add Lesson to {chap.title || `Chapter ${cIdx + 1}`}
-              </button>
+              {/* Bulk Lessons Import Area */}
+              {showBulkLessonsForChapIdx === cIdx && (
+                <div style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid var(--dash-border)', borderRadius: '8px', padding: '0.85rem', marginTop: '0.5rem', marginBottom: '0.75rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.4rem', color: 'var(--dash-text)' }}>
+                    Paste Lesson Titles (One lesson per line)
+                  </label>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--dash-text-muted)', marginBottom: '0.5rem' }}>
+                    Tip: Specify duration at the end of titles like: `My Lesson Title (15 mins)`
+                  </div>
+                  <textarea
+                    placeholder="e.g.&#10;Lesson 1: Intro & JVM Architecture (15 min)&#10;Lesson 2: Installing JDK (20 min)&#10;Lesson 3: Writing HelloWorld Class (12 mins)"
+                    rows="4"
+                    className="builder-input"
+                    style={{ fontFamily: 'monospace', resize: 'vertical', marginBottom: '0.6rem', height: '110px' }}
+                    id={`bulk-lessons-textarea-${cIdx}`}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => setShowBulkLessonsForChapIdx(null)}
+                      style={{ padding: '0.35rem 0.85rem', background: 'transparent', border: '1px solid var(--dash-border)', color: 'var(--dash-text)', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        const el = document.getElementById(`bulk-lessons-textarea-${cIdx}`);
+                        if (el) {
+                          handleBulkLessonsImport(cIdx, el.value);
+                          el.value = '';
+                        }
+                      }}
+                      style={{ padding: '0.35rem 1rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Import Lessons
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <button
+                  onClick={() => addLesson(cIdx)}
+                  style={{ flex: 1, padding: '0.65rem', background: 'rgba(255,255,255,0.01)', border: '1px dashed var(--dash-border)', color: 'var(--dash-text-secondary)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                    e.currentTarget.style.borderColor = 'var(--dash-text-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.01)';
+                    e.currentTarget.style.borderColor = 'var(--dash-border)';
+                  }}
+                >
+                  + Add Single Lesson
+                </button>
+                <button
+                  onClick={() => setShowBulkLessonsForChapIdx(showBulkLessonsForChapIdx === cIdx ? null : cIdx)}
+                  style={{ padding: '0.65rem 1.15rem', background: 'transparent', border: '1px solid var(--color-primary)', color: 'var(--color-primary)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(220,20,60,0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  ⚡ Bulk Add Lessons
+                </button>
+              </div>
             </div>
           </div>
         ))}

@@ -16,6 +16,11 @@ export async function GET(req, { params }) {
 
     const { courseId } = await params;
 
+    // Validate courseId format
+    if (!courseId || courseId === 'undefined' || !/^[0-9a-fA-F]{24}$/.test(courseId)) {
+      return NextResponse.json({ success: false, error: 'Invalid course ID format' }, { status: 400 });
+    }
+
     // Verify enrollment
     const enrollment = await Enrollment.findOne({
       student: session.user.id,

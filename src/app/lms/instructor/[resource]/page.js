@@ -333,7 +333,15 @@ export default function GenericResourcePage({ params }) {
         }
       `}</style>
 
-      {loading ? (
+      {isModalOpen ? (
+        <SchemaFormModal
+          config={dynamicConfig}
+          initialData={editingRow}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+          inline={true}
+        />
+      ) : loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--dash-text-muted)' }}>
           Loading {dynamicConfig.name}...
         </div>
@@ -392,7 +400,7 @@ export default function GenericResourcePage({ params }) {
                   </span>
                   {/* Category badge */}
                   {course.category && (
-                    <span style={{ position: 'absolute', top: 10, left: 10, padding: '0.2rem 0.6,px', borderRadius: 6, fontSize: '0.68rem', fontWeight: 700, background: 'var(--dash-accent)', color: 'white', letterSpacing: '0.04em' }}>
+                    <span style={{ position: 'absolute', top: 10, left: 10, padding: '0.2rem 0.6px', borderRadius: 6, fontSize: '0.68rem', fontWeight: 700, background: 'var(--dash-accent)', color: 'white', letterSpacing: '0.04em' }}>
                       {course.category}
                     </span>
                   )}
@@ -465,15 +473,6 @@ export default function GenericResourcePage({ params }) {
           onAdd={() => { setEditingRow(null); setIsModalOpen(true); }}
           onEdit={(row) => { setEditingRow(row); setIsModalOpen(true); }}
           onDelete={handleDelete}
-        />
-      )}
-
-      {isModalOpen && (
-        <SchemaFormModal
-          config={dynamicConfig}
-          initialData={editingRow}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSave}
         />
       )}
     </div>
