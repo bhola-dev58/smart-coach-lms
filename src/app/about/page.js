@@ -32,7 +32,7 @@ export default function AboutPage() {
             </div>
             <div style={{ position: 'relative' }}>
               <img src="/images/hero/hero-bg.jpg" alt="Gradify Academy Campus" style={{ width: '100%', height: 400, objectFit: 'cover', border: '1px solid var(--color-border)' }} />
-              <div style={{ position: 'absolute', bottom: -20, right: -20, background: 'var(--color-primary)', color: 'white', padding: 'var(--space-6)', textAlign:'center' }}>
+              <div style={{ position: 'absolute', bottom: -20, right: -20, background: 'var(--color-primary)', color: 'white', padding: 'var(--space-6)', textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-3xl)', fontWeight: 800 }}>8+</div>
                 <Link href="/about" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ About Gradify Academy</Link>
               </div>
@@ -51,7 +51,7 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-3">
             {[
-              { name: 'Dr. Rajesh Kumar', role: 'Head of Mathematics', image: '/images/faculty/faculty-1.jpg' },
+              { name: 'Er. Adarsh Tiwari', role: 'Head of Mathematics', image: '/images/faculty/faculty-1.jpg' },
               { name: 'Prof. Sneha Patel', role: 'Head of Physics', image: '/images/faculty/faculty-2.jpg' },
               { name: 'Dr. Amit Bansal', role: 'Head of Chemistry', image: '/images/faculty/faculty-3.jpg' },
             ].map((f, i) => (

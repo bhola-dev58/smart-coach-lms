@@ -43,7 +43,7 @@ async function seedUsers() {
         role: 'admin',
       },
       {
-        name: 'Dr. Rajesh Kumar',
+        name: 'Er. Adarsh Tiwari',
         email: 'instructor@gradify.academy', // Isko simple id k sath test k liye override karte h
         password: hashedPassword,
         role: 'instructor',
@@ -62,7 +62,7 @@ async function seedUsers() {
     for (const userData of usersToCreate) {
       const existing = await User.findOne({ email: userData.email });
       if (existing) {
-        await User.updateOne({ email: userData.email }, { $set: { password: hashedPassword, role: userData.role }});
+        await User.updateOne({ email: userData.email }, { $set: { password: hashedPassword, role: userData.role } });
         console.log(`🔄 Updated: ${userData.name} (${userData.role}) | Pass: ${rawPassword}`);
         updated++;
       } else {

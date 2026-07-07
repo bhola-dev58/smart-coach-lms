@@ -93,18 +93,18 @@ async function seed() {
     let instructor = await User.findOne({ email: 'rajesh@gradify.academy' });
     if (!instructor) {
       instructor = await User.create({
-        name: 'Dr. Rajesh Kumar',
+        name: 'Er. Adarsh Tiwari',
         email: 'rajesh@gradify.academy',
         role: 'instructor',
         bio: 'Senior Science Faculty with 15+ years of teaching board & foundation courses.',
         specialization: ['Physics', 'Chemistry', 'Mathematics Foundation'],
       });
-      console.log('✅ Created instructor: Dr. Rajesh Kumar');
+      console.log('✅ Created instructor: Er. Adarsh Tiwari');
     } else {
       instructor.bio = 'Senior Science Faculty with 15+ years of teaching board & foundation courses.';
       instructor.specialization = ['Physics', 'Chemistry', 'Mathematics Foundation'];
       await instructor.save();
-      console.log('⏭️  Instructor updated: Dr. Rajesh Kumar');
+      console.log('⏭️  Instructor updated: Er. Adarsh Tiwari');
     }
 
     // ── Create second instructor ──
