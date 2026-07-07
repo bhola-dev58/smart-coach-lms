@@ -51,9 +51,9 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-3">
             {[
-              { name: 'Er. Adarsh Tiwari', role: 'Head of Mathematics', image: '/images/faculty/faculty-1.jpg' },
-              { name: 'Prof. Sneha Patel', role: 'Head of Physics', image: '/images/faculty/faculty-2.jpg' },
-              { name: 'Dr. Amit Bansal', role: 'Head of Chemistry', image: '/images/faculty/faculty-3.jpg' },
+              { name: 'Er. Adarsh Tiwari', role: 'Founder', image: '/images/faculty/faculty-1.jpg' },
+              { name: 'Bhola Yadav', role: 'Technical Expert', image: '/images/faculty/faculty-2.jpg' },
+              { name: 'Rudraksha', role: 'Promotion Head', image: '/images/faculty/faculty-3.jpg' },
             ].map((f, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <img src={f.image} alt={f.name} style={{ width: '100%', height: 300, objectFit: 'cover', marginBottom: 'var(--space-4)', border: '1px solid var(--color-border)' }} />
