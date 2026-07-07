@@ -54,8 +54,8 @@ export default function AboutPage() {
               { name: 'Er. Adarsh Tiwari', role: 'Founder', image: '/images/faculty/faculty-1.jpg' },
               { name: 'Bhola Yadav', role: 'Technical Expert', image: '/images/faculty/faculty-2.jpg' },
               { name: 'Rudraksha', role: 'Promotion Head', image: '/images/faculty/faculty-3.jpg' },
-              { name: 'Antriksh', role: 'Digital Marketing Head', image: '/images/faculty/faculty-2.jpg' },
-              { name: 'Priyanshu', role: 'Content Head', image: '/images/faculty/faculty-3.jpg' },
+              { name: 'Antriksh', role: 'Digital Marketing Head', image: '/images/faculty/faculty-4.jpg' },
+              { name: 'Priyanshu', role: 'Content Head', image: '/images/faculty/faculty-5.jpg' },
 
             ].map((f, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
