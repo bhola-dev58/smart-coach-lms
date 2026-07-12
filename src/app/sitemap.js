@@ -24,7 +24,7 @@ export default async function sitemap() {
     const courses = await Course.find({ isPublished: true }).select('slug updatedAt').lean();
     courseRoutes = courses.map((course) => ({
       url: `${baseUrl}/courses/${course.slug}`,
-      lastModified: new (course.updatedAt || Date)().toISOString().split('T')[0],
+      lastModified: (course.updatedAt ? new Date(course.updatedAt) : new Date()).toISOString().split('T')[0],
       changeFrequency: 'weekly',
       priority: 0.7,
     }));
