@@ -9,7 +9,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="section section-white">
+    <section className={`section section-white ${styles.howItWorksSection}`}>
       <div className="container">
         <div className="section-header">
           <span className="section-label">How It Works</span>

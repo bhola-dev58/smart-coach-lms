@@ -1,13 +1,36 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'About Us',
-  description: 'Learn about Gradify Academy — India\'s premier coaching platform. Our story, mission, expert faculty, and commitment to student success.',
+  title: 'About Us - Our Story, Mission & Faculty | Gradify Academy',
+  description: 'Learn about Gradify Academy — India\'s premier school coaching platform. Read about our story, mission, vision, IITian/NITian expert faculty, and core values.',
 };
 
 export default function AboutPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://gradify.academy"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "About Us",
+        "item": "https://gradify.academy/about"
+      }
+    ]
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="page-banner">
         <div className="container">
           <h1>About Gradify Academy</h1>

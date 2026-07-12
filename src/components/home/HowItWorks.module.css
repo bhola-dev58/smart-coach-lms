@@ -47,3 +47,9 @@
 @media (max-width: 480px) {
   .stepsGrid { grid-template-columns: 1fr; }
 }
+
+@media (min-width: 769px) {
+  .howItWorksSection {
+    display: none !important;
+  }
+}

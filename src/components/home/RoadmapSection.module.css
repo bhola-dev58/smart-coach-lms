@@ -1,0 +1,241 @@
+/* ─── Section wrapper ─────────────────────────────────────────── */
+.roadmapSection {
+  background: #f8f9fc url('/images/backgrounds-Journy-light.avif') no-repeat center center;
+  background-size: cover;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Scroll container (full-width, outside the 1200px container) */
+.scrollWrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 110px 80px; /* Reduced vertical padding to decrease height */
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  /* hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  z-index: 1;
+}
+.scrollWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Roadmap track canvas ────────────────────────────────────── */
+.roadmapTrack {
+  position: relative;
+  min-width: 960px;
+  max-width: 960px;
+  height: 300px;
+  margin: 0 auto;
+}
+
+/* ─── Winding road SVG ────────────────────────────────────────── */
+.roadSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* path animations */
+.pathBase {
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+  animation: drawRoad 2.4s ease forwards;
+}
+.pathDashes {
+  opacity: 0;
+  animation: fadeIn 0.6s 2.2s ease forwards;
+}
+@keyframes drawRoad {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* ─── Step node container ─────────────────────────────────────── */
+.node {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: 2;
+  transition: transform 0.25s ease;
+}
+.node:hover {
+  transform: scale(1.02);
+}
+
+/* ─── Connector lines (Shorter 35px height for shorter amplitude) ── */
+.conn {
+  width: 2px;
+  height: 35px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 1px;
+  z-index: 1;
+}
+.connUp {
+  bottom: 100%;
+  background: linear-gradient(to top, var(--color-primary, #1B2B6B) 0%, rgba(27, 43, 107, 0.1) 100%);
+}
+.connDown {
+  top: 100%;
+  background: linear-gradient(to bottom, var(--color-primary, #1B2B6B) 0%, rgba(27, 43, 107, 0.1) 100%);
+}
+.connDownGreen {
+  top: 100%;
+  background: linear-gradient(to bottom, var(--color-secondary, #27AE60) 0%, rgba(39, 174, 96, 0.1) 100%);
+}
+
+/* ─── Bead (icon circle) ──────────────────────────────────────── */
+.bead {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid var(--color-primary, #1B2B6B);
+  box-shadow:
+    0 4px 16px rgba(27, 43, 107, 0.12),
+    0 0 0 0 rgba(27, 43, 107, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 3;
+}
+.node:hover .bead {
+  background: var(--color-primary, #1B2B6B);
+  box-shadow:
+    0 8px 28px rgba(27, 43, 107, 0.24),
+    0 0 0 6px rgba(27, 43, 107, 0.1);
+  transform: scale(1.1);
+}
+
+/* green trophy bead */
+.beadGreen {
+  border-color: var(--color-secondary, #27AE60);
+  background: rgba(39, 174, 96, 0.04);
+  animation: pulseGreen 2.8s ease-in-out infinite;
+}
+.node:hover .beadGreen {
+  background: var(--color-secondary, #27AE60);
+  box-shadow:
+    0 8px 28px rgba(39, 174, 96, 0.28),
+    0 0 0 6px rgba(39, 174, 96, 0.12);
+}
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 4px 16px rgba(39, 174, 96, 0.12), 0 0 0 0 rgba(39, 174, 96, 0.2); }
+  50%       { box-shadow: 0 4px 16px rgba(39, 174, 96, 0.12), 0 0 0 8px rgba(39, 174, 96, 0); }
+}
+
+/* Icon */
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary, #1B2B6B);
+  transition: color 0.28s ease;
+  display: block;
+}
+.icon path {
+  fill: currentColor;
+}
+.node:hover .bead .icon {
+  color: #ffffff;
+}
+.iconGreen {
+  color: var(--color-secondary, #27AE60);
+}
+.node:hover .beadGreen .icon {
+  color: #ffffff;
+}
+
+/* ─── Card styling ────────────────────────────────────────────── */
+.card {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px; /* Slimmed down width for tighter spacing */
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(27, 43, 107, 0.08);
+  box-shadow: 0 8px 24px rgba(27, 43, 107, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  z-index: 4;
+  text-align: left;
+}
+.node:hover .card {
+  border-color: rgba(27, 43, 107, 0.16);
+  box-shadow: 0 12px 36px rgba(27, 43, 107, 0.1);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.stepNum {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-primary, #1B2B6B);
+  background: rgba(27, 43, 107, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.cardTitle {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text, #1B2B6B);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cardDesc {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.8rem;
+  color: var(--color-text-light, #555555);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Success Card Style */
+.cardGreen {
+  border-bottom: 3px solid var(--color-secondary, #27AE60);
+}
+.stepNumGreen {
+  color: var(--color-secondary, #27AE60);
+  background: rgba(39, 174, 96, 0.08);
+}
+
+/* Positioning card above / below connector (Bead size 60px + connector 35px = 95px) */
+.cardAbove {
+  bottom: calc(100% + 41px);
+}
+.cardBelow {
+  top: calc(100% + 41px);
+}
+
+/* ─── Mobile: hide entirely ─── */
+@media (max-width: 768px) {
+  .roadmapSection {
+    display: none !important;
+  }
+}

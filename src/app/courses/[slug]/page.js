@@ -120,6 +120,31 @@ export default async function CourseDetailsPage({ params }) {
     }))
   } : null;
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://gradify.academy"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Courses",
+        "item": "https://gradify.academy/courses"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": course.title,
+        "item": `https://gradify.academy/courses/${course.slug}`
+      }
+    ]
+  };
+
   return (
     <>
       {/* Injecting Course Schema Markup */}
@@ -134,6 +159,11 @@ export default async function CourseDetailsPage({ params }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
+      {/* Injecting Breadcrumb Schema Markup */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', display: 'flex', justifyContent: 'center', width: '100%' }}>
         <div style={{ width: '100%', maxWidth: '1000px' }}>
           <LmsCourseDetail course={serialized} backLink="/courses" />

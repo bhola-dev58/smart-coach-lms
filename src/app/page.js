@@ -1,18 +1,21 @@
 
+
 import HeroSection from '@/components/home/HeroSection';
 import StatsSection from '@/components/home/StatsSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
 import CoursesSection from '@/components/home/CoursesSection';
 import HowItWorks from '@/components/home/HowItWorks';
+import RoadmapSection from '@/components/home/RoadmapSection';
+import ScholarshipCalculator from '@/components/home/ScholarshipCalculator';
 import CTASection from '@/components/home/CTASection';
 import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import '@/models/User'; // Register User schema for populate('instructor')
 
 export const metadata = {
-  title: 'Gradify Academy',
+  title: 'Gradify Academy | Class 8-12 Boards, JEE & NEET Online Coaching',
   description:
-    'Join India\'s fastest-growing coaching platform. Expert faculty from IITs & NITs, industry-relevant curriculum, and guaranteed placement assistance. From Concepts to Creation.',
+    'Join India\'s premier school coaching platform. Live classes for Class 8, 9, 10, 11 & 12 in Science, Math & English. Target 95%+ in board exams and top ranks in JEE/NEET with expert IITian faculty.',
 };
 
 export default async function HomePage() {
@@ -48,6 +51,8 @@ export default async function HomePage() {
       <FeaturesSection />
       <CoursesSection courses={courses} />
       <HowItWorks />
+      <RoadmapSection />
+      <ScholarshipCalculator />
       <CTASection />
     </>
   );

@@ -78,8 +78,26 @@ export default async function CoursesPage({ searchParams }) {
     return acc;
   }, {});
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Gradify Academy Courses",
+    "description": "Explore coaching courses for Mathematics, Physics, Chemistry, Biology, Olympiad & Board Prep.",
+    "url": "https://gradify.academy/courses",
+    "numberOfItems": courses.length,
+    "itemListElement": courses.map((c, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "url": `https://gradify.academy/courses/${c.slug}`
+    }))
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
       <div className="page-banner">
         <div className="container">
           <h1>All Courses</h1>
