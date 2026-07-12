@@ -11,32 +11,64 @@ export async function generateMetadata({ params }) {
   
   if (!course) return { title: 'Course Not Found' };
   
-  const keywords = [
+  const isCoding = course.category?.toLowerCase().includes('computer') || 
+                   course.category?.toLowerCase().includes('coding') || 
+                   course.title?.toLowerCase().includes('python') || 
+                   course.title?.toLowerCase().includes('java') || 
+                   course.title?.toLowerCase().includes('dsa');
+
+  const baseKeywords = [
     course.title,
     course.category,
     ...(course.tags || []),
     "Gradify Academy",
-    "Online Course",
-    "Coding Course in Hindi",
+    "Online Course Syllabus",
+    "Tuition Fee Details",
+    "Course Certificate"
+  ];
+
+  const codingKeywords = [
     "Best Coding Institute",
-    "DSA Course",
-    "Web Development Syllabus",
-  ].filter(Boolean);
+    "Programming in Hindi",
+    "Coding Interview Preparation",
+    "DSA Course Online",
+    "Placement Support Course"
+  ];
+
+  const schoolKeywords = [
+    "School Coaching Online",
+    "Class 10 CBSE Maths",
+    "Class 12 Science Tuition",
+    "JEE Main Preparation",
+    "NEET Biology Prep",
+    "Board Exam Revision Course"
+  ];
+
+  const keywords = [...baseKeywords, ...(isCoding ? codingKeywords : schoolKeywords)].filter(Boolean);
+
+  const description = course.shortSubtitle || course.description?.substring(0, 160) || 
+    (isCoding 
+      ? `Master ${course.title} with Gradify Academy. Online classes in Hindi, complete syllabus, hands-on programming exercises, and certificate of completion.`
+      : `Master ${course.title} with Gradify Academy. Online classes, comprehensive school syllabus coverage, regular mock tests, and board exam target prep.`
+    );
 
   return {
-    title: `${course.title} - Learn ${course.category || 'Coding'} | Gradify Academy`,
-    description: course.shortSubtitle || course.description?.substring(0, 160) || `Master ${course.title} with Gradify Academy. Online classes, syllabus, projects, certificate of completion, and placement assistance.`,
+    title: `${course.title} Course Syllabus, Fees & Certificate | Gradify Academy`,
+    description,
     keywords: keywords.join(', '),
+    alternates: {
+      canonical: `https://gradify.academy/courses/${course.slug}`
+    },
     openGraph: {
       title: `${course.title} | Gradify Academy`,
-      description: course.shortSubtitle || course.description?.substring(0, 160),
+      description,
       images: course.thumbnail ? [{ url: course.thumbnail }] : [],
       type: 'video.other',
     },
     twitter: {
       card: 'summary_large_image',
       title: `${course.title} | Gradify Academy`,
-      description: course.shortSubtitle || course.description?.substring(0, 160),
+      description,
       images: course.thumbnail ? [course.thumbnail] : [],
     }
   };
@@ -88,7 +120,7 @@ export default async function CourseDetailsPage({ params }) {
     "provider": {
       "@type": "Organization",
       "name": "Gradify Academy",
-      "sameAs": "https://gradify.com"
+      "sameAs": "https://gradify.academy"
     },
     "hasCourseInstance": {
       "@type": "CourseInstance",
@@ -100,7 +132,9 @@ export default async function CourseDetailsPage({ params }) {
       "@type": "Offer",
       "category": "Paid",
       "price": course.price || 0,
-      "priceCurrency": "INR"
+      "priceCurrency": "INR",
+      "availability": "https://schema.org/InStock",
+      "priceValidUntil": "2027-12-31"
     },
     "educationalCredentialAwarded": "Certificate of Completion",
     "teaches": (course.learningOutcomes || []).slice(0, 5)
