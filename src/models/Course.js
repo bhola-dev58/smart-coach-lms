@@ -88,6 +88,15 @@ const courseSchema = new mongoose.Schema(
     tags: [{ type: String }],
     faqs: [faqSchema],
 
+    // ── SEO Fields (all optional, fall back to title/description) ──
+    seoTitle:       { type: String, default: '' },       // custom <title>, falls back to title | Gradify Academy
+    seoDescription: { type: String, default: '' },       // custom meta description ≤155 chars
+    seoKeywords:    [{ type: String }],                  // per-course geo + intent keyword array
+    locationTags:   [{ type: String }],                  // e.g. ["Whitefield", "Bangalore", "Bengaluru"]
+    targetClass:    [{ type: String }],                  // e.g. ["Class 11", "Class 12"]
+    avgRating:      { type: Number, default: 0 },        // denormalized for schema.org AggregateRating
+    reviewCount:    { type: Number, default: 0 },        // denormalized for schema.org AggregateRating
+
     // ── Ratings & Stats ──
     rating: { type: Number, default: 0, min: 0, max: 5 },
     totalRatings: { type: Number, default: 0 },
@@ -107,6 +116,7 @@ courseSchema.index({ category: 1, isPublished: 1 });
 courseSchema.index({ instructor: 1 });
 courseSchema.index({ isFeatured: 1, isPublished: 1 });
 courseSchema.index({ tags: 1 });
+courseSchema.index({ locationTags: 1, isPublished: 1 }); // geo-targeted SEO queries
 
 // ── Static Methods to sync realtime stats ──
 courseSchema.statics.syncEnrollmentsCount = async function(courseId) {

@@ -1,76 +1,53 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import LmsCourseDetail from '@/components/lms/LmsCourseDetail';
+import CourseSchema from '@/components/courses/CourseSchema';
 import styles from '@/app/lms/lms.module.css';
 
 export async function generateMetadata({ params }) {
   await connectDB();
   const { slug } = await params;
   const course = await Course.findOne({ slug }).lean();
-  
-  if (!course) return { title: 'Course Not Found' };
-  
-  const isCoding = course.category?.toLowerCase().includes('computer') || 
-                   course.category?.toLowerCase().includes('coding') || 
-                   course.title?.toLowerCase().includes('python') || 
-                   course.title?.toLowerCase().includes('java') || 
-                   course.title?.toLowerCase().includes('dsa');
 
-  const baseKeywords = [
-    course.title,
-    course.category,
-    ...(course.tags || []),
-    "Gradify Academy",
-    "Online Course Syllabus",
-    "Tuition Fee Details",
-    "Course Certificate"
-  ];
+  if (!course) return { title: 'Course Not Found | Gradify Academy' };
 
-  const codingKeywords = [
-    "Best Coding Institute",
-    "Programming in Hindi",
-    "Coding Interview Preparation",
-    "DSA Course Online",
-    "Placement Support Course"
-  ];
+  // Use DB-seeded SEO fields; fall back to title/shortDescription if not yet seeded
+  const title = course.seoTitle?.trim()
+    ? course.seoTitle
+    : `${course.title} | Gradify Academy`;
 
-  const schoolKeywords = [
-    "School Coaching Online",
-    "Class 10 CBSE Maths",
-    "Class 12 Science Tuition",
-    "JEE Main Preparation",
-    "NEET Biology Prep",
-    "Board Exam Revision Course"
-  ];
+  const description = course.seoDescription?.trim()
+    ? course.seoDescription
+    : (course.shortDescription?.slice(0, 155) || course.description?.slice(0, 155) || '');
 
-  const keywords = [...baseKeywords, ...(isCoding ? codingKeywords : schoolKeywords)].filter(Boolean);
+  const keywords = course.seoKeywords?.length
+    ? course.seoKeywords.join(', ')
+    : [course.title, course.category, 'Gradify Academy', 'Online Course'].filter(Boolean).join(', ');
 
-  const description = course.shortSubtitle || course.description?.substring(0, 160) || 
-    (isCoding 
-      ? `Master ${course.title} with Gradify Academy. Online classes in Hindi, complete syllabus, hands-on programming exercises, and certificate of completion.`
-      : `Master ${course.title} with Gradify Academy. Online classes, comprehensive school syllabus coverage, regular mock tests, and board exam target prep.`
-    );
+  const thumbnail = course.thumbnail || '';
+  const canonicalUrl = `https://gradify.academy/courses/${course.slug}`;
 
   return {
-    title: `${course.title} Course Syllabus, Fees & Certificate | Gradify Academy`,
+    title,
     description,
-    keywords: keywords.join(', '),
-    alternates: {
-      canonical: `https://gradify.academy/courses/${course.slug}`
-    },
+    keywords,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: `${course.title} | Gradify Academy`,
+      title,
       description,
-      images: course.thumbnail ? [{ url: course.thumbnail }] : [],
-      type: 'video.other',
+      images: thumbnail ? [{ url: thumbnail, alt: `${course.title} — Gradify Academy` }] : [],
+      url: canonicalUrl,
+      type: 'website',
+      locale: 'en_IN',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${course.title} | Gradify Academy`,
+      title,
       description,
-      images: course.thumbnail ? [course.thumbnail] : [],
-    }
+      images: thumbnail ? [thumbnail] : [],
+    },
   };
 }
 
@@ -82,6 +59,16 @@ export default async function CourseDetailsPage({ params }) {
     .lean();
 
   if (!course) notFound();
+
+  // Fetch up to 3 other published courses for cross-linking (excluding current)
+  const relatedCourses = await Course.find({
+    isPublished: true,
+    slug: { $ne: slug },
+  })
+    .select('slug title shortDescription thumbnail category price originalPrice rating totalStudents')
+    .sort({ totalStudents: -1 })
+    .limit(3)
+    .lean();
 
   let computedLessons = 0;
   let computedDurationMinutes = 0;
@@ -110,99 +97,96 @@ export default async function CourseDetailsPage({ params }) {
     totalHours: Math.ceil(computedDurationMinutes / 60),
   }));
 
-  // Google Search Course Rich Snippet Schema
-  const courseJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    "name": course.title,
-    "description": course.shortSubtitle || course.description || "",
-    "image": course.thumbnail || "",
-    "provider": {
-      "@type": "Organization",
-      "name": "Gradify Academy",
-      "sameAs": "https://gradify.academy"
-    },
-    "hasCourseInstance": {
-      "@type": "CourseInstance",
-      "courseMode": "On-demand / Self-paced",
-      "inLanguage": course.language || "Hindi",
-      "courseWorkload": `PT${serialized.totalHours || 0}H`
-    },
-    "offers": {
-      "@type": "Offer",
-      "category": "Paid",
-      "price": course.price || 0,
-      "priceCurrency": "INR",
-      "availability": "https://schema.org/InStock",
-      "priceValidUntil": "2027-12-31"
-    },
-    "educationalCredentialAwarded": "Certificate of Completion",
-    "teaches": (course.learningOutcomes || []).slice(0, 5)
-  };
+  const serializedRelated = JSON.parse(JSON.stringify(relatedCourses));
 
-  // Google Search FAQ Rich Snippet Schema
-  const faqJsonLd = (course.faqs && course.faqs.length > 0) ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": course.faqs.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  } : null;
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://gradify.academy"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Courses",
-        "item": "https://gradify.academy/courses"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": course.title,
-        "item": `https://gradify.academy/courses/${course.slug}`
-      }
-    ]
+  const categoryLabels = {
+    MATHS: 'Mathematics', SCIENCE: 'Science', COMMERCE: 'Commerce',
+    ARTS: 'Arts', GENERAL: 'General', COMPUTER_SCIENCE: 'Computer Science',
   };
 
   return (
     <>
-      {/* Injecting Course Schema Markup */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
-      />
-      {/* Injecting FAQ Schema Markup */}
-      {faqJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-        />
+      {/* Structured JSON-LD schemas: Course, FAQPage (if applicable), BreadcrumbList, AggregateRating (if reviews exist) */}
+      <CourseSchema course={serialized} />
+
+      {/* Star rating summary — only show when reviews exist */}
+      {serialized.totalRatings > 0 && (
+        <div style={{
+          background: 'var(--color-surface)',
+          borderBottom: '1px solid var(--color-border)',
+          padding: '0.6rem 1.5rem',
+          textAlign: 'center',
+          fontSize: '0.9rem',
+          color: 'var(--color-text-muted)',
+        }}>
+          <span style={{ color: '#f59e0b', fontWeight: 700, fontSize: '1rem', marginRight: '0.4rem' }}>
+            {'★'.repeat(Math.round(serialized.rating))}{'☆'.repeat(5 - Math.round(serialized.rating))}
+          </span>
+          <strong style={{ color: 'var(--color-text)' }}>{serialized.rating}</strong>/5
+          &nbsp;·&nbsp;{serialized.totalRatings} review{serialized.totalRatings !== 1 ? 's' : ''}
+        </div>
       )}
-      {/* Injecting Breadcrumb Schema Markup */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+
       <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', display: 'flex', justifyContent: 'center', width: '100%' }}>
         <div style={{ width: '100%', maxWidth: '1000px' }}>
           <LmsCourseDetail course={serialized} backLink="/courses" />
         </div>
       </div>
+
+      {/* ── Related Courses Cross-Links ─────────────────────── */}
+      {serializedRelated.length > 0 && (
+        <section style={{ background: 'var(--color-bg-light, #f8f9fc)', padding: '3rem 0', borderTop: '1px solid var(--color-border)' }}>
+          <div className="container">
+            <h2 style={{ textAlign: 'center', fontSize: '1.4rem', marginBottom: '0.5rem' }}>
+              More Courses You Might Like
+            </h2>
+            <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>
+              Continue your learning journey with these popular courses at Gradify Academy
+            </p>
+            <div className="grid grid-3">
+              {serializedRelated.map((c) => (
+                <div className="card" key={c.slug} style={{ transition: 'transform 0.2s' }}>
+                  <div className="card-img-wrapper">
+                    <img
+                      src={c.thumbnail || '/images/courses/default.jpg'}
+                      alt={`${c.title} — Gradify Academy course thumbnail`}
+                      className="card-img"
+                      loading="lazy"
+                    />
+                    <span className="course-category badge badge-primary">
+                      {categoryLabels[c.category] || c.category}
+                    </span>
+                  </div>
+                  <div className="card-body">
+                    <h3 className="card-title" style={{ fontSize: '0.95rem' }}>{c.title}</h3>
+                    <p className="card-text" style={{ fontSize: '0.85rem' }}>
+                      {c.shortDescription?.slice(0, 90) || ''}
+                    </p>
+                    <div className="course-price">
+                      <div className="course-price-row">
+                        <span className="price-amount">₹{c.price?.toLocaleString('en-IN')}</span>
+                        {c.originalPrice > 0 && (
+                          <span className="price-original">₹{c.originalPrice?.toLocaleString('en-IN')}</span>
+                        )}
+                      </div>
+                      <div className="course-btn-group" style={{ marginTop: '0.5rem' }}>
+                        <Link
+                          href={`/courses/${c.slug}`}
+                          className="btn btn-primary btn-sm"
+                          id={`related-${c.slug}`}
+                          style={{ width: '100%', textAlign: 'center' }}
+                        >
+                          View Course →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

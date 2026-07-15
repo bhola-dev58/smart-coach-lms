@@ -34,6 +34,7 @@ export default function Footer() {
                 <li><Link href="/courses">Class 11-12 Physics & Chemistry</Link></li>
                 <li><Link href="/courses">IIT-JEE & NEET Foundations</Link></li>
                 <li><Link href="/courses">Olympiad & NTSE Prep</Link></li>
+                <li><Link href="/whitefield-bangalore-coaching">Coding Classes Whitefield</Link></li>
               </ul>
             </div>
 

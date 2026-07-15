@@ -37,8 +37,9 @@ export default function CoursesSection({ courses = [] }) {
                 <div className="card-img-wrapper">
                   <img
                     src={c.thumbnail || '/images/courses/default.jpg'}
-                    alt={c.title}
+                    alt={`${c.title} — Gradify Academy course thumbnail`}
                     className="card-img"
+                    loading="lazy"
                   />
                   <span className="course-category badge badge-primary">
                     {categoryLabels[c.category] || c.category}

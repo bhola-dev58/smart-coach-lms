@@ -32,10 +32,15 @@ export const metadata = {
 
 const orgJsonLd = {
   "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
+  "@type": ["EducationalOrganization", "LocalBusiness"],
   "name": "Gradify Academy",
   "url": "https://gradify.academy",
   "logo": "https://gradify.academy/images/logo-only.png",
+  "image": "https://gradify.academy/images/logo-only.png",
+  "description": "Expert online coaching for Class 8-12 students in Whitefield, Bangalore — CBSE/ICSE boards, JEE, NEET, and coding courses in Python, Java, and DSA.",
+  "priceRange": "₹999 – ₹4999",
+  "telephone": "+91-8874270707",
+  "email": "contact@gradify.academy",
   "sameAs": [
     "https://www.facebook.com/gradify.academy",
     "https://www.instagram.com/gradify.academy",
@@ -49,11 +54,23 @@ const orgJsonLd = {
     "postalCode": "560087",
     "addressCountry": "IN"
   },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "12.9316",
+    "longitude": "77.7186"
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Bengaluru" },
+    { "@type": "Place", "name": "Whitefield" },
+    { "@type": "Place", "name": "Varthur" },
+    { "@type": "Country", "name": "India" }
+  ],
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+91-8874270707",
     "contactType": "Admissions & Support",
-    "email": "contact@gradify.academy"
+    "email": "contact@gradify.academy",
+    "availableLanguage": ["English", "Hindi"]
   }
 };
 
