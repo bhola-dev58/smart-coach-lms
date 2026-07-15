@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import styles from './about.module.css';
 
 export const metadata = {
   title: 'About Us - Our Story, Mission & Faculty | Gradify Academy',
@@ -41,7 +42,7 @@ export default function AboutPage() {
       {/* Our Story */}
       <section className="section section-white">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-12)', alignItems: 'center' }}>
+          <div className={styles.storyGrid}>
             <div>
               <span className="section-label">Our Story</span>
               <h2 style={{ marginTop: 'var(--space-2)' }}>Building India&apos;s Best School Coaching Platform</h2>
@@ -53,38 +54,42 @@ export default function AboutPage() {
                 <Link href="/contact" className="btn btn-outline btn-md">Contact Us</Link>
               </div>
             </div>
-            <div style={{ position: 'relative' }}>
-              <img src="/images/hero/hero-bg.jpg" alt="Gradify Academy Campus" style={{ width: '100%', height: 400, objectFit: 'cover', border: '1px solid var(--color-border)' }} />
-              <div style={{ position: 'absolute', bottom: -20, right: -20, background: 'var(--color-primary)', color: 'white', padding: 'var(--space-6)', textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-3xl)', fontWeight: 800 }}>8+</div>
-                <Link href="/about" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ About Gradify Academy</Link>
+            <div className={styles.imageWrapper}>
+              <img src="/images/hero/hero-bg.jpg" alt="Gradify Academy Campus" className={styles.storyImage} />
+              <div className={styles.badge}>
+                <div className={styles.badgeNumber}>8+</div>
+                <Link href="/about" className={styles.badgeLink}>→ About Gradify Academy</Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Faculty Showcase */}
-      <section className="section section-white">
+      {/* Organizers & Team Showcase */}
+      <section className={styles.organizerSection}>
         <div className="container">
           <div className="section-header">
-            <span className="section-label">Expert Mentors</span>
-            <h2>Our Faculty</h2>
+            <span className="section-label">Core Team</span>
+            <h2>Founding Team &amp; Experts</h2>
             <div className="section-divider" />
+            <p style={{ color: 'var(--color-text-light)', marginTop: 'var(--space-2)' }}>
+              Meet the visionaries, technical experts, and organizers powering the Gradify Academy platform.
+            </p>
           </div>
-          <div className="grid grid-3">
+          <div className={styles.organizerGrid}>
             {[
               { name: 'Er. Adarsh Tiwari', role: 'Founder', image: '/images/faculty/faculty-1.jpg' },
               { name: 'Bhola Yadav', role: 'Technical Expert', image: '/images/faculty/faculty-2.jpg' },
               { name: 'Rudraksha', role: 'Promotion Head', image: '/images/faculty/faculty-3.jpg' },
               { name: 'Antriksh', role: 'Digital Marketing Head', image: '/images/faculty/faculty-4.jpg' },
               { name: 'Priyanshu', role: 'Content Head', image: '/images/faculty/faculty-5.jpg' },
-
             ].map((f, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <img src={f.image} alt={f.name} style={{ width: '100%', height: 300, objectFit: 'cover', marginBottom: 'var(--space-4)', border: '1px solid var(--color-border)' }} />
-                <h4 style={{ marginBottom: 'var(--space-1)' }}>{f.name}</h4>
-                <p style={{ color: 'var(--color-primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>{f.role}</p>
+              <div key={i} className={styles.organizerCard}>
+                <img src={f.image} alt={`${f.name} — Gradify Academy ${f.role}`} className={styles.avatar} />
+                <div className={styles.details}>
+                  <h4 className={styles.name}>{f.name}</h4>
+                  <p className={styles.role}>{f.role}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -96,17 +101,36 @@ export default function AboutPage() {
         <div className="container">
           <div className="section-header">
             <span className="section-label">Our Purpose</span>
-            <h2>Mission & Vision</h2>
+            <h2>Mission &amp; Vision</h2>
             <div className="section-divider" />
           </div>
           <div className="grid grid-2">
-            <div style={{ background: 'white', padding: 'var(--space-8)', border: '1px solid var(--color-border)', borderTop: '4px solid var(--color-primary)' }}>
-              <h3 style={{ marginBottom: 'var(--space-3)' }}>Our Mission</h3>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To democratize quality school education by providing affordable, accessible, and comprehensive coaching that empowers Class 8 to 12 students to achieve academic excellence and succeed in their careers.</p>
+            <div className={`${styles.purposeCard} ${styles.mission}`}>
+              <div className={styles.purposeIconWrapper}>
+                {/* 🎯 Bullseye Target SVG */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="6" />
+                  <circle cx="12" cy="12" r="2" />
+                </svg>
+              </div>
+              <h3 className={styles.purposeTitle}>Our Mission</h3>
+              <p className={styles.purposeText}>
+                To democratize quality school education by providing affordable, accessible, and comprehensive coaching that empowers Class 8 to 12 students to achieve academic excellence and succeed in their careers.
+              </p>
             </div>
-            <div style={{ background: 'white', padding: 'var(--space-8)', border: '1px solid var(--color-border)', borderTop: '4px solid var(--color-dark)' }}>
-              <h3 style={{ marginBottom: 'var(--space-3)' }}>Our Vision</h3>
-              <p style={{ color: 'var(--color-text-light)', lineHeight: 'var(--leading-relaxed)' }}>To become India&apos;s most trusted school coaching platform by 2030, empowering 100,000+ students equipped with deep knowledge, critical thinking, and confidence to succeed globally.</p>
+            <div className={`${styles.purposeCard} ${styles.vision}`}>
+              <div className={styles.purposeIconWrapper}>
+                {/* 🧭 Compass Vision SVG */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                </svg>
+              </div>
+              <h3 className={styles.purposeTitle}>Our Vision</h3>
+              <p className={styles.purposeText}>
+                To become India&apos;s most trusted school coaching platform by 2030, empowering 100,000+ students equipped with deep knowledge, critical thinking, and confidence to succeed globally.
+              </p>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  background: var(--color-dark) url('/images/hero/hero-bg.jpg') no-repeat center center / cover;
+  background-color: var(--color-dark);
   padding: 6rem 0 5rem;
   color: white;
   overflow: hidden;

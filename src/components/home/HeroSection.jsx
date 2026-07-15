@@ -1,9 +1,20 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './HeroSection.module.css';
 
 export default function HeroSection() {
   return (
     <section className={styles.hero}>
+      {/* Optimized Background Image for LCP & Web Vitals performance */}
+      <Image
+        src="/images/hero/hero-bg.jpg"
+        alt="Gradify Academy Hero Background"
+        fill
+        priority
+        quality={75}
+        sizes="100vw"
+        style={{ objectFit: 'cover', zIndex: 0 }}
+      />
       <div className={styles.heroOverlay} />
       <div className={`container ${styles.heroContent}`}>
         <h1>Master Your <span className={styles.highlight}>Academic</span> Journey With Expert Coaching</h1>
@@ -20,6 +31,5 @@ export default function HeroSection() {
         </div>
       </div>
     </section>
-
   );
 }

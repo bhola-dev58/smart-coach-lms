@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import styles from './contact.module.css';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -43,31 +43,76 @@ export default function ContactPage() {
       <div className="page-banner">
         <div className="container">
           <h1>Contact Us</h1>
-          <nav className="breadcrumb"><Link href="/">Home</Link><span className="separator">/</span><span className="current">Contact</span></nav>
+          <nav className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="separator">/</span>
+            <span className="current">Contact</span>
+          </nav>
         </div>
       </div>
 
       {/* Info Cards */}
       <section className="section section-light" style={{ paddingTop: 'var(--space-12)', paddingBottom: 'var(--space-8)' }}>
         <div className="container">
-          <div className="grid grid-4">
+          <div className={styles.infoGrid}>
             {[
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#29c810ff" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>, title: 'Visit Us', text: '10th Cross, Varthur,\nDevasthanagalu, Bengaluru\nKarnataka 560087', isLink: false },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#29c810ff" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>, title: 'Call Us', text: '+91-8874270707', isLink: true, href: 'tel:+918874270707' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#29c810ff" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>, title: 'Email Us', text: 'contact@gradify.academy', isLink: true, href: 'mailto:contact@gradify.academy' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#29c810ff" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>, title: 'Working Hours', text: 'Mon – Fri: 8AM – 8PM\nSat: 9AM – 6PM', isLink: false },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                ),
+                title: 'Visit Us',
+                text: '10th Cross, Varthur,\nDevasthanagalu, Bengaluru\nKarnataka 560087',
+                isLink: false
+              },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                ),
+                title: 'Call Us',
+                text: '+91-8874270707',
+                isLink: true,
+                href: 'tel:+918874270707'
+              },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                ),
+                title: 'Email Us',
+                text: 'contact@gradify.academy',
+                isLink: true,
+                href: 'mailto:contact@gradify.academy'
+              },
+              {
+                icon: (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                ),
+                title: 'Working Hours',
+                text: 'Mon – Fri: 8AM – 8PM\nSat: 9AM – 6PM',
+                isLink: false
+              },
             ].map((card, i) => (
-              <div key={i} style={{ background: 'white', padding: 'var(--space-6)', border: '1px solid var(--color-border)', textAlign: 'center', borderTop: '4px solid var(--color-primary)' }}>
-                <div style={{ width: 56, height: 56, background: 'rgba(200,16,46,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto var(--space-4)' }}>
+              <div key={i} className={styles.infoCard}>
+                <div className={styles.iconWrapper}>
                   {card.icon}
                 </div>
-                <h4 style={{ marginBottom: 'var(--space-2)' }}>{card.title}</h4>
+                <h4 className={styles.cardTitle}>{card.title}</h4>
                 {card.isLink ? (
-                  <a href={card.href} style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', textDecoration: 'none', display: 'block', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'} onMouseLeave={(e) => e.target.style.color = 'var(--color-text-light)'}>
+                  <a href={card.href} className={styles.cardTextLink}>
                     {card.text}
                   </a>
                 ) : (
-                  <p style={{ color: 'var(--color-text-light)', fontSize: 'var(--text-sm)', whiteSpace: 'pre-line' }}>{card.text}</p>
+                  <p className={styles.cardText}>{card.text}</p>
                 )}
               </div>
             ))}
@@ -76,12 +121,12 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form */}
-      <section className="section section-white">
+      <section className={styles.contactSection + " section-white"}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-10)', alignItems: 'start' }}>
-            <div>
-              <h2 style={{ marginBottom: 'var(--space-2)' }}>Send Us a Message</h2>
-              <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--space-8)' }}>Have a question? Fill out the form below and we&apos;ll get back within 4 hours.</p>
+          <div className={styles.contactGrid}>
+            <div className={styles.formCard}>
+              <h2 className={styles.formTitle}>Send Us a Message</h2>
+              <p className={styles.formSubtitle}>Have a question? Fill out the form below and we&apos;ll get back within 4 hours.</p>
 
               {submitted && (
                 <div style={{ background: 'rgba(46,213,115,0.1)', border: '1px solid #2ed573', padding: 'var(--space-4)', marginBottom: 'var(--space-4)', color: '#2ed573', fontWeight: 600, fontSize: 'var(--text-sm)', borderRadius: '4px' }}>
@@ -96,7 +141,7 @@ export default function ContactPage() {
               )}
 
               <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)', marginBottom: 'var(--space-5)' }}>
+                <div className={styles.formRow}>
                   <div className="form-group">
                     <label className="form-label">Full Name *</label>
                     <input type="text" className="form-input" required placeholder="Your name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
@@ -106,7 +151,7 @@ export default function ContactPage() {
                     <input type="email" className="form-input" required placeholder="you@example.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)', marginBottom: 'var(--space-5)' }}>
+                <div className={styles.formRow}>
                   <div className="form-group">
                     <label className="form-label">Phone Number</label>
                     <input
@@ -150,16 +195,16 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <div style={{ width: '100%', height: 320, background: 'var(--color-border)', marginBottom: 'var(--space-6)', overflow: 'hidden' }}>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248849.56659846953!2d77.46612665!3d12.9539974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin" width="100%" height="320" style={{ border: 0, display: 'block' }} allowFullScreen loading="lazy" title="Gradify Academy Location" />
+              <div className={styles.mapWrapper}>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248849.56659846953!2d77.46612665!3d12.9539974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin" width="100%" height="100%" style={{ border: 0, display: 'block' }} allowFullScreen loading="lazy" title="Gradify Academy Location" />
               </div>
-              <div style={{ background: 'var(--color-primary)', padding: 'var(--space-6)', color: 'white' }}>
-                <h4 style={{ color: 'white', marginBottom: 'var(--space-3)' }}>Quick Support</h4>
-                <p style={{ fontSize: 'var(--text-sm)', opacity: 0.8, marginBottom: 'var(--space-4)' }}>Need immediate help?</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  <Link href="/courses" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ Browse All Courses</Link>
-                  <Link href="/lms" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ Student LMS Dashboard</Link>
-                  <Link href="/about" style={{ color: 'white', fontSize: 'var(--text-sm)', opacity: 0.9 }}>→ About Gradify Academy</Link>
+              <div className={styles.sidebarCard}>
+                <h4 className={styles.sidebarTitle}>Quick Support</h4>
+                <p className={styles.sidebarText}>Need immediate help?</p>
+                <div className={styles.sidebarLinks}>
+                  <Link href="/courses" className={styles.sidebarLink}>→ Browse All Courses</Link>
+                  <Link href="/lms" className={styles.sidebarLink}>→ Student LMS Dashboard</Link>
+                  <Link href="/about" className={styles.sidebarLink}>→ About Gradify Academy</Link>
                 </div>
               </div>
             </div>

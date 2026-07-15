@@ -1,0 +1,315 @@
+/* ─── About Page Story Styles ─────────────────────────────────── */
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 769px) {
+  .storyGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  /* Add margin on mobile so the absolute badge does not cut off or cause overflow */
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 769px) {
+  .imageWrapper {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+}
+
+.storyImage {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+}
+
+@media (min-width: 769px) {
+  .storyImage {
+    height: 400px;
+  }
+}
+
+.badge {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-4) var(--space-5);
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 769px) {
+  .badge {
+    bottom: -20px;
+    right: -20px;
+    padding: var(--space-6);
+  }
+}
+
+.badgeNumber {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (min-width: 769px) {
+  .badgeNumber {
+    font-size: var(--text-3xl);
+  }
+}
+
+.badgeLink {
+  color: white;
+  font-size: var(--text-xs);
+  opacity: 0.9;
+  text-decoration: none;
+  display: block;
+  margin-top: 4px;
+  transition: opacity 0.2s;
+}
+
+@media (min-width: 769px) {
+  .badgeLink {
+    font-size: var(--text-sm);
+  }
+}
+
+.badgeLink:hover {
+  opacity: 1;
+}
+
+/* ─── Organizers & Core Team Showcase ────────────────────────── */
+
+.organizerSection {
+  padding: var(--space-12) 0;
+  background: #f8fafc; /* Subtle slate-gray background to contrast with white cards */
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (min-width: 769px) {
+  .organizerSection {
+    padding: var(--space-16) 0;
+  }
+}
+
+.organizerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+@media (min-width: 768px) {
+  .organizerGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1200px) {
+  .organizerGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+.organizerCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--color-surface, #ffffff);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+@media (min-width: 768px) {
+  .organizerCard {
+    gap: var(--space-5);
+    padding: var(--space-5);
+  }
+}
+
+.organizerCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border-color: var(--color-primary);
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid rgba(200, 16, 46, 0.08);
+  transition: border-color 0.2s;
+}
+
+@media (min-width: 768px) {
+  .avatar {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+.organizerCard:hover .avatar {
+  border-color: rgba(200, 16, 46, 0.2);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@media (min-width: 768px) {
+  .details {
+    gap: 4px;
+  }
+}
+
+.name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .name {
+    font-size: var(--text-base);
+  }
+}
+
+.role {
+  font-size: 10px;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (min-width: 768px) {
+  .role {
+    font-size: var(--text-xs);
+  }
+}
+
+/* On extremely narrow devices (like older iPhones/Galaxy Fold), stack elements vertically */
+@media (max-width: 360px) {
+  .organizerCard {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+/* ─── Purpose, Mission & Vision Section ──────────────────────── */
+
+.purposeCard {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 24px; /* Thick modern border-radius */
+  padding: var(--space-6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  overflow: hidden;
+}
+
+.purposeCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-primary);
+}
+
+.purposeCard.mission {
+  border-left: 6px solid var(--color-primary);
+}
+
+.purposeCard.vision {
+  border-left: 6px solid #111827; /* Premium deep slate */
+}
+
+@media (min-width: 768px) {
+  .purposeCard {
+    padding: var(--space-8);
+    gap: var(--space-4);
+  }
+}
+
+.purposeIconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-1);
+}
+
+.mission .purposeIconWrapper {
+  background: rgba(200, 16, 46, 0.06);
+  color: var(--color-primary);
+}
+
+.vision .purposeIconWrapper {
+  background: rgba(17, 24, 39, 0.06);
+  color: #111827;
+}
+
+.purposeTitle {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-text);
+}
+
+@media (min-width: 768px) {
+  .purposeTitle {
+    font-size: var(--text-xl);
+  }
+}
+
+.purposeText {
+  color: var(--color-text-light);
+  line-height: 1.7;
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 768px) {
+  .purposeText {
+    font-size: var(--text-base);
+  }
+}
+
+

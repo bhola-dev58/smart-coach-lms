@@ -1,0 +1,219 @@
+/* ─── Contact Page Styles ──────────────────────────────────────── */
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 576px) {
+  .infoGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+@media (min-width: 992px) {
+  .infoGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.infoCard {
+  background: rgba(228, 227, 227, 0.966);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  box-shadow: rgba(99, 94, 94, 0.15) 0px 3px 12px 0px;
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid var(--color-primary);
+  transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+  transform-style: preserve-3d;
+
+}
+
+.infoCard:hover {
+  transform: translateY(-20px) scale(1.10);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.iconWrapper {
+  width: 56px;
+  height: 56px;
+  background: rgba(200, 16, 46, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-4);
+  border-radius: 50%;
+}
+
+.cardTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.cardTextLink {
+  color: var(--color-text-light);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  display: block;
+  transition: color 0.2s;
+  line-height: 1.6;
+}
+
+.cardTextLink:hover {
+  color: var(--color-primary);
+}
+
+.cardText {
+  color: var(--color-text-light);
+  font-size: var(--text-sm);
+  white-space: pre-line;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Contact Form & Map Section ──────────────────────────────── */
+
+.contactSection {
+  padding: var(--space-10) 0;
+}
+
+@media (min-width: 769px) {
+  .contactSection {
+    padding: var(--space-16) 0;
+  }
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+@media (min-width: 992px) {
+  .contactGrid {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: var(--space-12);
+  }
+}
+
+.formTitle {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  line-height: 1.2;
+}
+
+@media (min-width: 769px) {
+  .formTitle {
+    font-size: var(--text-3xl);
+  }
+}
+
+.formSubtitle {
+  color: var(--color-text-light);
+  margin-bottom: var(--space-6);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 769px) {
+  .formSubtitle {
+    margin-bottom: var(--space-8);
+    font-size: var(--text-base);
+  }
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 576px) {
+  .formRow {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+}
+
+.formCard {
+  background: #f8fafc; /* Premium light slate background */
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: var(--space-6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+  margin-bottom: var(--space-6); /* margin on mobile when stacked */
+}
+
+@media (min-width: 769px) {
+  .formCard {
+    padding: var(--space-8);
+    margin-bottom: 0; /* reset margin on desktop side-by-side view */
+  }
+}
+
+/* ─── Map & Sidebar ────────────────────────────────────────── */
+
+.mapWrapper {
+  width: 100%;
+  height: 240px;
+  background: var(--color-border);
+  margin-bottom: var(--space-5);
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+@media (min-width: 769px) {
+  .mapWrapper {
+    height: 320px;
+    margin-bottom: var(--space-6);
+  }
+}
+
+.sidebarCard {
+  background: var(--color-primary);
+  padding: var(--space-6);
+  color: white;
+  border-radius: 8px;
+}
+
+.sidebarTitle {
+  color: white;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.sidebarText {
+  font-size: var(--text-sm);
+  opacity: 0.8;
+  margin-bottom: var(--space-4);
+}
+
+.sidebarLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sidebarLink {
+  color: white;
+  font-size: var(--text-sm);
+  opacity: 0.9;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-block;
+}
+
+.sidebarLink:hover {
+  opacity: 1;
+  transform: translateX(4px);
+}
