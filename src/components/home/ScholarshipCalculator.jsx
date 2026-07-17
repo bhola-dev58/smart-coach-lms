@@ -55,7 +55,7 @@ export default function ScholarshipCalculator() {
 
         <div className={styles.gridContainer}>
           {/* Left Side: Interactive Controls */}
-          <div className={styles.controlCard}>
+          <div className={`${styles.controlCard} animate-fade-in-up`}>
             <h3 className={styles.cardSubtitle}>Enter Student Details</h3>
             
             {/* Student Class */}
@@ -133,7 +133,7 @@ export default function ScholarshipCalculator() {
           </div>
 
           {/* Right Side: Calculation & Recommendation */}
-          <div className={styles.resultCard}>
+          <div className={`${styles.resultCard} animate-fade-in-up delay-200`}>
             <div className={styles.scholarshipBadge}>
               <span className={styles.badgeLabel}>PREDICTED SCHOLARSHIP</span>
               <div className={styles.badgeValue}>{scholarship}% OFF</div>

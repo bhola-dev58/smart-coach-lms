@@ -5,7 +5,7 @@
 // ============================================================
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummyKey12345678901234567890');
 const FROM = 'Gradify Academy <contact@gradify.academy>';
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://gradify.academy';
 

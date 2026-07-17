@@ -218,6 +218,28 @@ export default function LmsCourseDetail({ course, backLink = '/lms/browse' }) {
             )}
           </div>
 
+          {/* Dynamic No-Cost EMI Options Card */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.2)',
+            borderRadius: '10px',
+            padding: '0.65rem 0.85rem',
+            marginBottom: '1rem',
+            fontSize: '0.78rem',
+            color: '#d97706',
+            fontWeight: 600,
+            lineHeight: '1.4'
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+            <span>No-Cost EMI: Pay ₹{Math.round(c.price / 3).toLocaleString('en-IN')}/mo in 3 installments</span>
+          </div>
+
           {/* Enroll */}
           <EnrollButton
             courseId={c._id}

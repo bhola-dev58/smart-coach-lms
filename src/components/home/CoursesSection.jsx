@@ -32,8 +32,12 @@ export default function CoursesSection({ courses = [] }) {
           </div>
         ) : (
           <div className="grid grid-3">
-            {courses.map((c) => (
-              <div className="card" key={c._id || c.slug}>
+            {courses.map((c, i) => (
+              <div
+                className="card animate-fade-in-up"
+                key={c._id || c.slug}
+                style={{ animationDelay: `${i * 150}ms` }}
+              >
                 <div className="card-img-wrapper">
                   <img
                     src={c.thumbnail || '/images/courses/default.jpg'}

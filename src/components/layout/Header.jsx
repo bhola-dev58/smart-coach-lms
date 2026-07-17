@@ -142,9 +142,34 @@ export default function Header() {
               ) : (
                 <button
                   onClick={() => router.push(`${pathname}?auth=login`, { scroll: false })}
-                  className="btn btn-outline btn-sm"
+                  className="btn btn-primary btn-sm"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.55rem 1.35rem',
+                    fontWeight: 600,
+                    boxShadow: '0 4px 12px rgba(29, 78, 216, 0.15)',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(29, 78, 216, 0.25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(29, 78, 216, 0.15)';
+                  }}
                 >
-                  Login
+                  {/* User Profile SVG Icon */}
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Login / Sign Up</span>
                 </button>
               )}
               <button

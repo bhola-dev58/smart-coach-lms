@@ -46,8 +46,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
-      <StatsSection statsData={statsData} />
+      <HeroSection statsData={statsData} />
       <FeaturesSection />
       <CoursesSection courses={courses} />
       <HowItWorks />

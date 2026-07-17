@@ -99,10 +99,10 @@ export default function RoadmapSection() {
           </svg>
 
           {/* ── Steps ── */}
-          {steps.map((step) => (
+          {steps.map((step, i) => (
             <div 
-              className={styles.node} 
-              style={{ left: step.left, top: step.top }} 
+              className={`${styles.node} animate-fade-in-up`} 
+              style={{ left: step.left, top: step.top, animationDelay: `${i * 150}ms` }} 
               key={step.num}
             >
               {/* Connector line */}

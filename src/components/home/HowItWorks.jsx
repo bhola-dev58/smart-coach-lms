@@ -18,7 +18,11 @@ export default function HowItWorks() {
         </div>
         <div className={styles.stepsGrid}>
           {steps.map((s, i) => (
-            <div className={styles.step} key={i}>
+            <div
+              className={`${styles.step} animate-fade-in-up`}
+              key={i}
+              style={{ animationDelay: `${i * 150}ms` }}
+            >
               <div className={styles.stepNum}>{s.num}</div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
