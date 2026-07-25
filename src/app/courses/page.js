@@ -24,8 +24,8 @@ export default async function CoursesPage({ searchParams }) {
 
   const filter = { isPublished: true };
   if (category && category !== 'All') filter.category = category;
-  if (targetClass && targetClass !== 'All') filter.targetClass = targetClass;
-  if (level && level !== 'All') filter.level = level;
+  if (targetClass && targetClass !== 'All') filter.targetClass = { $in: [targetClass, 'All Classes'] };
+  if (level && level !== 'All') filter.level = { $in: [level, 'All Levels', 'All'] };
   if (searchQuery) {
     filter.$or = [
       { title: { $regex: searchQuery, $options: 'i' } },

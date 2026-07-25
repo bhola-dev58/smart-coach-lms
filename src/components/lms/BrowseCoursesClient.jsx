@@ -40,8 +40,8 @@ export default function BrowseCoursesClient({ courses = [] }) {
   // Apply filters
   const filtered = courses.filter(c => {
     const matchesCategory = filter === 'All' || !filter || (c.category && c.category.toUpperCase() === filter.toUpperCase());
-    const matchesClass = selectedClass === 'All' || c.targetClass === selectedClass;
-    const matchesLevel = selectedLevel === 'All' || c.level === selectedLevel;
+    const matchesClass = selectedClass === 'All' || c.targetClass === selectedClass || c.targetClass === 'All Classes';
+    const matchesLevel = selectedLevel === 'All' || c.level === selectedLevel || c.level === 'All Levels' || c.level === 'All';
     const matchesQuery = !query || 
       (c.title || '').toLowerCase().includes(query) ||
       (c.shortDescription || '').toLowerCase().includes(query) ||

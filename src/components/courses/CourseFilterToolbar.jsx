@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 export default function CourseFilterToolbar({ categories = [] }) {
   const router = useRouter();
@@ -12,6 +12,12 @@ export default function CourseFilterToolbar({ categories = [] }) {
   const currentLevel = searchParams.get('level') || 'All';
   const currentSort = searchParams.get('sort') || 'popular';
   const currentSearch = searchParams.get('q') || '';
+
+  const [searchTerm, setSearchTerm] = useState(currentSearch);
+
+  useEffect(() => {
+    setSearchTerm(currentSearch);
+  }, [currentSearch]);
 
   const createQueryString = useCallback(
     (name, value) => {
@@ -26,10 +32,20 @@ export default function CourseFilterToolbar({ categories = [] }) {
     [searchParams]
   );
 
-  const handleFilterChange = (name, value) => {
+  const handleFilterChange = useCallback((name, value) => {
     const queryString = createQueryString(name, value);
     router.push(`/courses${queryString ? `?${queryString}` : ''}`, { scroll: false });
-  };
+  }, [createQueryString, router]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== currentSearch) {
+        handleFilterChange('q', searchTerm);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, currentSearch, handleFilterChange]);
 
   const handleClearAll = () => {
     router.push('/courses', { scroll: false });
@@ -97,11 +113,8 @@ export default function CourseFilterToolbar({ categories = [] }) {
           <input
             type="text"
             placeholder="Search by course title, topic, or subject..."
-            defaultValue={currentSearch}
-            onChange={(e) => {
-              const val = e.target.value;
-              handleFilterChange('q', val);
-            }}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               width: '100%',
               padding: '0.75rem 1rem 0.75rem 2.6rem',
