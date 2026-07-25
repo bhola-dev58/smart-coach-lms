@@ -93,7 +93,11 @@ const courseSchema = new mongoose.Schema(
     seoDescription: { type: String, default: '' },       // custom meta description ≤155 chars
     seoKeywords:    [{ type: String }],                  // per-course geo + intent keyword array
     locationTags:   [{ type: String }],                  // e.g. ["Whitefield", "Bangalore", "Bengaluru"]
-    targetClass:    [{ type: String }],                  // e.g. ["Class 11", "Class 12"]
+    targetClass: {
+      type: String,
+      enum: ['Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'Dropper / Repeater', 'All Classes'],
+      default: 'All Classes',
+    },
     avgRating:      { type: Number, default: 0 },        // denormalized for schema.org AggregateRating
     reviewCount:    { type: Number, default: 0 },        // denormalized for schema.org AggregateRating
 

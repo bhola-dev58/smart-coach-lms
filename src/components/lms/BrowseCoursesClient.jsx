@@ -1,12 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import EnrollButton from '@/components/courses/EnrollButton';
 import styles from '@/app/lms/lms.module.css';
 import UiIcon from '@/components/common/UiIcon';
 
 export default function BrowseCoursesClient({ courses = [] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [selectedClass, setSelectedClass] = useState(searchParams.get('class') || 'All');
+  const [selectedLevel, setSelectedLevel] = useState(searchParams.get('level') || 'All');
+
   const categoryLabels = {
     MATHS: 'Mathematics',
     SCIENCE: 'Science',
@@ -16,27 +22,98 @@ export default function BrowseCoursesClient({ courses = [] }) {
     COMPUTER_SCIENCE: 'Computer Science'
   };
 
-  const searchParams = useSearchParams();
   const filter = searchParams.get('category') || 'All';
   const query = (searchParams.get('q') || '').trim().toLowerCase();
 
-  // First apply category filter, then search query filter
-  const afterCategory = (filter === 'All' || !filter)
-    ? courses
-    : courses.filter(c => c.category.toUpperCase() === filter.toUpperCase());
+  const classTabs = [
+    { label: 'All Classes', value: 'All' },
+    { label: 'Class 8th', value: 'Class 8' },
+    { label: 'Class 9th', value: 'Class 9' },
+    { label: 'Class 10th (SSLC)', value: 'Class 10' },
+    { label: 'Class 11th (1st PUC)', value: 'Class 11' },
+    { label: 'Class 12th (2nd PUC)', value: 'Class 12' },
+    { label: 'Dropper / Repeater', value: 'Dropper / Repeater' },
+  ];
 
-  const filtered = query
-    ? afterCategory.filter(c =>
-        (c.title || '').toLowerCase().includes(query) ||
-        (c.shortDescription || '').toLowerCase().includes(query) ||
-        (c.description || '').toLowerCase().includes(query) ||
-        (c.category || '').toLowerCase().includes(query) ||
-        (c.tags || []).some(t => t.toLowerCase().includes(query))
-      )
-    : afterCategory;
+  const levelOptions = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+
+  // Apply filters
+  const filtered = courses.filter(c => {
+    const matchesCategory = filter === 'All' || !filter || (c.category && c.category.toUpperCase() === filter.toUpperCase());
+    const matchesClass = selectedClass === 'All' || c.targetClass === selectedClass;
+    const matchesLevel = selectedLevel === 'All' || c.level === selectedLevel;
+    const matchesQuery = !query || 
+      (c.title || '').toLowerCase().includes(query) ||
+      (c.shortDescription || '').toLowerCase().includes(query) ||
+      (c.description || '').toLowerCase().includes(query) ||
+      (c.category || '').toLowerCase().includes(query) ||
+      (c.tags || []).some(t => t.toLowerCase().includes(query));
+
+    return matchesCategory && matchesClass && matchesLevel && matchesQuery;
+  });
 
   return (
     <div style={{ padding: '1.5rem 2rem' }}>
+
+      {/* ── Target Class Filter Tabs ── */}
+      <div style={{ marginBottom: '1.5rem', background: 'var(--dash-surface)', padding: '1rem 1.25rem', borderRadius: '12px', border: '1px solid var(--dash-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--dash-text-muted)', marginBottom: '0.6rem', textTransform: 'uppercase' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Filter by Class / Target Grade:
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {classTabs.map(item => {
+            const active = selectedClass === item.value;
+            return (
+              <button
+                key={item.value}
+                onClick={() => setSelectedClass(item.value)}
+                style={{
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '20px',
+                  fontSize: '0.8rem',
+                  fontWeight: active ? 700 : 500,
+                  border: active ? '1.5px solid var(--dash-accent, #2563eb)' : '1px solid var(--dash-border)',
+                  background: active ? 'rgba(37, 99, 235, 0.1)' : 'var(--dash-bg)',
+                  color: active ? 'var(--dash-accent, #2563eb)' : 'var(--dash-text)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Level filter row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--dash-border)' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--dash-text-muted)', textTransform: 'uppercase' }}>Skill Level:</span>
+          <div style={{ display: 'flex', gap: '0.4rem' }}>
+            {levelOptions.map(lvl => {
+              const active = selectedLevel === lvl;
+              return (
+                <button
+                  key={lvl}
+                  onClick={() => setSelectedLevel(lvl)}
+                  style={{
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '12px',
+                    fontSize: '0.75rem',
+                    fontWeight: active ? 700 : 500,
+                    border: active ? '1px solid var(--dash-accent)' : '1px solid var(--dash-border)',
+                    background: active ? 'var(--dash-accent)' : 'transparent',
+                    color: active ? '#ffffff' : 'var(--dash-text-muted)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {lvl === 'All' ? 'All Levels' : lvl}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Search result heading */}
       {query && (
@@ -88,19 +165,34 @@ export default function BrowseCoursesClient({ courses = [] }) {
                 overflow: 'hidden',
               }}>
                 <img src={c.thumbnail || '/images/courses/default.jpg'} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <span style={{
-                  position: 'absolute',
-                  top: '0.75rem',
-                  left: '0.75rem',
-                  background: 'var(--color-primary)',
-                  color: 'white',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '6px',
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                }}>
-                  {categoryLabels[c.category] || c.category}
-                </span>
+                <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  <span style={{
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                  }}>
+                    {categoryLabels[c.category] || c.category}
+                  </span>
+                  {c.targetClass && c.targetClass !== 'All Classes' && (
+                    <span style={{
+                      background: '#2563eb',
+                      color: 'white',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                    }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                      {c.targetClass}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Body */}

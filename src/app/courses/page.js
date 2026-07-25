@@ -4,6 +4,7 @@ import Course from '@/models/Course';
 import '@/models/User'; // Register User schema for populate('instructor')
 import EnrollButton from '@/components/courses/EnrollButton';
 import CategoryDropdown from '@/components/courses/CategoryDropdown';
+import CourseFilterToolbar from '@/components/courses/CourseFilterToolbar';
 import Category from '@/models/Category';
 
 export const metadata = {
@@ -16,11 +17,15 @@ export default async function CoursesPage({ searchParams }) {
   await connectDB();
   const params = await searchParams;
   const category = params.category;
+  const targetClass = params.class || params.targetClass;
+  const level = params.level;
   const sort = params.sort || 'popular';
   const searchQuery = params.q || '';
 
   const filter = { isPublished: true };
-  if (category) filter.category = category;
+  if (category && category !== 'All') filter.category = category;
+  if (targetClass && targetClass !== 'All') filter.targetClass = targetClass;
+  if (level && level !== 'All') filter.level = level;
   if (searchQuery) {
     filter.$or = [
       { title: { $regex: searchQuery, $options: 'i' } },
@@ -112,46 +117,8 @@ export default async function CoursesPage({ searchParams }) {
       <section className="section">
         <div className="container">
 
-          <div
-            className="courses-toolbar"
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '1.5rem',
-              marginBottom: 'var(--space-6)',
-              background: 'var(--color-surface)',
-              padding: '1rem 1.5rem',
-              borderRadius: '12px',
-              border: '1px solid var(--color-border)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              flexWrap: 'wrap'
-            }}
-          >
-            {/* Category Filter Dropdown */}
-            <CategoryDropdown
-              categories={allCategories}
-              categoryLabels={categoryLabels}
-              currentCategory={category}
-              searchQuery={searchQuery}
-            />
-
-            {/* Search Bar Navbar Style */}
-            <form method="GET" action="/courses" style={{ display: 'flex', gap: '0.5rem', minWidth: '300px', flex: '0 1 auto' }}>
-              <input
-                type="search"
-                name="q"
-                defaultValue={searchQuery}
-                placeholder="Search courses..."
-                className="search-input"
-              />
-              {category && <input type="hidden" name="category" value={category} />}
-              <button type="submit" className="btn btn-primary btn-sm" style={{ padding: '0 1.25rem', borderRadius: '20px' }}>
-                Search
-              </button>
-            </form>
-          </div>
+          {/* ── Multi-Filter Toolbar (Class, Category, Level, Search, Sort) ── */}
+          <CourseFilterToolbar categories={allCategories} />
 
           <div
             style={{
@@ -173,6 +140,8 @@ export default async function CoursesPage({ searchParams }) {
               </strong>{' '}
               courses
               {category ? ` in ${categoryLabels[category] || category}` : ''}
+              {targetClass && targetClass !== 'All' ? ` (${targetClass})` : ''}
+              {level && level !== 'All' ? ` • ${level}` : ''}
             </span>
           </div>
 
@@ -182,16 +151,14 @@ export default async function CoursesPage({ searchParams }) {
                 No courses found
               </h3>
               <p style={{ color: 'var(--color-text-muted)' }}>
-                {category
-                  ? `No courses available in the "${categoryLabels[category] || category}" category yet.`
-                  : 'New courses are being added soon!'}
+                No matching courses found for your selected filters. Try choosing a different class or category.
               </p>
               <Link
                 href="/courses"
                 className="btn btn-outline btn-md"
                 style={{ marginTop: 'var(--space-4)' }}
               >
-                View All Categories
+                Clear All Filters
               </Link>
             </div>
           ) : (
@@ -205,9 +172,17 @@ export default async function CoursesPage({ searchParams }) {
                       className="card-img"
                       loading="lazy"
                     />
-                    <span className="course-category badge badge-primary">
-                      {categoryLabels[c.category] || c.category}
-                    </span>
+                    <div style={{ position: 'absolute', bottom: 'var(--space-3)', left: 'var(--space-3)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      <span className="course-category badge badge-primary">
+                        {categoryLabels[c.category] || c.category}
+                      </span>
+                      {c.targetClass && c.targetClass !== 'All Classes' && (
+                        <span className="badge" style={{ background: '#2563eb', color: '#ffffff', fontWeight: 600, fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                          {c.targetClass}
+                        </span>
+                      )}
+                    </div>
                     {c.isFeatured && (
                       <span
                         className="badge badge-dark"
@@ -216,9 +191,13 @@ export default async function CoursesPage({ searchParams }) {
                           top: 'var(--space-3)',
                           right: 'var(--space-3)',
                           fontSize: '0.65rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
                         }}
                       >
-                        ⭐ Popular
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Popular
                       </span>
                     )}
                   </div>

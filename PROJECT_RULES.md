@@ -20,6 +20,14 @@
 
 ---
 
+## UI/UX Design & Front-End Protocol (Garden-Skills)
+
+1. **Zero Emojis**: Never use raw unicode emojis in UI components/pages. Use SVG icons exclusively.
+2. **Modern Aesthetics**: Enforce dynamic dark/light CSS tokens, glassmorphism, responsive grids, micro-interactions, and skeleton loading states.
+3. **Canonical Knowledge**: Reference `.gsd/KNOWLEDGE_UI_UX_DESIGN.md` for full design tokens and layout patterns.
+
+---
+
 ## Proof Requirements
 
 Every change requires verification evidence:

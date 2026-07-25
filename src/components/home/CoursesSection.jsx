@@ -45,9 +45,17 @@ export default function CoursesSection({ courses = [] }) {
                     className="card-img"
                     loading="lazy"
                   />
-                  <span className="course-category badge badge-primary">
-                    {categoryLabels[c.category] || c.category}
-                  </span>
+                  <div style={{ position: 'absolute', bottom: 'var(--space-3)', left: 'var(--space-3)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', zIndex: 2 }}>
+                    <span className="course-category badge badge-primary">
+                      {categoryLabels[c.category] || c.category}
+                    </span>
+                    {c.targetClass && c.targetClass !== 'All Classes' && (
+                      <span className="badge" style={{ background: '#2563eb', color: '#ffffff', fontWeight: 600, fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                        {c.targetClass}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="card-body">
                   <h3 className="card-title">{c.title}</h3>

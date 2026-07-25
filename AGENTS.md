@@ -13,4 +13,10 @@
 
 3. **Development vs Production Caching Differences**:
    - Remember that `npm run dev` (Local) disables static route caching, so database changes show up immediately during local testing. Production builds enforce static route caching unless explicit dynamic exports or `revalidatePath` calls are present.
+
+4. **UI/UX Design & Front-End Excellence (Garden-Skills Protocol)**:
+   - **No Emojis**: NEVER use raw emojis (🎯, ⭐, 📚) in UI elements. ALWAYS use clean inline React SVG icons.
+   - **Premium Visual Aesthetics**: Apply modern gradients, glassmorphism (`backdrop-filter`), smooth micro-animations (`transition: all 0.2s ease`), and dynamic theme CSS variables.
+   - **Responsive & Accessible**: All components, cards, forms, and toolbars MUST be fully responsive across mobile/desktop with active focus rings, skeleton loaders, and live character counters.
+   - **Skill File Reference**: Master design guidelines are active in `.agent/skills/web-design-engineer/SKILL.md` and `.gsd/KNOWLEDGE_UI_UX_DESIGN.md`.
 <!-- END:nextjs-agent-rules -->
