@@ -80,18 +80,35 @@ export default function LmsCourseDetail({ course, backLink = '/lms/browse' }) {
       }}>
         {/* Left — Info */}
         <div>
-          <span style={{
-            display: 'inline-block',
-            background: 'var(--dash-accent-light)',
-            color: 'var(--dash-accent)',
-            padding: '0.2rem 0.75rem',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            marginBottom: '1rem',
-          }}>
-            {c.category}
-          </span>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+            <span style={{
+              display: 'inline-block',
+              background: 'var(--dash-accent-light)',
+              color: 'var(--dash-accent)',
+              padding: '0.2rem 0.75rem',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}>
+              {c.category}
+            </span>
+            {c.targetClass && c.targetClass !== 'All Classes' && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: '#2563eb',
+                color: '#ffffff',
+                padding: '0.2rem 0.75rem',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                {c.targetClass}
+              </span>
+            )}
+          </div>
 
           <h1 style={{
             fontFamily: 'var(--font-heading)',
@@ -273,6 +290,36 @@ export default function LmsCourseDetail({ course, backLink = '/lms/browse' }) {
               <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', color: 'var(--dash-text-muted)', fontSize: '0.85rem' }}>
                 <span style={{ color: '#2ed573', flexShrink: 0 }}>✓</span>
                 <span>{o}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Requirements & Prerequisites */}
+      {c.prerequisites?.length > 0 && (
+        <div style={{
+          background: 'var(--dash-surface)',
+          border: '1px solid var(--dash-border)',
+          borderRadius: '14px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          boxShadow: 'var(--dash-shadow)',
+        }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--dash-accent, #2563eb)' }}>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Requirements & Prerequisites
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {c.prerequisites.map((p, i) => (
+              <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', color: 'var(--dash-text-muted)', fontSize: '0.85rem' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--dash-accent, #2563eb)', flexShrink: 0, marginTop: '2px' }}>
+                  <polyline points="9 11 12 14 22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+                <span>{p}</span>
               </div>
             ))}
           </div>

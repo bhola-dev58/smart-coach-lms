@@ -111,10 +111,22 @@ export default function CourseForm({ initialData = null }) {
          <textarea style={{...inputStyle, minHeight: '100px'}} name="description" value={formData.description} onChange={handleChange} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
          <div>
             <label style={labelStyle}>Category *</label>
             <input style={inputStyle} required name="category" value={formData.category} onChange={handleChange} />
+         </div>
+         <div>
+            <label style={labelStyle}>Target Class *</label>
+            <select style={inputStyle} name="targetClass" value={formData.targetClass || 'All Classes'} onChange={handleChange}>
+               <option value="All Classes">All Classes</option>
+               <option value="Class 8">Class 8</option>
+               <option value="Class 9">Class 9</option>
+               <option value="Class 10">Class 10</option>
+               <option value="Class 11">Class 11</option>
+               <option value="Class 12">Class 12</option>
+               <option value="Dropper / Repeater">Dropper / Repeater</option>
+            </select>
          </div>
          <div>
             <label style={labelStyle}>Level</label>
@@ -122,6 +134,7 @@ export default function CourseForm({ initialData = null }) {
                <option value="Beginner">Beginner</option>
                <option value="Intermediate">Intermediate</option>
                <option value="Advanced">Advanced</option>
+               <option value="All Levels">All Levels</option>
             </select>
          </div>
          <div>

@@ -59,6 +59,7 @@ export const schemaConfig = {
       { key: 'isFree', label: 'Is Free Course?', type: 'boolean', default: false },
       { key: 'thumbnail', label: 'Upload Thumbnail', type: 'file' },
       { key: 'category', label: 'Category', type: 'select', options: ['MATHS', 'SCIENCE', 'COMMERCE', 'GENERAL', 'ARTS', 'COMPUTER_SCIENCE'] },
+      { key: 'targetClass', label: 'Target Class / Grade', type: 'select', options: ['Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'Dropper / Repeater', 'All Classes'] },
       { key: 'level', label: 'Skill Level', type: 'select', options: ['Beginner', 'Intermediate', 'Advanced', 'All Levels'] },
       { key: 'language', label: 'Language', type: 'text', default: 'Hindi' },
       { key: 'totalHours', label: 'Expected Total Hours', type: 'number' },
