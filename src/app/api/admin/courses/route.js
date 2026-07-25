@@ -42,6 +42,7 @@ export async function POST(request) {
     
     revalidatePath('/');
     revalidatePath('/courses');
+    revalidatePath('/lms/browse');
 
     return NextResponse.json({ success: true, data: newCourse, error: null });
   } catch (error) {
@@ -69,6 +70,7 @@ export async function PUT(request) {
     
     revalidatePath('/');
     revalidatePath('/courses');
+    revalidatePath('/lms/browse');
 
     return NextResponse.json({ success: true, data: updatedCourse, error: null });
   } catch (error) {
@@ -92,6 +94,7 @@ export async function DELETE(request) {
     
     revalidatePath('/');
     revalidatePath('/courses');
+    revalidatePath('/lms/browse');
 
     return NextResponse.json({ success: true, data: null, error: null });
   } catch (error) {

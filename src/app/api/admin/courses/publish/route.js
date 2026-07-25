@@ -42,6 +42,7 @@ export async function POST(req) {
 
     revalidatePath('/');
     revalidatePath('/courses');
+    revalidatePath('/lms/browse');
 
     // ── Get all active students to notify ──
     const students = await User.find({ isActive: true, role: 'student' }).select('_id email').lean();

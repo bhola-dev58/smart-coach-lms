@@ -4,6 +4,8 @@ import Course from '@/models/Course';
 import '@/models/User';
 import BrowseCoursesClient from '@/components/lms/BrowseCoursesClient';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = { title: 'Browse Courses — Gradify Academy' };
 
 export default async function BrowseCoursesPage() {
