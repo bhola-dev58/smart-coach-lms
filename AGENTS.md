@@ -17,6 +17,6 @@
 4. **UI/UX Design & Front-End Excellence (Garden-Skills Protocol)**:
    - **No Emojis**: NEVER use raw emojis (🎯, ⭐, 📚) in UI elements. ALWAYS use clean inline React SVG icons.
    - **Premium Visual Aesthetics**: Apply modern gradients, glassmorphism (`backdrop-filter`), smooth micro-animations (`transition: all 0.2s ease`), and dynamic theme CSS variables.
-   - **Responsive & Accessible**: All components, cards, forms, and toolbars MUST be fully responsive across mobile/desktop with active focus rings, skeleton loaders, and live character counters.
+   - **Responsive & Accessible**: All components, cards, forms, and toolbars MUST be fully responsive across mobile/desktop with active focus rings, skeleton loaders for async/content-loading surfaces, and live character counters for inputs with length constraints.
    - **Skill File Reference**: Master design guidelines are active in `.agent/skills/web-design-engineer/SKILL.md` and `.gsd/KNOWLEDGE_UI_UX_DESIGN.md`.
 <!-- END:nextjs-agent-rules -->
