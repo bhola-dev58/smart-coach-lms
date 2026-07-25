@@ -12,6 +12,7 @@ import Course from '@/models/Course';
 import User from '@/models/User';
 import { createNotification } from '@/lib/notifications';
 import { sendNewCourseLaunchEmail } from '@/lib/email';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(req) {
   try {
@@ -38,6 +39,9 @@ export async function POST(req) {
     }
 
     await Course.findByIdAndUpdate(courseId, { status: 'published', publishedAt: new Date() });
+
+    revalidatePath('/');
+    revalidatePath('/courses');
 
     // ── Get all active students to notify ──
     const students = await User.find({ isActive: true, role: 'student' }).select('_id email').lean();

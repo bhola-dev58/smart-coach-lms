@@ -84,7 +84,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-### 🐳 Running with Docker
+### Running with Docker
 
 You can containerize and run the application locally using the pre-configured `Dockerfile`:
 
@@ -96,9 +96,9 @@ docker build -t gradify-academy .
 docker run -p 3000:3000 --env-file .env.local gradify-academy
 ```
 
-🌐 Open [http://localhost:3000](http://localhost:3000) to access the app running inside the Docker container.
+ Open [http://localhost:3000](http://localhost:3000) to access the app running inside the Docker container.
 
-## 💳 Testing Payments
+## Testing Payments
 
 We use **Razorpay SDK** for processing. To test UPI intent flows, netbanking, or cards without spending money:
 1. Ensure your `.env.local` contains `NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_...`

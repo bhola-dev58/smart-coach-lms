@@ -12,6 +12,8 @@ import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import '@/models/User'; // Register User schema for populate('instructor')
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Gradify Academy | Class 8-12 Boards, JEE & NEET Online Coaching',
   description:

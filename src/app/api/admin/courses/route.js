@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/authOptions';
 import { connectDB } from '@/lib/db';
 import Course from '@/models/Course';
 import slugify from 'slugify';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(request) {
   try {
@@ -39,6 +40,9 @@ export async function POST(request) {
 
     const newCourse = await Course.create(data);
     
+    revalidatePath('/');
+    revalidatePath('/courses');
+
     return NextResponse.json({ success: true, data: newCourse, error: null });
   } catch (error) {
     if (error.code === 11000) {
@@ -63,6 +67,9 @@ export async function PUT(request) {
 
     const updatedCourse = await Course.findByIdAndUpdate(_id, updateData, { returnDocument: 'after' });
     
+    revalidatePath('/');
+    revalidatePath('/courses');
+
     return NextResponse.json({ success: true, data: updatedCourse, error: null });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -83,6 +90,9 @@ export async function DELETE(request) {
 
     await Course.findByIdAndDelete(id);
     
+    revalidatePath('/');
+    revalidatePath('/courses');
+
     return NextResponse.json({ success: true, data: null, error: null });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
