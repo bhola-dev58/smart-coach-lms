@@ -20,60 +20,172 @@
 }
 
 .infoCard {
-  background: rgba(228, 227, 227, 0.966);
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  box-shadow: rgba(99, 94, 94, 0.15) 0px 3px 12px 0px;
+  background: #ffffff;
+  padding: 2rem 1.5rem;
+  border: 2px solid #5050502f;
+  border-radius: 60px 0px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
   text-align: center;
-  border-radius: 12px;
-  border: 1px solid var(--color-primary);
-  transition: transform .7s cubic-bezier(.22, 1, .36, 1);
-  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.infoCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, var(--color-primary, #2563eb), #3b82f6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .infoCard:hover {
-  transform: translateY(-20px) scale(1.10);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  transform: translateY(-6px) rotate(0deg);
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.14), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-color: rgba(28, 90, 196, 0.733);
+}
+
+.infoCard:hover::before {
+  opacity: 1;
 }
 
 .iconWrapper {
-  width: 56px;
-  height: 56px;
-  background: rgba(200, 16, 46, 0.08);
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.16) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-4);
-  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  border-radius: 14px;
+  transition: transform 0.3s ease, background 0.3s ease;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.infoCard:hover .iconWrapper {
+  transform: scale(1.08) rotate(3deg);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(37, 99, 235, 0.26) 100%);
 }
 
 .cardTitle {
-  font-size: var(--text-base);
+  font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: var(--space-2);
-  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  color: var(--color-heading, #0f172a);
+  letter-spacing: -0.01em;
 }
 
 .cardTextLink {
-  color: var(--color-text-light);
-  font-size: var(--text-sm);
+  color: #475569;
+  font-size: 0.875rem;
   text-decoration: none;
-  display: block;
-  transition: color 0.2s;
+  display: inline-block;
+  transition: color 0.2s ease;
   line-height: 1.6;
+  font-weight: 500;
 }
 
 .cardTextLink:hover {
-  color: var(--color-primary);
+  color: var(--color-primary, #2563eb);
+  text-decoration: underline;
 }
 
 .cardText {
-  color: var(--color-text-light);
-  font-size: var(--text-sm);
+  color: #475569;
+  font-size: 0.875rem;
   white-space: pre-line;
   line-height: 1.6;
+  font-weight: 500;
   margin: 0;
+}
+
+/* ─── Individual Card Color & Hover Theme Variations ──────────── */
+
+/* 1. Visit Us (Location - Rose/Red Theme) */
+.cardLocation .iconWrapper {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.08) 0%, rgba(225, 29, 72, 0.18) 100%);
+}
+
+.cardLocation::before {
+  background: linear-gradient(90deg, #e11d48, #f43f5e);
+}
+
+.cardLocation:hover {
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 241, 242, 0.85) 100%);
+  border-color: rgba(225, 29, 72, 0.35);
+  box-shadow: 0 16px 32px -8px rgba(225, 29, 72, 0.18), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cardLocation:hover .iconWrapper {
+  background: linear-gradient(75deg, rgba(225, 29, 72, 0.15) 0%, rgba(225, 29, 72, 0.28) 100%);
+}
+
+/* 2. Call Us (Phone - Emerald/Green Theme) */
+.cardPhone .iconWrapper {
+  background: linear-gradient(75deg, rgba(5, 150, 105, 0.08) 0%, rgba(5, 150, 105, 0.18) 100%);
+}
+
+.cardPhone::before {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.cardPhone:hover {
+  background: linear-gradient(180deg, #ffffff 0%, rgba(236, 253, 245, 0.85) 100%);
+  border-color: rgba(5, 150, 105, 0.35);
+  box-shadow: 0 16px 32px -8px rgba(5, 150, 105, 0.18), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cardPhone:hover .iconWrapper {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.15) 0%, rgba(5, 150, 105, 0.28) 100%);
+}
+
+.cardPhone:hover .cardTextLink {
+  color: #059669;
+}
+
+/* 3. Email Us (Email - Royal Blue Theme) */
+.cardEmail .iconWrapper {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.18) 100%);
+}
+
+.cardEmail::before {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.cardEmail:hover {
+  background: linear-gradient(180deg, #ffffff 0%, rgba(239, 246, 255, 0.85) 100%);
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.18), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cardEmail:hover .iconWrapper {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.28) 100%);
+}
+
+/* 4. Working Hours (Schedule - Amber/Gold Theme) */
+.cardHours .iconWrapper {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(217, 119, 6, 0.18) 100%);
+}
+
+.cardHours::before {
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+}
+
+.cardHours:hover {
+  background: linear-gradient(180deg, #ffffff 0%, rgba(254, 243, 199, 0.85) 100%);
+  border-color: rgba(217, 119, 6, 0.35);
+  box-shadow: 0 16px 32px -8px rgba(217, 119, 6, 0.18), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cardHours:hover .iconWrapper {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0.28) 100%);
 }
 
 /* ─── Contact Form & Map Section ──────────────────────────────── */
@@ -144,18 +256,21 @@
 }
 
 .formCard {
-  background: #f8fafc; /* Premium light slate background */
+  background: #f8fafc;
+  /* Premium light slate background */
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: var(--space-6);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
-  margin-bottom: var(--space-6); /* margin on mobile when stacked */
+  margin-bottom: var(--space-6);
+  /* margin on mobile when stacked */
 }
 
 @media (min-width: 769px) {
   .formCard {
     padding: var(--space-8);
-    margin-bottom: 0; /* reset margin on desktop side-by-side view */
+    margin-bottom: 0;
+    /* reset margin on desktop side-by-side view */
   }
 }
 

@@ -85,6 +85,7 @@ const courseSchema = new mongoose.Schema(
     // ── Course Metadata ──
     prerequisites: [{ type: String }],
     learningOutcomes: [{ type: String }],
+    targetAudience: [{ type: String }],
     tags: [{ type: String }],
     faqs: [faqSchema],
 
