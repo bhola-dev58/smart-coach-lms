@@ -167,6 +167,7 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave, 
     const key = field.key.toLowerCase();
     const label = field.label;
     
+    if (key === 'shortdescription' || key.includes('shortdescription')) return `Enter short course subtitle (max 200 chars)...`;
     if (key.includes('title')) return `Enter ${label.toLowerCase()} (e.g. DSA in Python)`;
     if (key.includes('description')) return `Enter detailed ${label.toLowerCase()} description here...`;
     if (key.includes('price')) return `e.g. 999`;
@@ -339,8 +340,13 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave, 
                 field.type === 'stringArray' || 
                 field.key === 'title' || 
                 field.key === 'description' || 
+                field.key === 'shortDescription' || 
                 field.key === 'learningOutcomes' || 
                 field.key === 'prerequisites';
+
+              const maxCharLimit = field.maxLength || (field.key === 'shortDescription' ? 200 : null);
+              const currentVal = formData[field.key] || '';
+              const charCount = typeof currentVal === 'string' ? currentVal.length : 0;
 
               return (
                 <div key={field.key} style={{
@@ -349,9 +355,20 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave, 
                   gap: '0.4rem',
                   gridColumn: isFullWidth ? '1 / span 2' : 'auto',
                 }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--dash-text-secondary)', fontWeight: 600 }}>
-                    {field.label.replace(/\(comma\s+separated\)/i, '').trim()} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '0.85rem', color: 'var(--dash-text-secondary)', fontWeight: 600 }}>
+                      {field.label.replace(/\(comma\s+separated\)/i, '').trim()} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
+                    </label>
+                    {maxCharLimit && (
+                      <span style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        color: charCount >= maxCharLimit ? '#ef4444' : charCount >= maxCharLimit * 0.85 ? '#f59e0b' : 'var(--dash-text-muted)',
+                      }}>
+                        {charCount} / {maxCharLimit} chars
+                      </span>
+                    )}
+                  </div>
                   
                   {field.key === 'tags' ? (
                     <div style={{
@@ -1315,13 +1332,19 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave, 
                   ) : (
                     <input 
                       type={field.type === 'number' ? 'number' : 'text'}
+                      maxLength={maxCharLimit || undefined}
                       value={
                         (formData[field.key] === 0 || formData[field.key] === '0') && !initialData
                           ? ''
                           : (formData[field.key] === undefined || formData[field.key] === null ? '' : formData[field.key])
                       }
                       onChange={e => {
-                        const val = e.target.value === '' ? '' : (field.type === 'number' ? Number(e.target.value) : e.target.value);
+                        let val = e.target.value;
+                        if (field.type === 'number') {
+                          val = val === '' ? '' : Number(val);
+                        } else if (maxCharLimit && typeof val === 'string' && val.length > maxCharLimit) {
+                          val = val.slice(0, maxCharLimit);
+                        }
                         handleChange(field.key, val);
                       }}
                       required={field.required}

@@ -86,8 +86,24 @@ export default function CourseForm({ initialData = null }) {
       </div>
 
       <div>
-         <label style={labelStyle}>Short Description *</label>
-         <input style={inputStyle} required name="shortDescription" value={formData.shortDescription} onChange={handleChange} />
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+           <label style={labelStyle}>Short Description *</label>
+           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: (formData.shortDescription?.length || 0) >= 200 ? '#ef4444' : '#888' }}>
+             {formData.shortDescription?.length || 0} / 200 chars
+           </span>
+         </div>
+         <input 
+           style={inputStyle} 
+           required 
+           name="shortDescription" 
+           maxLength={200}
+           value={formData.shortDescription} 
+           onChange={e => {
+             const val = e.target.value.slice(0, 200);
+             setFormData(prev => ({ ...prev, shortDescription: val }));
+           }} 
+           placeholder="Enter short course subtitle (max 200 chars)..."
+         />
       </div>
 
       <div>

@@ -53,7 +53,7 @@ export const schemaConfig = {
     fields: [
       { key: 'title', label: 'Course Title', type: 'text', required: true },
       { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'shortDescription', label: 'Short Subtitle (200 chars)', type: 'text' },
+      { key: 'shortDescription', label: 'Short Subtitle (200 chars)', type: 'text', maxLength: 200 },
       { key: 'price', label: 'Offer Price (INR)', type: 'number', default: 0 },
       { key: 'originalPrice', label: 'Original MRP (INR)', type: 'number', default: 0 },
       { key: 'isFree', label: 'Is Free Course?', type: 'boolean', default: false },
