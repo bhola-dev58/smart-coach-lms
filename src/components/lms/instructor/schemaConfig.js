@@ -65,6 +65,7 @@ export const schemaConfig = {
       { key: 'totalHours', label: 'Expected Total Hours', type: 'number' },
       { key: 'prerequisites', label: 'Prerequisites', type: 'stringArray' },
       { key: 'learningOutcomes', label: 'Learning Outcomes', type: 'stringArray' },
+      { key: 'targetAudience', label: 'Who Is This Course For? (Target Audience)', type: 'stringArray' },
       { key: 'tags', label: 'Tags', type: 'stringArray' },
       { key: 'faqs', label: 'FAQs', type: 'faqArray' },
       { key: 'isPublished', label: 'Published / Live', type: 'boolean', default: false },

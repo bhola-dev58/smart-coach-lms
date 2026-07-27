@@ -127,8 +127,8 @@ export default async function CourseDetailsPage({ params }) {
         </div>
       )}
 
-      <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <div style={{ width: '100%', maxWidth: '1000px' }}>
+      <div className={styles.lmsWrapper} style={{ minHeight: '80vh', background: 'var(--dash-bg)', width: '100%', padding: '1.5rem 0' }}>
+        <div style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
           <LmsCourseDetail course={serialized} backLink="/courses" />
         </div>
       </div>
