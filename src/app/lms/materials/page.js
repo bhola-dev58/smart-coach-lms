@@ -31,7 +31,7 @@ export default async function MaterialsPage() {
       {/* Materials Grid */}
       {materials.length === 0 ? (
         <div style={{ background: 'var(--dash-surface)', border: '1px dashed var(--dash-border)', borderRadius: '12px', padding: '3rem 2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', margin: '0 0 1rem 0', opacity: 0.8 }}>📂</div>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--dash-text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           <h3 style={{ color: 'var(--dash-text)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>No Materials Found</h3>
           <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>
             Instructors haven't uploaded any study materials for your enrolled courses yet.

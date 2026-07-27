@@ -156,7 +156,7 @@ export default function InstructorRootPage() {
     },
     {
       title: 'Course Rating',
-      value: `${stats?.avgRating || 4.8} ★`,
+      value: `${stats?.avgRating || 4.8} / 5`,
       href: '/lms/instructor/reviews',
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -291,7 +291,7 @@ export default function InstructorRootPage() {
       {/* Quick Action Shortcuts */}
       <div>
         <h4 style={{ margin: '0 0 1rem 0', color: 'var(--dash-text)', fontSize: '1rem', fontWeight: 700 }}>
-          ⚡ Quick Actions
+          Quick Actions
         </h4>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <Link href="/lms/instructor/courses" className="dash-quick-link">
@@ -317,7 +317,7 @@ export default function InstructorRootPage() {
       <div style={{ background: 'var(--dash-surface)', border: '1px solid var(--dash-border)', borderRadius: '12px', padding: '1.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <h4 style={{ margin: 0, color: 'var(--dash-text)', fontSize: '1rem', fontWeight: 700 }}>
-            📖 Recent Courses
+            Recent Courses
           </h4>
           <Link href="/lms/instructor/courses" style={{ fontSize: '0.85rem', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>
             View All Courses →

@@ -80,8 +80,11 @@ export async function GET(request, { params }) {
         .populate('course', 'title')
         .populate('batch', 'name');
     } else if (resourceName === 'announcements') {
+      await import('@/models/User');
       await import('@/models/Course');
-      queryBuilder = queryBuilder.populate('course', 'title');
+      queryBuilder = queryBuilder
+        .populate('createdBy', 'name email')
+        .populate('targetCourses', 'title');
     } else if (resourceName === 'assignments') {
       await import('@/models/Course');
       queryBuilder = queryBuilder.populate('course', 'title');
@@ -144,6 +147,13 @@ export async function POST(request, { params }) {
       if (!body.lessonSlug || body.lessonSlug.trim() === '') body.lessonSlug = 'general';
     }
 
+    if (resourceName === 'announcements') {
+      body.createdBy = auth.session.user.id;
+      if (body.course) {
+        body.targetCourses = [body.course];
+      }
+    }
+
     // Auto-generate slug for courses if not provided
     if (resourceName === 'courses') {
       if (!body.slug || body.slug.trim() === '') {
@@ -159,6 +169,44 @@ export async function POST(request, { params }) {
     }
 
     const newItem = await Model.create(body);
+
+    // ── Announcement Creation Notification Hook ──
+    if (resourceName === 'announcements' && newItem) {
+      try {
+        const { createNotification } = await import('@/lib/notifications');
+        const Enrollment = (await import('@/models/Enrollment')).default;
+        const User = (await import('@/models/User')).default;
+
+        let recipientStudentIds = [];
+
+        // If specific courses targeted, get students enrolled in those courses
+        if (newItem.targetCourses && newItem.targetCourses.length > 0) {
+          const enrollments = await Enrollment.find({ course: { $in: newItem.targetCourses } }).select('student').lean();
+          recipientStudentIds = enrollments.map(e => e.student ? e.student.toString() : null).filter(Boolean);
+        } else {
+          // General announcement for all active students across the academy
+          const students = await User.find({ role: 'student' }).select('_id').lean();
+          recipientStudentIds = students.map(s => s._id.toString());
+        }
+
+        if (recipientStudentIds.length > 0) {
+          const uniqueStudentIds = Array.from(new Set(recipientStudentIds));
+          const cleanMessage = newItem.content ? newItem.content.replace(/<[^>]*>?/gm, '').substring(0, 150) : 'New announcement posted.';
+          
+          await createNotification(
+            uniqueStudentIds,
+            'announcement',
+            `Announcement: ${newItem.title}`,
+            cleanMessage,
+            '/lms/notifications'
+          );
+          console.log(`Dispatched announcement notification to ${uniqueStudentIds.length} students.`);
+        }
+      } catch (notifErr) {
+        console.error('Error dispatching announcement notifications:', notifErr);
+      }
+    }
+
     return NextResponse.json({ success: true, data: newItem });
   } catch (err) {
     console.error(`Error creating resource:`, err);
@@ -204,6 +252,12 @@ export async function PUT(request, { params }) {
       if (!updateData.lessonSlug || updateData.lessonSlug.trim() === '') updateData.lessonSlug = 'general';
     }
 
+    if (resourceName === 'announcements') {
+      if (updateData.course) {
+        updateData.targetCourses = [updateData.course];
+      }
+    }
+
     const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { returnDocument: 'after', runValidators: true }).lean();
 
     // ── Live Session Completed Hook: Auto-add to Course Curriculum ──
@@ -244,7 +298,7 @@ export async function PUT(request, { params }) {
               isFree: false
             });
             await course.save();
-            console.log(`✅ Auto-attached recorded live session to course curriculum: ${updatedItem.title}`);
+            console.log(`Auto-attached recorded live session to course curriculum: ${updatedItem.title}`);
           }
         }
       } catch (err) {
@@ -260,10 +314,10 @@ export async function PUT(request, { params }) {
         const isRejected = updatedItem.status === 'rejected';
 
         const notifTitle = isAccepted 
-          ? '✅ Assignment Accepted & Graded' 
+          ? 'Assignment Accepted & Graded' 
           : isRejected 
-            ? '❌ Assignment Revision Required' 
-            : '📝 Assignment Status Updated';
+            ? 'Assignment Revision Required' 
+            : 'Assignment Status Updated';
 
         const notifMsg = `Your submission status is now ${updatedItem.status?.toUpperCase() || 'EVALUATED'}.${updatedItem.marksAwarded !== null && updatedItem.marksAwarded !== undefined ? ` Score: ${updatedItem.marksAwarded}` : ''}`;
 

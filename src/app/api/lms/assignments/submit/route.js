@@ -53,7 +53,7 @@ export async function POST(req) {
         await createNotification(
           instructorId,
           'assignment_submitted',
-          '📝 New Assignment Submission',
+          'New Assignment Submission',
           `${studentName} submitted work for "${assignment.title || 'Assignment'}"`,
           '/lms/instructor/assignmentsubmissions'
         );

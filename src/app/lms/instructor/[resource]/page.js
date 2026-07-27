@@ -134,18 +134,25 @@ export default function GenericResourcePage({ params }) {
          }
          
          // Handle generic objects (like nested IDs or weird DB responses)
-         if (typeof val === 'object' && val !== null) {
-           if (f.key === 'student') {
-             return val.name ? `${val.name} (${val.email})` : (val.email || val._id || String(val));
-           }
-           if (f.key === 'assignment') return val.title || val.name || val._id || String(val);
-           if (f.key === 'course') return val.title || val._id || String(val);
-           if (f.key === 'batch') return val.name || val._id || String(val);
-           if (val.title) return val.title;
-           if (val.name) return val.name;
-           if (val._id || val.id) return String(val._id || val.id);
-           return 'Object';
-         }
+          if (f.key === 'course') {
+            if (Array.isArray(row.targetCourses) && row.targetCourses.length > 0) {
+              return row.targetCourses.map(c => typeof c === 'object' ? (c.title || c._id) : c).join(', ');
+            }
+            if (typeof val === 'object' && val !== null) return val.title || val._id || String(val);
+            return val || 'All Courses';
+          }
+
+          if (typeof val === 'object' && val !== null) {
+            if (f.key === 'student') {
+              return val.name ? `${val.name} (${val.email})` : (val.email || val._id || String(val));
+            }
+            if (f.key === 'assignment') return val.title || val.name || val._id || String(val);
+            if (f.key === 'batch') return val.name || val._id || String(val);
+            if (val.title) return val.title;
+            if (val.name) return val.name;
+            if (val._id || val.id) return String(val._id || val.id);
+            return 'Object';
+          }
 
          // Truncate long text
          const strVal = String(val);

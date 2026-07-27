@@ -105,7 +105,7 @@ export default function MyTestSeriesPage() {
     <div style={{ padding: '1.5rem 2rem' }}>
       {assignments.length === 0 ? (
         <div style={{ background: 'var(--dash-surface)', border: '1px dashed var(--dash-border)', borderRadius: '12px', padding: '4rem 2rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', margin: '0 0 1rem 0' }}>📝</div>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--dash-text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           <h3 style={{ color: 'var(--dash-text)', fontSize: '1.2rem', marginBottom: '0.5rem' }}>No pending assignments</h3>
           <p style={{ color: 'var(--dash-text-muted)', fontSize: '0.9rem' }}>
             Instructors haven't assigned any tests for your enrolled courses yet.
@@ -172,7 +172,8 @@ export default function MyTestSeriesPage() {
                       transition: 'all 0.2s ease',
                     }}
                   >
-                    📄 Open Assignment PDF / File
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Open Assignment File
                   </a>
                 )}
 
@@ -184,7 +185,8 @@ export default function MyTestSeriesPage() {
                 {isAccepted ? (
                   <div style={{ background: 'rgba(46, 213, 115, 0.12)', border: '1px solid rgba(46, 213, 115, 0.35)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center' }}>
                     <div style={{ fontSize: '0.9rem', color: '#2ed573', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-                      <span>✅</span> Assignment Accepted & Graded
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      Assignment Accepted & Graded
                     </div>
                     {sub.marksAwarded !== null && sub.marksAwarded !== undefined && (
                       <div style={{ fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 800, marginTop: '0.3rem' }}>
@@ -193,14 +195,15 @@ export default function MyTestSeriesPage() {
                     )}
                     {sub.feedback && (
                       <div style={{ fontSize: '0.8rem', color: 'var(--dash-text-secondary)', marginTop: '0.4rem', fontStyle: 'italic', background: 'rgba(255,255,255,0.04)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
-                        💬 Instructor Feedback: "{sub.feedback}"
+                        Instructor Feedback: "{sub.feedback}"
                       </div>
                     )}
                   </div>
                 ) : isPendingReview ? (
                   <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.35)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center' }}>
                     <div style={{ fontSize: '0.9rem', color: '#f59e0b', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-                      <span>⏳</span> Review Pending
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      Review Pending
                     </div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--dash-text-muted)', marginTop: '0.25rem', lineHeight: 1.4 }}>
                       Your submission has been received. Waiting for instructor evaluation.

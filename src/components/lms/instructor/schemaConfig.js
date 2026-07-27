@@ -3,9 +3,12 @@ export const schemaConfig = {
   announcements: {
     name: 'Announcements',
     fields: [
-      { key: 'title', label: 'Title', type: 'text', required: true },
+      { key: 'title', label: 'Announcement Title', type: 'text', required: true },
       { key: 'content', label: 'Message Content', type: 'textarea', required: true },
-      { key: 'course', label: 'Select Course', type: 'text', required: true },
+      { key: 'course', label: 'Select Target Course (Optional)', type: 'text' },
+      { key: 'type', label: 'Priority / Type', type: 'select', options: ['info', 'warning', 'success', 'urgent'], default: 'info' },
+      { key: 'targetAudience', label: 'Target Audience', type: 'select', options: ['all', 'students', 'instructors'], default: 'all' },
+      { key: 'showAsBanner', label: 'Show as Top Banner', type: 'boolean', default: false },
       { key: 'isActive', label: 'Active', type: 'boolean', default: true }
     ]
   },

@@ -3,6 +3,7 @@ import './globals.css';
 import AuthProvider from '@/components/providers/AuthProvider';
 import AuthModal from '@/components/auth/AuthModal';
 import LayoutShell from '@/components/layout/LayoutShell';
+import WhatsAppButton from '@/components/layout/WhatsAppButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -104,6 +105,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <AuthModal />
           <LayoutShell>{children}</LayoutShell>
+          <WhatsAppButton />
         </AuthProvider>
       </body>
     </html>
