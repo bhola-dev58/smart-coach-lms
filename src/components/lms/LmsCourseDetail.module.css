@@ -30,16 +30,16 @@
 }
 
 .breadcrumbLink:hover {
-  color: #2563eb;
+  color: #eb7425;
 }
 
 .breadcrumbSeparator {
-  color: #cbd5e1;
-  font-size: 0.8rem;
+  color: #000000;
+  font-size: 1rem;
 }
 
 .breadcrumbCurrent {
-  color: #2563eb;
+  color: #eb7425;
   font-weight: 700;
 }
 

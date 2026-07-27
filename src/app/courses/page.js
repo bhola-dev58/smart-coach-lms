@@ -23,9 +23,18 @@ export default async function CoursesPage({ searchParams }) {
   const searchQuery = params.q || '';
 
   const filter = { isPublished: true };
-  if (category && category !== 'All') filter.category = category;
-  if (targetClass && targetClass !== 'All') filter.targetClass = { $in: [targetClass, 'All Classes'] };
-  if (level && level !== 'All') filter.level = { $in: [level, 'All Levels', 'All'] };
+  if (category && category !== 'All') {
+    const catList = category.split(',').filter(Boolean);
+    filter.category = catList.length > 1 ? { $in: catList } : catList[0];
+  }
+  if (targetClass && targetClass !== 'All') {
+    const classList = targetClass.split(',').filter(Boolean);
+    filter.targetClass = { $in: [...classList, 'All Classes'] };
+  }
+  if (level && level !== 'All') {
+    const levelList = level.split(',').filter(Boolean);
+    filter.level = { $in: [...levelList, 'All Levels', 'All'] };
+  }
   if (searchQuery) {
     filter.$or = [
       { title: { $regex: searchQuery, $options: 'i' } },
@@ -40,20 +49,25 @@ export default async function CoursesPage({ searchParams }) {
   else if (sort === 'rating') sortQuery = { rating: -1 };
   else if (sort === 'newest') sortQuery = { publishedAt: -1 };
 
-  let courses = await Course.find(filter)
-    .populate('instructor', 'name avatar')
-    .sort(sortQuery)
-    .lean();
+  // Parallel execution of courses search and categories fetch for fast performance
+  const [coursesRaw, categoriesFromDb] = await Promise.all([
+    Course.find(filter)
+      .select('title shortDescription description category targetClass level price originalPrice thumbnail slug isPublished isFeatured totalStudents rating publishedAt chapters instructor')
+      .populate('instructor', 'name avatar')
+      .sort(sortQuery)
+      .lean(),
+    Category.find({ isActive: true }).sort({ label: 1 }).select('name label').lean(),
+  ]);
 
   // Dynamically compute runtime stats
-  courses = courses.map(c => {
+  const courses = coursesRaw.map(c => {
     let computedLessons = 0;
     let computedDurationMinutes = 0;
     if (c.chapters) {
       c.chapters.forEach(ch => {
         if (ch.lessons) {
           ch.lessons.forEach(l => {
-            const isAssignment = l.title.toLowerCase().includes('assignment') || l.type === 'assignment';
+            const isAssignment = l.title ? (l.title.toLowerCase().includes('assignment') || l.type === 'assignment') : false;
             if (!isAssignment) {
               computedLessons += 1;
               computedDurationMinutes += (l.duration || 0);
@@ -75,13 +89,38 @@ export default async function CoursesPage({ searchParams }) {
     };
   });
 
-  // Fetch categories dynamically from database
-  const categoriesFromDb = await Category.find({ isActive: true }).sort({ label: 1 }).lean();
   const allCategories = categoriesFromDb.map(c => c.name);
   const categoryLabels = categoriesFromDb.reduce((acc, c) => {
     acc[c.name] = c.label;
     return acc;
   }, {});
+
+  const getFormattedCategory = (cat) => {
+    if (!cat) return '';
+    if (Array.isArray(cat)) {
+      return cat.map(c => categoryLabels[c] || c).join(', ');
+    }
+    if (typeof cat === 'string') {
+      return cat.split(',').map(s => s.trim()).map(c => categoryLabels[c] || c).join(', ');
+    }
+    return String(cat);
+  };
+
+  const getFormattedClasses = (targetClass) => {
+    if (!targetClass) return '';
+    const items = Array.isArray(targetClass)
+      ? targetClass
+      : String(targetClass).split(',').map(s => s.trim());
+    return items.filter(i => i && i !== 'All Classes' && i !== 'All').join(', ');
+  };
+
+  const getFormattedLevels = (level) => {
+    if (!level) return '';
+    const items = Array.isArray(level)
+      ? level
+      : String(level).split(',').map(s => s.trim());
+    return items.filter(i => i && i !== 'All Levels' && i !== 'All').join(', ');
+  };
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -162,38 +201,34 @@ export default async function CoursesPage({ searchParams }) {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-3">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 360px))', gap: '1.5rem', justifyContent: 'center' }}>
               {courses.map((c) => (
-                <div className="card" key={c._id.toString()}>
+                <div className="card" key={c._id.toString()} style={{ maxWidth: '360px', width: '100%', margin: '0 auto' }}>
                   <div className="card-img-wrapper">
+                    <img
+                      src={c.thumbnail || '/images/courses/default.jpg'}
+                      alt=""
+                      className="card-img-blur"
+                      aria-hidden="true"
+                    />
                     <img
                       src={c.thumbnail || '/images/courses/default.jpg'}
                       alt={`${c.title} — Gradify Academy course thumbnail`}
                       className="card-img"
                       loading="lazy"
                     />
-                    <div style={{ position: 'absolute', bottom: 'var(--space-3)', left: 'var(--space-3)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                      <span className="course-category badge badge-primary">
-                        {categoryLabels[c.category] || c.category}
-                      </span>
-                      {c.targetClass && c.targetClass !== 'All Classes' && (
-                        <span className="badge" style={{ background: '#2563eb', color: '#ffffff', fontWeight: 600, fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                          {c.targetClass}
-                        </span>
-                      )}
-                    </div>
                     {c.isFeatured && (
                       <span
                         className="badge badge-dark"
                         style={{
                           position: 'absolute',
-                          top: 'var(--space-3)',
-                          right: 'var(--space-3)',
+                          top: '10px',
+                          right: '10px',
                           fontSize: '0.65rem',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '3px',
+                          zIndex: 2,
                         }}
                       >
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -202,7 +237,16 @@ export default async function CoursesPage({ searchParams }) {
                     )}
                   </div>
                   <div className="card-body">
-                    <h3 className="card-title">{c.title}</h3>
+                    {/* Header Row: Title + Category Subtitle Tag */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                      <h3 className="card-title" style={{ margin: 0, flex: 1 }}>{c.title}</h3>
+                      {c.category && (
+                        <span style={{ fontSize: '0.725rem', fontWeight: 600, padding: '2px 8px', borderRadius: '6px', border: '1px solid #bfdbfe', background: '#eff6ff', color: '#1d4ed8', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                          {getFormattedCategory(c.category)}
+                        </span>
+                      )}
+                    </div>
+
                     <p className="card-text">
                       {c.shortDescription || c.description}
                     </p>
@@ -263,7 +307,8 @@ export default async function CoursesPage({ searchParams }) {
                       </span>
                     </div>
                     <div className="course-price">
-                      <div className="course-price-row">
+                      {/* Price Row: Price + Target Class & Level Badges */}
+                      <div className="course-price-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                         <div>
                           <span className="price-amount">
                             ₹{c.price?.toLocaleString('en-IN')}
@@ -274,6 +319,17 @@ export default async function CoursesPage({ searchParams }) {
                             </span>
                           )}
                         </div>
+                        {getFormattedClasses(c.targetClass) && (
+                          <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '2px 7px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                            {getFormattedClasses(c.targetClass)}
+                          </span>
+                        )}
+                        {getFormattedLevels(c.level) && (
+                          <span style={{ fontSize: '0.675rem', fontWeight: 500, padding: '2px 6px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b' }}>
+                            {getFormattedLevels(c.level)}
+                          </span>
+                        )}
                       </div>
                       <div className="course-btn-group">
                         <Link
