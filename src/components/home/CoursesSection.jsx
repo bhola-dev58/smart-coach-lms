@@ -10,6 +10,24 @@ export default function CoursesSection({ courses = [] }) {
     GENERAL: 'General',
     COMPUTER_SCIENCE: 'Computer Science'
   };
+  const getFormattedCategory = (cat) => {
+    if (!cat) return '';
+    if (Array.isArray(cat)) {
+      return cat.map(c => categoryLabels[c] || c).join(', ');
+    }
+    if (typeof cat === 'string') {
+      return cat.split(',').map(s => s.trim()).map(c => categoryLabels[c] || c).join(', ');
+    }
+    return String(cat);
+  };
+
+  const getFormattedClasses = (targetClass) => {
+    if (!targetClass) return '';
+    const items = Array.isArray(targetClass)
+      ? targetClass
+      : String(targetClass).split(',').map(s => s.trim());
+    return items.filter(i => i && i !== 'All Classes' && i !== 'All').join(', ');
+  };
 
   return (
     <section className="section section-light" id="popular-courses">
@@ -31,34 +49,38 @@ export default function CoursesSection({ courses = [] }) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-3">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 360px))', gap: '1.5rem', justifyContent: 'center' }}>
             {courses.map((c, i) => (
               <div
                 className="card animate-fade-in-up"
                 key={c._id || c.slug}
-                style={{ animationDelay: `${i * 150}ms` }}
+                style={{ animationDelay: `${i * 150}ms`, maxWidth: '360px', width: '100%', margin: '0 auto' }}
               >
                 <div className="card-img-wrapper">
+                  <img
+                    src={c.thumbnail || '/images/courses/default.jpg'}
+                    alt=""
+                    className="card-img-blur"
+                    aria-hidden="true"
+                  />
                   <img
                     src={c.thumbnail || '/images/courses/default.jpg'}
                     alt={`${c.title} — Gradify Academy course thumbnail`}
                     className="card-img"
                     loading="lazy"
                   />
-                  <div style={{ position: 'absolute', bottom: 'var(--space-3)', left: 'var(--space-3)', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', zIndex: 2 }}>
-                    <span className="course-category badge badge-primary">
-                      {categoryLabels[c.category] || c.category}
-                    </span>
-                    {c.targetClass && c.targetClass !== 'All Classes' && (
-                      <span className="badge" style={{ background: '#2563eb', color: '#ffffff', fontWeight: 600, fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                        {c.targetClass}
+                </div>
+                <div className="card-body">
+                  {/* Header Row: Title + Category Subtitle Tag */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                    <h3 className="card-title" style={{ margin: 0, flex: 1 }}>{c.title}</h3>
+                    {c.category && (
+                      <span style={{ fontSize: '0.725rem', fontWeight: 600, padding: '2px 8px', borderRadius: '6px', border: '1px solid #bfdbfe', background: '#eff6ff', color: '#1d4ed8', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {getFormattedCategory(c.category)}
                       </span>
                     )}
                   </div>
-                </div>
-                <div className="card-body">
-                  <h3 className="card-title">{c.title}</h3>
+
                   <p className="card-text">
                     {c.shortDescription || c.description}
                   </p>
@@ -104,7 +126,8 @@ export default function CoursesSection({ courses = [] }) {
                     </span>
                   </div>
                   <div className="course-price">
-                    <div className="course-price-row">
+                    {/* Price Row: Price + Target Class Badge */}
+                    <div className="course-price-row" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                       <div>
                         <span className="price-amount">
                           ₹{c.price?.toLocaleString('en-IN')}
@@ -115,6 +138,12 @@ export default function CoursesSection({ courses = [] }) {
                           </span>
                         )}
                       </div>
+                      {getFormattedClasses(c.targetClass) && (
+                        <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '2px 7px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#334155', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                          {getFormattedClasses(c.targetClass)}
+                        </span>
+                      )}
                     </div>
                     <div className="course-btn-group">
                       <Link
