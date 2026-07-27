@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnrollButton from '@/components/courses/EnrollButton';
 import UiIcon from '@/components/common/UiIcon';
+import { getFormattedCategory, getFormattedClasses, getFormattedLevels } from '@/lib/courseFormat';
+
 export default function BrowseCoursesClient({ courses = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();

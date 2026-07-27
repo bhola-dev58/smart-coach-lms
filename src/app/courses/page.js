@@ -8,6 +8,8 @@ import CourseFilterToolbar from '@/components/courses/CourseFilterToolbar';
 import Category from '@/models/Category';
 import { getFormattedCategory, getFormattedClasses, getFormattedLevels } from '@/lib/courseFormat';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'All Courses | Gradify Academy',
   description:

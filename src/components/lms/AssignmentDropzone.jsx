@@ -130,7 +130,33 @@ export default function AssignmentDropzone({ lesson, courseId, onComplete }) {
             borderRadius: '12px', padding: '2rem', position: 'relative', textAlign: 'left'
           }}>
             <h3 style={{ margin: '0 0 1rem 0', color: 'var(--color-primary)' }}>{lesson.title} - Description</h3>
-            <div dangerouslySetInnerHTML={{ __html: lesson.content }} style={{ lineHeight: 1.6, marginBottom: '2rem' }} />
+            <div dangerouslySetInnerHTML={{ __html: lesson.content }} style={{ lineHeight: 1.6, marginBottom: '1.5rem' }} />
+            
+            {(lesson.fileUrl || lesson.attachmentUrl) && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <a
+                  href={lesson.fileUrl || lesson.attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '0.6rem 1.25rem',
+                    borderRadius: '8px',
+                    background: 'var(--color-primary, #3b82f6)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)',
+                  }}
+                >
+                  📄 View / Download Assignment PDF
+                </a>
+              </div>
+            )}
+
             <div style={{ textAlign: 'right' }}>
               <button 
                 onClick={() => setShowViewModal(false)}

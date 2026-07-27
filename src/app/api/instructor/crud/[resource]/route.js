@@ -94,6 +94,20 @@ export async function GET(request, { params }) {
       queryBuilder = queryBuilder
         .populate('student', 'name email')
         .populate('course', 'title');
+    } else if (resourceName === 'discussions') {
+      await import('@/models/User');
+      await import('@/models/Course');
+      queryBuilder = queryBuilder
+        .populate('user', 'name email')
+        .populate('course', 'title');
+    } else if (resourceName === 'assignmentsubmissions') {
+      await import('@/models/User');
+      await import('@/models/Assignment');
+      await import('@/models/Course');
+      queryBuilder = queryBuilder
+        .populate('student', 'name email')
+        .populate('assignment', 'title')
+        .populate('course', 'title');
     }
 
     const data = await queryBuilder.sort({ createdAt: -1 }).limit(100).lean();
@@ -121,6 +135,14 @@ export async function POST(request, { params }) {
     if (Model.schema.paths.instructor) body.instructor = auth.session.user.id;
     if (Model.schema.paths.user) body.user = auth.session.user.id;
     if (Model.schema.paths.createdBy) body.createdBy = auth.session.user.id;
+
+    // Auto-inject required discussion defaults if applicable
+    if (resourceName === 'discussions') {
+      if (!body.userName) body.userName = auth.session.user.name || auth.session.user.email || 'Instructor';
+      if (!body.userRole) body.userRole = auth.session.user.role || 'instructor';
+      if (!body.question) body.question = body.title || body.content || body.discussion || 'Discussion Question';
+      if (!body.lessonSlug || body.lessonSlug.trim() === '') body.lessonSlug = 'general';
+    }
 
     // Auto-generate slug for courses if not provided
     if (resourceName === 'courses') {
@@ -173,6 +195,15 @@ export async function PUT(request, { params }) {
       }
     }
 
+    if (resourceName === 'discussions') {
+      if (!updateData.userName) updateData.userName = auth.session.user.name || auth.session.user.email || 'Instructor';
+      if (!updateData.userRole) updateData.userRole = auth.session.user.role || 'instructor';
+      if (!updateData.question && (updateData.title || updateData.content)) {
+        updateData.question = updateData.title || updateData.content;
+      }
+      if (!updateData.lessonSlug || updateData.lessonSlug.trim() === '') updateData.lessonSlug = 'general';
+    }
+
     const updatedItem = await Model.findByIdAndUpdate(_id, updateData, { returnDocument: 'after', runValidators: true }).lean();
 
     // ── Live Session Completed Hook: Auto-add to Course Curriculum ──
@@ -218,6 +249,33 @@ export async function PUT(request, { params }) {
         }
       } catch (err) {
         console.error('Error auto-attaching live session recording to course curriculum:', err);
+      }
+    }
+
+    // ── Assignment Submission Evaluation Hook: Notify Student ──
+    if (resourceName === 'assignmentsubmissions' && updatedItem && updatedItem.student) {
+      try {
+        const { createNotification } = await import('@/lib/notifications');
+        const isAccepted = updatedItem.status === 'accepted' || updatedItem.status === 'graded';
+        const isRejected = updatedItem.status === 'rejected';
+
+        const notifTitle = isAccepted 
+          ? '✅ Assignment Accepted & Graded' 
+          : isRejected 
+            ? '❌ Assignment Revision Required' 
+            : '📝 Assignment Status Updated';
+
+        const notifMsg = `Your submission status is now ${updatedItem.status?.toUpperCase() || 'EVALUATED'}.${updatedItem.marksAwarded !== null && updatedItem.marksAwarded !== undefined ? ` Score: ${updatedItem.marksAwarded}` : ''}`;
+
+        await createNotification(
+          updatedItem.student,
+          'assignment_graded',
+          notifTitle,
+          notifMsg,
+          '/lms/tests'
+        );
+      } catch (notifErr) {
+        console.error('Failed to notify student on assignment evaluation:', notifErr);
       }
     }
 

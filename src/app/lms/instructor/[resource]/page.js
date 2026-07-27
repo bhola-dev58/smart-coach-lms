@@ -136,13 +136,13 @@ export default function GenericResourcePage({ params }) {
          // Handle generic objects (like nested IDs or weird DB responses)
          if (typeof val === 'object' && val !== null) {
            if (f.key === 'student') {
-             if (resource === 'enrollments') {
-               return val.name || val._id || String(val);
-             }
              return val.name ? `${val.name} (${val.email})` : (val.email || val._id || String(val));
            }
+           if (f.key === 'assignment') return val.title || val.name || val._id || String(val);
            if (f.key === 'course') return val.title || val._id || String(val);
            if (f.key === 'batch') return val.name || val._id || String(val);
+           if (val.title) return val.title;
+           if (val.name) return val.name;
            if (val._id || val.id) return String(val._id || val.id);
            return 'Object';
          }
@@ -154,8 +154,8 @@ export default function GenericResourcePage({ params }) {
       }
     });
 
-    // If it is the enrollments resource and f.key is 'student', inject Student Email column
-    if (resource === 'enrollments' && f.key === 'student') {
+    // If it is the enrollments or assignmentsubmissions resource and f.key is 'student', inject Student Email column
+    if ((resource === 'enrollments' || resource === 'assignmentsubmissions') && f.key === 'student') {
       columns.push({
         key: 'studentEmail',
         label: 'Student Email',

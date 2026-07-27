@@ -14,16 +14,18 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        'enrollment',     // "You enrolled in DSA Course"
-        'payment',        // "Payment ₹4999 received"
-        'course_update',  // "New lesson added to your course"
-        'certificate',    // "Your certificate is ready"
-        'announcement',   // General admin announcement
-        'reminder',       // "Complete your course, 80% done!"
-        'system',         // System-level notifications
-        'new_course',     // New course launched
-        'login',          // New login detected
-        'otp_verified',   // Email verification success
+        'enrollment',           // "You enrolled in DSA Course"
+        'payment',              // "Payment ₹4999 received"
+        'course_update',        // "New lesson added to your course"
+        'certificate',          // "Your certificate is ready"
+        'announcement',         // General admin announcement
+        'reminder',             // "Complete your course, 80% done!"
+        'system',               // System-level notifications
+        'new_course',           // New course launched
+        'login',                // New login detected
+        'otp_verified',         // Email verification success
+        'assignment_submitted', // Student submitted assignment -> notifies instructor
+        'assignment_graded',    // Instructor graded assignment -> notifies student
       ],
       required: true,
     },

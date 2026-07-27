@@ -6,6 +6,8 @@ import LmsCourseDetail from '@/components/lms/LmsCourseDetail';
 import CourseSchema from '@/components/courses/CourseSchema';
 import styles from '@/app/lms/lms.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
   await connectDB();
   const { slug } = await params;

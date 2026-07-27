@@ -6,6 +6,8 @@ import { connectDB } from '@/lib/db';
 import StudyMaterial from '@/models/StudyMaterial';
 import Enrollment from '@/models/Enrollment';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = { title: 'Study Materials | LMS' };
 
 export default async function MaterialsPage() {

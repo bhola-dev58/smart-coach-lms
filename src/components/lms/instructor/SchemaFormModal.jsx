@@ -532,10 +532,10 @@ export default function SchemaFormModal({ config, initialData, onClose, onSave, 
                       required={field.required}
                       className="modal-select"
                     >
-                      <option value="">{loadingCourses ? 'Loading courses...' : 'Select a course'}</option>
+                      <option value="">{loadingCourses ? 'Loading courses...' : courses.length === 0 ? 'No courses found (Create a course first)' : 'Select a course'}</option>
                       {courses.map(c => (
                         <option key={c._id} value={c._id}>
-                          {c.title} {c.slug ? `(${c.slug})` : ''}
+                          {c.title} {c.isPublished ? ' (Published)' : ' (Draft)'}
                         </option>
                       ))}
                     </select>

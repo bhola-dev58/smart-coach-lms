@@ -122,6 +122,8 @@ courseSchema.index({ instructor: 1 });
 courseSchema.index({ isFeatured: 1, isPublished: 1 });
 courseSchema.index({ tags: 1 });
 courseSchema.index({ locationTags: 1, isPublished: 1 }); // geo-targeted SEO queries
+courseSchema.index({ isPublished: 1, targetClass: 1, level: 1 });
+courseSchema.index({ isPublished: 1, createdAt: -1 });
 
 // ── Static Methods to sync realtime stats ──
 courseSchema.statics.syncEnrollmentsCount = async function(courseId) {

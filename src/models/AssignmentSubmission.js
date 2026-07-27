@@ -26,7 +26,7 @@ const submissionSchema = new mongoose.Schema(
     feedback: { type: String, default: '' },
     status: {
       type: String,
-      enum: ['submitted', 'graded', 'late'],
+      enum: ['submitted', 'graded', 'accepted', 'rejected', 'late'],
       default: 'submitted',
     },
   },

@@ -5,7 +5,7 @@ export const schemaConfig = {
     fields: [
       { key: 'title', label: 'Title', type: 'text', required: true },
       { key: 'content', label: 'Message Content', type: 'textarea', required: true },
-      { key: 'course', label: 'Course ID', type: 'text' }, // We could use dynamic relations dropdown later
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'isActive', label: 'Active', type: 'boolean', default: true }
     ]
   },
@@ -14,7 +14,7 @@ export const schemaConfig = {
     fields: [
       { key: 'title', label: 'Title', type: 'text', required: true },
       { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'course', label: 'Course ID', type: 'text', required: true },
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'dueDate', label: 'Due Date', type: 'date', required: true },
       { key: 'fileUrl', label: 'Attachment URL', type: 'file' }
     ]
@@ -25,8 +25,9 @@ export const schemaConfig = {
       { key: 'assignment', label: 'Assignment ID', type: 'text', required: true },
       { key: 'student', label: 'Student ID', type: 'text', required: true },
       { key: 'fileUrl', label: 'Submitted File', type: 'file' },
-      { key: 'status', label: 'Status', type: 'select', options: ['submitted', 'graded', 'rejected'] },
-      { key: 'grade', label: 'Grade Points', type: 'number' }
+      { key: 'status', label: 'Status', type: 'select', options: ['submitted', 'accepted', 'graded', 'rejected'] },
+      { key: 'marksAwarded', label: 'Marks Awarded', type: 'number' },
+      { key: 'feedback', label: 'Instructor Feedback', type: 'textarea' }
     ]
   },
   contacts: {
@@ -76,7 +77,7 @@ export const schemaConfig = {
     name: 'Batches',
     fields: [
       { key: 'name', label: 'Batch Name', type: 'text', required: true },
-      { key: 'course', label: 'Course', type: 'text', required: true },
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'students', label: 'Student Emails', type: 'stringArray' },
       { key: 'isActive', label: 'Active', type: 'boolean', default: true }
     ]
@@ -84,17 +85,17 @@ export const schemaConfig = {
   discussions: {
     name: 'Discussions',
     fields: [
-      { key: 'course', label: 'Course ID', type: 'text' },
-      { key: 'title', label: 'Topic Title', type: 'text' },
-      { key: 'content', label: 'Details', type: 'textarea' },
-      { key: 'isPinned', label: 'Pinned', type: 'boolean', default: false }
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
+      { key: 'lessonSlug', label: 'Lesson Slug (default: general)', type: 'text', default: 'general' },
+      { key: 'question', label: 'Question / Topic Title', type: 'textarea', required: true },
+      { key: 'isResolved', label: 'Resolved', type: 'boolean', default: false }
     ]
   },
   enrollments: {
     name: 'Enrollments',
     fields: [
       { key: 'student', label: 'Student ID', type: 'text', required: true },
-      { key: 'course', label: 'Course ID', type: 'text', required: true },
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'batch', label: 'Batch', type: 'text' },
       { key: 'status', label: 'Status', type: 'select', options: ['active', 'completed', 'expired', 'refunded'] },
       { key: 'paymentId', label: 'Payment Receipt ID', type: 'text' }
@@ -104,7 +105,7 @@ export const schemaConfig = {
     name: 'Live Sessions',
     fields: [
       { key: 'title', label: 'Session Title', type: 'text', required: true },
-      { key: 'course', label: 'Course ID', type: 'text', required: true },
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'batch', label: 'Batch ID (Optional)', type: 'text' },
       { key: 'scheduledAt', label: 'Scheduled Date/Time', type: 'date', required: true },
       { key: 'joinUrl', label: 'Zoom/Meet Link', type: 'text', required: true },
@@ -113,7 +114,6 @@ export const schemaConfig = {
       { key: 'status', label: 'Status', type: 'select', options: ['scheduled', 'live', 'completed', 'cancelled'] }
     ]
   },
-
   payments: {
     name: 'Payments',
     fields: [
@@ -126,7 +126,7 @@ export const schemaConfig = {
   reviews: {
     name: 'Reviews',
     fields: [
-      { key: 'course', label: 'Course ID', type: 'text' },
+      { key: 'course', label: 'Select Course', type: 'text' },
       { key: 'user', label: 'Student ID', type: 'text' },
       { key: 'rating', label: 'Stars (1-5)', type: 'number', required: true },
       { key: 'comment', label: 'Comment', type: 'textarea' },
@@ -137,7 +137,7 @@ export const schemaConfig = {
     name: 'Study Materials',
     fields: [
       { key: 'title', label: 'Document Title', type: 'text', required: true },
-      { key: 'course', label: 'Course ID', type: 'text', required: true },
+      { key: 'course', label: 'Select Course', type: 'text', required: true },
       { key: 'fileUrl', label: 'PDF/Doc Upload', type: 'file', required: true },
       { key: 'fileType', label: 'Format', type: 'select', options: ['PDF', 'ZIP', 'DOC', 'IMAGE'] },
       { key: 'size', label: 'File Size (e.g. 1.2 MB)', type: 'text' }

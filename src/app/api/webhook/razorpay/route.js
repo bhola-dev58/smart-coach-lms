@@ -15,13 +15,18 @@ export async function POST(request) {
       return NextResponse.json({ success: true, message: 'Webhook ignored' });
     }
 
-    // Verify Webhook Signature
+    // Verify Webhook Signature using constant-time comparison
     const expectedSignature = crypto
       .createHmac('sha256', webhookSecret)
       .update(rawBody)
       .digest('hex');
 
-    if (expectedSignature !== signature) {
+    const isSignatureValid =
+      signature &&
+      expectedSignature.length === signature.length &&
+      crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature));
+
+    if (!isSignatureValid) {
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
     }
 

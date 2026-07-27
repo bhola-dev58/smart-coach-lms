@@ -116,37 +116,146 @@ export default function MyTestSeriesPage() {
           {assignments.map(a => {
             const sub = subMap[a._id.toString()];
             const isLate = new Date(a.dueDate) < now;
-            let status = sub ? sub.status.toUpperCase() : (isLate ? 'OVERDUE' : 'PENDING');
-            let statusColor = sub ? '#2ed573' : (isLate ? '#e74c3c' : '#f39c12');
+            
+            const isAccepted = sub && (sub.status === 'graded' || sub.status === 'accepted' || (sub.marksAwarded !== null && sub.marksAwarded !== undefined));
+            const isRejected = sub && sub.status === 'rejected';
+            const isPendingReview = sub && !isAccepted && !isRejected;
+
+            let statusLabel = 'PENDING';
+            let statusColor = '#f39c12'; // default amber/orange
+
+            if (sub) {
+              if (isAccepted) {
+                statusLabel = 'ACCEPTED & GRADED';
+                statusColor = '#2ed573'; // Green
+              } else if (isRejected) {
+                statusLabel = 'REJECTED';
+                statusColor = '#ef4444'; // Red
+              } else {
+                statusLabel = 'REVIEW PENDING';
+                statusColor = '#f59e0b'; // Amber / Yellow
+              }
+            } else if (isLate) {
+              statusLabel = 'OVERDUE';
+              statusColor = '#ef4444'; // Red
+            }
 
             return (
               <div key={a._id.toString()} style={{ background: 'var(--dash-surface)', border: `1px solid ${statusColor}`, borderRadius: '12px', padding: '1.5rem', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ position: 'absolute', top: 0, right: 0, padding: '0.4rem 0.8rem', background: statusColor, color: 'white', fontSize: '0.7rem', fontWeight: 700, borderBottomLeftRadius: '8px' }}>
-                  {status}
+                <div style={{ position: 'absolute', top: 0, right: 0, padding: '0.4rem 0.8rem', background: statusColor, color: 'white', fontSize: '0.7rem', fontWeight: 700, borderBottomLeftRadius: '8px', letterSpacing: '0.03em' }}>
+                  {statusLabel}
                 </div>
                 
                 <div style={{ fontSize: '0.8rem', color: 'var(--dash-text-muted)', marginBottom: '0.5rem', paddingRight: '60px' }}>{a.course?.title}</div>
                 <h3 style={{ color: 'var(--dash-text)', fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 700 }}>{a.title}</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--dash-text-secondary)', marginBottom: '1rem', flex: 1 }}>{a.description}</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--dash-text-secondary)', marginBottom: '0.75rem', flex: 1 }}>{a.description}</p>
                 
+                {a.fileUrl && (
+                  <a
+                    href={a.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '8px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      color: 'var(--dash-accent, #3b82f6)',
+                      border: '1px solid rgba(59, 130, 246, 0.25)',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      marginBottom: '1rem',
+                      width: 'fit-content',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    📄 Open Assignment PDF / File
+                  </a>
+                )}
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--dash-text-secondary)', marginBottom: '1.25rem', borderTop: '1px dashed var(--dash-border)', paddingTop: '0.75rem' }}>
                   <span>Due: {new Date(a.dueDate).toLocaleDateString('en-IN')}</span>
                   <span>Marks: {a.totalMarks}</span>
                 </div>
 
-                {sub ? (
-                  <div style={{ background: 'rgba(46,213,115,0.1)', border: '1px solid rgba(46,213,115,0.3)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.85rem', color: '#2ed573', fontWeight: 700 }}>Successfully Submitted</div>
-                    {sub.marksAwarded !== null && (
-                      <div style={{ fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 700, marginTop: '0.2rem' }}>
-                        Score: {sub.marksAwarded} / {a.totalMarks}
+                {isAccepted ? (
+                  <div style={{ background: 'rgba(46, 213, 115, 0.12)', border: '1px solid rgba(46, 213, 115, 0.35)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#2ed573', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      <span>✅</span> Assignment Accepted & Graded
+                    </div>
+                    {sub.marksAwarded !== null && sub.marksAwarded !== undefined && (
+                      <div style={{ fontSize: '1rem', color: 'var(--dash-text)', fontWeight: 800, marginTop: '0.3rem' }}>
+                        Score: {sub.marksAwarded} / {a.totalMarks || 100}
                       </div>
                     )}
                     {sub.feedback && (
-                      <div style={{ fontSize: '0.75rem', color: 'var(--dash-text-muted)', marginTop: '0.4rem', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--dash-text-secondary)', marginTop: '0.4rem', fontStyle: 'italic', background: 'rgba(255,255,255,0.04)', padding: '0.4rem 0.6rem', borderRadius: '6px' }}>
+                        💬 Instructor Feedback: "{sub.feedback}"
+                      </div>
+                    )}
+                  </div>
+                ) : isPendingReview ? (
+                  <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.35)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#f59e0b', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      <span>⏳</span> Review Pending
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--dash-text-muted)', marginTop: '0.25rem', lineHeight: 1.4 }}>
+                      Your submission has been received. Waiting for instructor evaluation.
+                    </div>
+                    <button
+                      onClick={() => {
+                        setFileUrl(sub.fileUrl || '');
+                        setContent(sub.content || '');
+                        setActiveAssignment(a);
+                      }}
+                      style={{
+                        marginTop: '0.6rem',
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(245, 158, 11, 0.4)',
+                        background: 'transparent',
+                        color: '#f59e0b',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ✏️ Update Submission
+                    </button>
+                  </div>
+                ) : isRejected ? (
+                  <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.35)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#ef4444', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                      <span>❌</span> Revision Required / Rejected
+                    </div>
+                    {sub.feedback && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--dash-text-secondary)', marginTop: '0.4rem', fontStyle: 'italic' }}>
                         Feedback: "{sub.feedback}"
                       </div>
                     )}
+                    <button
+                      onClick={() => {
+                        setFileUrl(sub.fileUrl || '');
+                        setContent(sub.content || '');
+                        setActiveAssignment(a);
+                      }}
+                      style={{
+                        marginTop: '0.6rem',
+                        padding: '0.4rem 0.85rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        background: '#ef4444',
+                        color: 'white',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🔄 Resubmit Assignment
+                    </button>
                   </div>
                 ) : (
                   <button 
@@ -199,9 +308,32 @@ export default function MyTestSeriesPage() {
               <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--dash-text)', marginBottom: '0.25rem' }}>
                 {activeAssignment.title}
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--dash-text-secondary)', margin: 0 }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--dash-text-secondary)', margin: '0 0 0.75rem 0' }}>
                 {activeAssignment.description}
               </p>
+              {activeAssignment.fileUrl && (
+                <a
+                  href={activeAssignment.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    background: 'var(--color-primary, #3b82f6)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '0.82rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+                    marginTop: '0.25rem',
+                  }}
+                >
+                  📄 View / Download Task PDF
+                </a>
+              )}
             </div>
 
             {successMsg ? (

@@ -172,6 +172,42 @@ export default function CourseFilterToolbar({ categories = [] }) {
     },
   ];
 
+  const defaultCategories = ['MATHS', 'SCIENCE', 'COMPUTER_SCIENCE', 'COMMERCE', 'ARTS', 'GENERAL'];
+  const rawCatValues = Array.isArray(categories) && categories.length > 0
+    ? categories.map(c => typeof c === 'object' ? (c.name || c.value) : c)
+    : defaultCategories;
+  const activeCategoryValues = Array.from(new Set([...rawCatValues, ...defaultCategories]));
+
+  const categoryLabelMap = {
+    MATHS: 'Mathematics',
+    SCIENCE: 'Science & Physics',
+    COMPUTER_SCIENCE: 'Computer Science',
+    COMMERCE: 'Commerce',
+    ARTS: 'Arts',
+    GENERAL: 'General / Foundation',
+  };
+
+  const getCatLabel = (val) => categoryLabelMap[val] || String(val).replace(/_/g, ' ');
+
+  const stemItems = activeCategoryValues
+    .filter(c => ['MATHS', 'SCIENCE', 'COMPUTER_SCIENCE', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY', 'CODING', 'TECH'].includes(String(c).toUpperCase()))
+    .map(c => ({ label: getCatLabel(c), value: c }));
+
+  const commerceItems = activeCategoryValues
+    .filter(c => ['COMMERCE', 'ACCOUNTANCY', 'BUSINESS', 'ECONOMICS', 'FINANCE'].includes(String(c).toUpperCase()))
+    .map(c => ({ label: getCatLabel(c), value: c }));
+
+  const humanitiesItems = activeCategoryValues
+    .filter(c => ['ARTS', 'HUMANITIES', 'GENERAL', 'ENGLISH', 'HISTORY', 'GEOGRAPHY'].includes(String(c).toUpperCase()))
+    .map(c => ({ label: getCatLabel(c), value: c }));
+
+  const otherItems = activeCategoryValues
+    .filter(c => 
+      !['MATHS', 'SCIENCE', 'COMPUTER_SCIENCE', 'PHYSICS', 'CHEMISTRY', 'BIOLOGY', 'CODING', 'TECH',
+        'COMMERCE', 'ACCOUNTANCY', 'BUSINESS', 'ECONOMICS', 'FINANCE',
+        'ARTS', 'HUMANITIES', 'GENERAL', 'ENGLISH', 'HISTORY', 'GEOGRAPHY'].includes(String(c).toUpperCase())
+    ).map(c => ({ label: getCatLabel(c), value: c }));
+
   const categoryGroups = [
     {
       groupName: 'STEM & Technology',
@@ -182,11 +218,7 @@ export default function CourseFilterToolbar({ categories = [] }) {
           <line x1="6" y1="20" x2="6" y2="14" />
         </svg>
       ),
-      items: [
-        { label: 'Mathematics', value: 'MATHS' },
-        { label: 'Science & Physics', value: 'SCIENCE' },
-        { label: 'Computer Science', value: 'COMPUTER_SCIENCE' },
-      ],
+      items: stemItems,
     },
     {
       groupName: 'Commerce & Management',
@@ -196,9 +228,7 @@ export default function CourseFilterToolbar({ categories = [] }) {
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       ),
-      items: [
-        { label: 'Commerce', value: 'COMMERCE' },
-      ],
+      items: commerceItems,
     },
     {
       groupName: 'Humanities & Foundation',
@@ -208,12 +238,21 @@ export default function CourseFilterToolbar({ categories = [] }) {
           <line x1="2" y1="12" x2="22" y2="12" />
         </svg>
       ),
-      items: [
-        { label: 'Arts', value: 'ARTS' },
-        { label: 'General / Foundation', value: 'GENERAL' },
-      ],
+      items: humanitiesItems,
     },
   ];
+
+  if (otherItems.length > 0) {
+    categoryGroups.push({
+      groupName: 'Other Streams',
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+      items: otherItems,
+    });
+  }
 
   const levelOptions = [
     { label: 'Beginner', value: 'Beginner', desc: 'No prior background required' },

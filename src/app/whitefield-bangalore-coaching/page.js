@@ -32,6 +32,8 @@ export const metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+
 // LocalBusiness + ItemList schema for the landing page
 const localPageSchemas = [
   {

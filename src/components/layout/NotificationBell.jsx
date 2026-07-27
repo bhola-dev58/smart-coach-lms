@@ -7,16 +7,18 @@ import Link from 'next/link';
 // ── Notification type icon mapping ──
 function NotifIcon({ type }) {
   const icons = {
-    enrollment:   { emoji: '🎓', bg: '#ede9fe', color: '#7c3aed' },
-    payment:      { emoji: '💳', bg: '#fef3c7', color: '#d97706' },
-    course_update:{ emoji: '📚', bg: '#dbeafe', color: '#2563eb' },
-    new_course:   { emoji: '🚀', bg: '#d1fae5', color: '#059669' },
-    certificate:  { emoji: '🏆', bg: '#fef3c7', color: '#d97706' },
-    announcement: { emoji: '📢', bg: '#fee2e2', color: '#dc2626' },
-    reminder:     { emoji: '⏰', bg: '#fef3c7', color: '#d97706' },
-    system:       { emoji: '⚙️', bg: '#f3f4f6', color: '#6b7280' },
-    login:        { emoji: '🔐', bg: '#dbeafe', color: '#2563eb' },
-    otp_verified: { emoji: '✅', bg: '#d1fae5', color: '#059669' },
+    enrollment:           { emoji: '🎓', bg: '#ede9fe', color: '#7c3aed' },
+    payment:              { emoji: '💳', bg: '#fef3c7', color: '#d97706' },
+    course_update:        { emoji: '📚', bg: '#dbeafe', color: '#2563eb' },
+    new_course:           { emoji: '🚀', bg: '#d1fae5', color: '#059669' },
+    certificate:          { emoji: '🏆', bg: '#fef3c7', color: '#d97706' },
+    announcement:         { emoji: '📢', bg: '#fee2e2', color: '#dc2626' },
+    reminder:             { emoji: '⏰', bg: '#fef3c7', color: '#d97706' },
+    system:               { emoji: '⚙️', bg: '#f3f4f6', color: '#6b7280' },
+    login:                { emoji: '🔐', bg: '#dbeafe', color: '#2563eb' },
+    otp_verified:         { emoji: '✅', bg: '#d1fae5', color: '#059669' },
+    assignment_submitted: { emoji: '📝', bg: '#fef3c7', color: '#d97706' },
+    assignment_graded:    { emoji: '✅', bg: '#d1fae5', color: '#059669' },
   };
   const { emoji, bg, color } = icons[type] || icons.system;
   return (
