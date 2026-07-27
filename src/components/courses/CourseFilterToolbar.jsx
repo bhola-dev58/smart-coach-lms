@@ -71,7 +71,7 @@ export default function CourseFilterToolbar({ categories = [] }) {
       if (classesToApply.length > 0) params.set('class', classesToApply.join(','));
       if (categoriesToApply.length > 0) params.set('category', categoriesToApply.join(','));
       if (levelsToApply.length > 0) params.set('level', levelsToApply.join(','));
-      if (searchToApply && searchToApply.trim() !== '') params.set('q', searchToApply);
+      if (searchToApply && searchToApply.trim() !== '') params.set('q', searchToApply.trim());
       if (sortToApply && sortToApply !== 'popular') params.set('sort', sortToApply);
 
       const queryString = params.toString();

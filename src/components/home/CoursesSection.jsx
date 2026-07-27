@@ -1,33 +1,8 @@
 import Link from 'next/link';
 import EnrollButton from '@/components/courses/EnrollButton';
+import { getFormattedCategory, getFormattedClasses } from '@/lib/courseFormat';
 
 export default function CoursesSection({ courses = [] }) {
-  const categoryLabels = {
-    MATHS: 'Mathematics',
-    SCIENCE: 'Science',
-    COMMERCE: 'Commerce',
-    ARTS: 'Arts',
-    GENERAL: 'General',
-    COMPUTER_SCIENCE: 'Computer Science'
-  };
-  const getFormattedCategory = (cat) => {
-    if (!cat) return '';
-    if (Array.isArray(cat)) {
-      return cat.map(c => categoryLabels[c] || c).join(', ');
-    }
-    if (typeof cat === 'string') {
-      return cat.split(',').map(s => s.trim()).map(c => categoryLabels[c] || c).join(', ');
-    }
-    return String(cat);
-  };
-
-  const getFormattedClasses = (targetClass) => {
-    if (!targetClass) return '';
-    const items = Array.isArray(targetClass)
-      ? targetClass
-      : String(targetClass).split(',').map(s => s.trim());
-    return items.filter(i => i && i !== 'All Classes' && i !== 'All').join(', ');
-  };
 
   return (
     <section className="section section-light" id="popular-courses">

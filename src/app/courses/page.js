@@ -6,6 +6,7 @@ import EnrollButton from '@/components/courses/EnrollButton';
 import CategoryDropdown from '@/components/courses/CategoryDropdown';
 import CourseFilterToolbar from '@/components/courses/CourseFilterToolbar';
 import Category from '@/models/Category';
+import { getFormattedCategory, getFormattedClasses, getFormattedLevels } from '@/lib/courseFormat';
 
 export const metadata = {
   title: 'All Courses | Gradify Academy',
@@ -94,33 +95,6 @@ export default async function CoursesPage({ searchParams }) {
     acc[c.name] = c.label;
     return acc;
   }, {});
-
-  const getFormattedCategory = (cat) => {
-    if (!cat) return '';
-    if (Array.isArray(cat)) {
-      return cat.map(c => categoryLabels[c] || c).join(', ');
-    }
-    if (typeof cat === 'string') {
-      return cat.split(',').map(s => s.trim()).map(c => categoryLabels[c] || c).join(', ');
-    }
-    return String(cat);
-  };
-
-  const getFormattedClasses = (targetClass) => {
-    if (!targetClass) return '';
-    const items = Array.isArray(targetClass)
-      ? targetClass
-      : String(targetClass).split(',').map(s => s.trim());
-    return items.filter(i => i && i !== 'All Classes' && i !== 'All').join(', ');
-  };
-
-  const getFormattedLevels = (level) => {
-    if (!level) return '';
-    const items = Array.isArray(level)
-      ? level
-      : String(level).split(',').map(s => s.trim());
-    return items.filter(i => i && i !== 'All Levels' && i !== 'All').join(', ');
-  };
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -242,7 +216,7 @@ export default async function CoursesPage({ searchParams }) {
                       <h3 className="card-title" style={{ margin: 0, flex: 1 }}>{c.title}</h3>
                       {c.category && (
                         <span style={{ fontSize: '0.725rem', fontWeight: 600, padding: '2px 8px', borderRadius: '6px', border: '1px solid #bfdbfe', background: '#eff6ff', color: '#1d4ed8', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          {getFormattedCategory(c.category)}
+                          {getFormattedCategory(c.category, categoryLabels)}
                         </span>
                       )}
                     </div>

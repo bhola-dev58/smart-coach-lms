@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useTransition } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnrollButton from '@/components/courses/EnrollButton';
 import UiIcon from '@/components/common/UiIcon';
-
 export default function BrowseCoursesClient({ courses = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -14,7 +13,8 @@ export default function BrowseCoursesClient({ courses = [] }) {
   const currentCategory = searchParams.get('category') || 'All';
   const currentClass = searchParams.get('class') || 'All';
   const currentLevel = searchParams.get('level') || 'All';
-  const query = (searchParams.get('q') || '').trim().toLowerCase();
+  const rawQuery = searchParams.get('q') || '';
+  const query = rawQuery.trim().toLowerCase();
 
   const [openDropdown, setOpenDropdown] = useState(null); // 'class' | 'category' | 'level' | null
   const toolbarRef = useRef(null);
@@ -53,54 +53,14 @@ export default function BrowseCoursesClient({ courses = [] }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const categoryLabels = {
-    MATHS: 'Mathematics',
-    SCIENCE: 'Science',
-    COMMERCE: 'Commerce',
-    ARTS: 'Arts',
-    GENERAL: 'General',
-    COMPUTER_SCIENCE: 'Computer Science',
-  };
-
-  const getFormattedCategory = (cat) => {
-    if (!cat) return '';
-    if (Array.isArray(cat)) {
-      return cat.map((c) => categoryLabels[c] || c).join(', ');
-    }
-    if (typeof cat === 'string') {
-      return cat
-        .split(',')
-        .map((s) => s.trim())
-        .map((c) => categoryLabels[c] || c)
-        .join(', ');
-    }
-    return String(cat);
-  };
-
-  const getFormattedClasses = (targetClass) => {
-    if (!targetClass) return '';
-    const items = Array.isArray(targetClass)
-      ? targetClass
-      : String(targetClass).split(',').map((s) => s.trim());
-    return items.filter((i) => i && i !== 'All Classes' && i !== 'All').join(', ');
-  };
-
-  const getFormattedLevels = (level) => {
-    if (!level) return '';
-    const items = Array.isArray(level)
-      ? level
-      : String(level).split(',').map((s) => s.trim());
-    return items.filter((i) => i && i !== 'All Levels' && i !== 'All').join(', ');
-  };
-
-  // Helper to update URL params
+  // Helper to update URL params preserving raw search query case
   const applyFilterUpdates = (overrides = {}) => {
     const classesToApply = overrides.class !== undefined ? overrides.class : selectedClasses;
     const categoriesToApply = overrides.category !== undefined ? overrides.category : selectedCategories;
     const levelsToApply = overrides.level !== undefined ? overrides.level : selectedLevels;
 
     const params = new URLSearchParams();
-    if (query) params.set('q', query);
+    if (rawQuery.trim()) params.set('q', rawQuery.trim());
 
     if (classesToApply.length > 0) params.set('class', classesToApply.join(','));
     if (categoriesToApply.length > 0) params.set('category', categoriesToApply.join(','));
@@ -270,7 +230,7 @@ export default function BrowseCoursesClient({ courses = [] }) {
       (c.title || '').toLowerCase().includes(query) ||
       (c.shortDescription || '').toLowerCase().includes(query) ||
       (c.description || '').toLowerCase().includes(query) ||
-      (c.category || '').toLowerCase().includes(query) ||
+      cCategories.some((cat) => cat.toLowerCase().includes(query)) ||
       (c.tags || []).some((t) => t.toLowerCase().includes(query));
 
     return matchesCategory && matchesClass && matchesLevel && matchesQuery;

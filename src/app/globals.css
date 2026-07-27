@@ -61,8 +61,8 @@
   --space-20: 5rem;
 
   /* Container */
-  --container-max: 1600px;
-  --container-padding: 0.3rem;
+  --container-max: 1200px;
+  --container-padding: 1.5rem;
 }
 
 /* ---- Reset & Base ---- */
@@ -481,6 +481,13 @@ h6 {
 .course-category {
   display: inline-flex;
   align-items: center;
+}
+
+.card-img-wrapper .course-category {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
 }
 
 /* ---- Feature Card ---- */
