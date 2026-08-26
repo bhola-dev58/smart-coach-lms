@@ -5,6 +5,8 @@ const submissionSchema = new mongoose.Schema(
     assignment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Assignment',
+      // Required only for standalone assignments (not lesson-embedded ones which use lessonSlug)
+      required: function () { return !this.lessonSlug; },
     },
     course: {
       type: mongoose.Schema.Types.ObjectId,

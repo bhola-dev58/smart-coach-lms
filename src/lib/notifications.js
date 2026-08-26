@@ -9,7 +9,7 @@ import Notification from '@/models/Notification';
  * Create an in-app notification for one or more recipients.
  *
  * @param {string|string[]} recipientIds - User ObjectId(s)
- * @param {'enrollment'|'payment'|'course_update'|'certificate'|'announcement'|'reminder'|'system'|'new_course'|'login'} type
+ * @param {'enrollment'|'payment'|'course_update'|'certificate'|'announcement'|'reminder'|'system'|'new_course'|'login'|'otp_verified'|'assignment_submitted'|'assignment_graded'} type
  * @param {string} title
  * @param {string} message
  * @param {string} [link] - e.g. /lms/course/dsa-masterclass

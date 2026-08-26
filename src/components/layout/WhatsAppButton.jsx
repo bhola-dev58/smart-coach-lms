@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function WhatsAppButton({ 
-  phoneNumber = '918874270707', 
+  phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918874270707', 
   message = 'Hello Gradify Academy! I would like to inquire about courses and admissions.' 
 }) {
   const [hovered, setHovered] = useState(false);

@@ -127,8 +127,5 @@ enrollmentSchema.post('findOneAndUpdate', async function(doc) {
   }
 });
 
-if (mongoose.models.Enrollment) {
-  delete mongoose.models.Enrollment;
-}
 export default mongoose.models.Enrollment ||
   mongoose.model('Enrollment', enrollmentSchema);

@@ -92,15 +92,24 @@ export default function NotificationBell({ className = '' }) {
     return () => clearInterval(pollRef.current);
   }, [status]);
 
-  // ── Refresh on window focus ──
+  // ── Refresh on window focus OR tab becoming visible ──
   useEffect(() => {
     const onFocus = () => { 
       if (status === 'authenticated' && document.visibilityState === 'visible') { 
         fetchRef.current(true); 
       } 
     };
+    const onVisibilityChange = () => {
+      if (status === 'authenticated' && document.visibilityState === 'visible') {
+        fetchRef.current(true);
+      }
+    };
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [status]);
 
   // ── Close dropdown on outside click ──

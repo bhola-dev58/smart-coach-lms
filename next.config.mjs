@@ -15,6 +15,10 @@ const nextConfig = {
       { protocol: 'http', hostname: '**' },
     ],
   },
+  turbopack: {
+    // Explicitly set workspace root to silence the multiple lockfiles warning
+    root: '/home/bhola-dev58/colledge project/coaching center/meetme-center',
+  },
 };
 
 export default nextConfig;
